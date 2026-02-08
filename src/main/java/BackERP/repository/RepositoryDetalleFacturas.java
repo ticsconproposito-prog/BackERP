@@ -1,0 +1,10 @@
+package BackERP.repository;
+
+import BackERP.models.erpDetalleFacturas;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+
+public interface RepositoryDetalleFacturas extends JpaRepository<erpDetalleFacturas, Long> , JpaSpecificationExecutor<erpDetalleFacturas> {
+
+
+}

@@ -1,0 +1,48 @@
+package BackERP.controller;
+
+
+import BackERP.helper.erpDetalleFacturaSpecs;
+import BackERP.models.erpDetalleFacturas;
+import BackERP.repository.RepositoryDetalleFacturas;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
+
+public class DetalleFacturasRestController {
+
+    @Autowired
+    private RepositoryDetalleFacturas repdetfac;
+
+    @GetMapping("detalleFactura")
+    public List<erpDetalleFacturas> getDetalleFacturas(@RequestParam(required = false) Integer idEncabezadoFactura){
+
+        Specification<erpDetalleFacturas> spec = Specification.where(erpDetalleFacturaSpecs.idEncabezadoFacturaContains(idEncabezadoFactura));
+
+        return repdetfac.findAll(spec);
+    }
+
+    @PostMapping("grabarDetalleFactura")
+    public String grabarDetalleFacturas(@RequestBody erpDetalleFacturas detalleFacturas){
+        // valor por defecto
+        detalleFacturas.setFechaModificacion(LocalDate.now());
+        detalleFacturas.setHoraModificacion(LocalTime.now());
+        detalleFacturas.setEstado(1);
+        repdetfac.save(detalleFacturas);
+
+        return "Grabado";
+    }
+
+    @DeleteMapping("eliminarDetalleFactura/{idDetalleFactura}")
+    public String eliminarDetalleFactura(@PathVariable long idDetalleFactura){
+        System.out.println("eliminar");
+        erpDetalleFacturas updateerpDetalleFacturas = repdetfac.findById(idDetalleFactura).get();
+        updateerpDetalleFacturas.setEstado(0);
+        repdetfac.save(updateerpDetalleFacturas);
+        return "Eliminado";
+    }
+
+}
