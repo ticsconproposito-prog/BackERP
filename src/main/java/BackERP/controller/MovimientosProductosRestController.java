@@ -67,9 +67,15 @@ public class MovimientosProductosRestController {
     @DeleteMapping("eliminarMovProXIdOrden/{idOrdenProducto}")
     public String eliminarMovProXIdOrden(@PathVariable long idOrdenProducto){
         System.out.println("eliminar");
-        erpMovimientosProductos updateerpMovimientosProductos = removpro.findByIdOrdenProducto(idOrdenProducto).orElseThrow(() -> new RuntimeException("No se encontró el registro con idOrdenProducto: " + idOrdenProducto));
-        updateerpMovimientosProductos.setEstado(0);
-        removpro.save(updateerpMovimientosProductos);
+        List<erpMovimientosProductos> updateerpMovimientosProductos = removpro.findByIdOrdenProducto(idOrdenProducto);
+        if (updateerpMovimientosProductos.isEmpty()) {
+            throw new RuntimeException("No se encontraron registros con idOrdenProducto: " + idOrdenProducto);
+        }
+
+        updateerpMovimientosProductos.forEach(ump -> {
+            ump.setEstado(0);
+            removpro.save(ump);
+        });
         return "Eliminado";
     }
 }
