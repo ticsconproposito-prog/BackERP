@@ -14,6 +14,10 @@ public class erpMovimientosProductosSpecs {
         };
     }
 
+    public static Specification<erpMovimientosProductos> estadoEquals(int estado) {
+        return (root, query, cb) ->
+                cb.equal(root.get("estado").as(Integer.class), estado);
 
+    }
 
 }

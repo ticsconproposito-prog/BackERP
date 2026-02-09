@@ -23,7 +23,8 @@ public class MovimientosProductosRestController {
     public List<erpMovimientosProductos> getMovimientosProductos( @RequestParam(required = false) Integer idOrdenProducto){
 
 
-        Specification<erpMovimientosProductos> spec = Specification.where(erpMovimientosProductosSpecs.idOrdenProductosContains(idOrdenProducto));
+        Specification<erpMovimientosProductos> spec = Specification.where(erpMovimientosProductosSpecs.estadoEquals(1))
+                .and(erpMovimientosProductosSpecs.idOrdenProductosContains(idOrdenProducto));
 
         return removpro.findAll(spec);
     }
@@ -59,7 +60,7 @@ public class MovimientosProductosRestController {
         System.out.println("eliminar");
         erpMovimientosProductos updateerpMovimientosProductos = removpro.findById(idMovimientoProducto).get();
         updateerpMovimientosProductos.setEstado(0);
-        removpro.save(updateerpMovimientosProductos); 
+        removpro.save(updateerpMovimientosProductos);
         return "Eliminado";
     }
 }
