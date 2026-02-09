@@ -54,7 +54,7 @@ public class MovimientosProductosRestController {
         return "Editado";
     }
 
-    @DeleteMapping("eliminarMovimientosProductos/{idMovimientosProductos}")
+    @DeleteMapping("eliminarMovimientosProductos/{idMovimientoProducto}")
     public String eliminarMovimientoProducto(@PathVariable long idMovimientoProducto){
         System.out.println("eliminar");
         erpMovimientosProductos updateerpMovimientosProductos = removpro.findById(idMovimientoProducto).get();
