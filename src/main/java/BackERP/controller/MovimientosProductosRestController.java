@@ -59,7 +59,7 @@ public class MovimientosProductosRestController {
         System.out.println("eliminar");
         erpMovimientosProductos updateerpMovimientosProductos = removpro.findById(idMovimientoProducto).get();
         updateerpMovimientosProductos.setEstado(0);
-        removpro.save(updateerpMovimientosProductos);
+        removpro.save(updateerpMovimientosProductos); 
         return "Eliminado";
     }
 }
