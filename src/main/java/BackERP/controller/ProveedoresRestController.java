@@ -44,7 +44,7 @@ public class ProveedoresRestController {
                 .where(erpProveedoresSpecs.estadoEquals(1))
                .and(erpProveedoresSpecs.nombreContains(nombre))
                 .and(erpProveedoresSpecs.idProveedorContains(idProveedorContains))
-                .and(erpProveedoresSpecs.nombreDeContactoContains(nombreDeContacto));
+                .and(erpProveedoresSpecs.nombreDeContacto1Contains(nombreDeContacto));
 
         return repprove.findAll(spec, pageable);
     }

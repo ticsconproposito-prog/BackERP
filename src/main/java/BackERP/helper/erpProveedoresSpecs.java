@@ -14,15 +14,15 @@ public class erpProveedoresSpecs {
             return cb.like(cb.lower(root.get("nombre")), pattern, '\\');
         };
     }
-    public static Specification<erpProveedores> nombreDeContactoContains(String nombreDeContacto) {
+
+    public static Specification<erpProveedores> nombreDeContacto1Contains(String nombre) {
         return (root, query, cb) -> {
-            String pattern = LikeHelper.buildLikePattern(nombreDeContacto, LikeHelper.MatchMode.ANYWHERE, false);
+            String pattern = LikeHelper.buildLikePattern(nombre, LikeHelper.MatchMode.ANYWHERE, false);
             if (pattern == null) return cb.conjunction();
-            return cb.or(cb.like(cb.lower(root.get("nombreDeContacto1")), pattern, '\\'),
-            cb.like(cb.lower(root.get("nombreDeContacto1")), pattern, '\\'))
-            ;
+            return cb.like(cb.lower(root.get("nombreDeContacto1")), pattern, '\\');
         };
     }
+
 
     public static Specification<erpProveedores> idProveedorContains(Integer id) {
         return (root, query, cb) ->{
