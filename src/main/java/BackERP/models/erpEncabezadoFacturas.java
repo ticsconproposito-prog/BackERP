@@ -12,6 +12,8 @@ public class erpEncabezadoFacturas {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
     private Long idEncabezadoFactura;
+    @Column
+    private int tipoDocumento;
     @ManyToOne
     @JoinColumn(name = "idCliente", referencedColumnName = "idCliente")
     private erpclientes idCliente ;
@@ -73,6 +75,14 @@ public class erpEncabezadoFacturas {
 
     public void setIdEncabezadoFactura(Long idEncabezadoFactura) {
         this.idEncabezadoFactura = idEncabezadoFactura;
+    }
+
+    public int getTipoDocumento() {
+        return tipoDocumento;
+    }
+
+    public void setTipoDocumento(int tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
     }
 
     public erpclientes getIdCliente() {

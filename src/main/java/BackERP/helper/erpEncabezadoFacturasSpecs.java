@@ -44,7 +44,7 @@ public class erpEncabezadoFacturasSpecs {
         return (root, query, cb) -> {
             String pattern = LikeHelper.buildLikePattern(tipoDocumento, LikeHelper.MatchMode.ANYWHERE, false);
             if (pattern == null) return cb.conjunction();
-            return cb.like(cb.lower(root.get("facturaProsesada")), pattern, '\\');
+            return cb.like(cb.lower(root.get("tipoDocumento")), pattern, '\\');
         };
     }
 
