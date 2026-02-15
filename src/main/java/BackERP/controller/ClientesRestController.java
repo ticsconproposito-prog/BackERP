@@ -23,8 +23,9 @@ public class ClientesRestController {
 
     @GetMapping("clientes")
     public Page<erpclientes> getClientes(
-            @RequestParam(required = false) String nombre,
-            @RequestParam(required = false) String nit,
+            @RequestParam(required = false) String nombreCliente,
+            @RequestParam(required = false) String nitCliente,
+            @RequestParam(required = false) Integer idCliente,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "idCliente,asc") String sort
@@ -40,8 +41,9 @@ public class ClientesRestController {
 
         Specification<erpclientes> spec = Specification
                 .where(erpClientesSpecs.estadoEquals(1))
-                .and(erpClientesSpecs.nombreClienteContains(nombre))
-                .and(erpClientesSpecs.nitClienteContains(nit));
+                .and(erpClientesSpecs.idCLienteContains(idCliente))
+                .and(erpClientesSpecs.nombreClienteContains(nombreCliente))
+                .and(erpClientesSpecs.nitClienteContains(nitCliente));
 
         return repcli.findAll(spec, pageable);
     }

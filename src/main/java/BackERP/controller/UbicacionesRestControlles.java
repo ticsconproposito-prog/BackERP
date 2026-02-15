@@ -20,11 +20,13 @@ public class UbicacionesRestControlles {
     private RepositoryUbicaciones remubi;
 
     @GetMapping("ubicaciones")
-    public List<erpUbicaciones> getUbicaciones(@RequestParam(required = false) Integer idUbicaciones){
+    public List<erpUbicaciones> getUbicaciones(@RequestParam(required = false) Integer idUbicaciones,
+                                               @RequestParam(required = false) String nombreUbicacion){
 
 
         Specification<erpUbicaciones> spec = Specification.where(erpUbicacionesSpecs.estadoEquals(1))
-                .and(erpUbicacionesSpecs.idUbicacionContains(idUbicaciones));
+                .and(erpUbicacionesSpecs.idUbicacionContains(idUbicaciones))
+                .and(erpUbicacionesSpecs.nombreUbicacionContains(nombreUbicacion));
 
         return remubi.findAll(spec);
     }

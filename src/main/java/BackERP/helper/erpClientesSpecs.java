@@ -1,5 +1,6 @@
 package BackERP.helper;
 
+import BackERP.models.erpUbicaciones;
 import BackERP.models.erpclientes;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -25,6 +26,16 @@ public class erpClientesSpecs {
             return cb.like(cb.lower(root.get("nit")),pattern, '\\');
         };
     }
+
+    public static Specification<erpclientes> idCLienteContains(Integer id) {
+        return (root, query, cb) ->{
+            if (id == null) {
+                return null; // <-- al devolver null, no se agrega restricción }
+            }
+            return cb.equal(root.get("idCLiente"), id);
+        };
+    }
+
     public static Specification<erpclientes> estadoEquals(int estado) {
         return (root, query, cb) ->
                 cb.equal(root.get("estado").as(Integer.class), estado);
