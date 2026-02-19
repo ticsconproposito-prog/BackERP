@@ -56,7 +56,9 @@ public class erpEncabezadoFacturas {
     @Column
     private double total;
     @Column
-    private String facturaProsesada;
+    private String facturaProcesada;
+    @Column
+    private String direccionEntrega;
     @Column
     private int  estado;
     @Column
@@ -245,12 +247,20 @@ public class erpEncabezadoFacturas {
         this.total = total;
     }
 
-    public String getFacturaProsesada() {
-        return facturaProsesada;
+    public String getFacturaProcesada() {
+        return facturaProcesada;
     }
 
-    public void setFacturaProsesada(String facturaProsesada) {
-        this.facturaProsesada = facturaProsesada;
+    public void setFacturaProcesada(String facturaProcesada) {
+        this.facturaProcesada = facturaProcesada;
+    }
+
+    public String getDireccionEntrega() {
+        return direccionEntrega;
+    }
+
+    public void setDireccionEntrega(String direccionEntrega) {
+        this.direccionEntrega = direccionEntrega;
     }
 
     public int getEstado() {

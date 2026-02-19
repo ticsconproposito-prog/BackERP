@@ -27,9 +27,19 @@ public class erpDetalleFacturas {
     @Column
     private int porcentajeDeDescuento;
     @Column
+    private double ImpBruto;
+    @Column
+    private double ImpExento;
+    @Column
+    private double ImpOtros;
+    @Column
+    private double ImpNeto;
+    @Column
     private int iva;
     @Column
     private int isr;
+    @Column
+    private double ImpTotal;
     @Column
     private int estado;
     @Column
@@ -108,6 +118,38 @@ public class erpDetalleFacturas {
         this.porcentajeDeDescuento = porcentajeDeDescuento;
     }
 
+    public double getImpNeto() {
+        return ImpNeto;
+    }
+
+    public void setImpNeto(double impNeto) {
+        ImpNeto = impNeto;
+    }
+
+    public double getImpOtros() {
+        return ImpOtros;
+    }
+
+    public void setImpOtros(double impOtros) {
+        ImpOtros = impOtros;
+    }
+
+    public double getImpExento() {
+        return ImpExento;
+    }
+
+    public void setImpExento(double impExento) {
+        ImpExento = impExento;
+    }
+
+    public double getImpBruto() {
+        return ImpBruto;
+    }
+
+    public void setImpBruto(double impBruto) {
+        ImpBruto = impBruto;
+    }
+
     public int getIva() {
         return iva;
     }
@@ -122,6 +164,14 @@ public class erpDetalleFacturas {
 
     public void setIsr(int isr) {
         this.isr = isr;
+    }
+
+    public double getImpTotal() {
+        return ImpTotal;
+    }
+
+    public void setImpTotal(double impTotal) {
+        ImpTotal = impTotal;
     }
 
     public int getEstado() {
