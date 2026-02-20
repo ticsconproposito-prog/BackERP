@@ -43,8 +43,6 @@ public class erpDetalleFacturas {
     @Column
     private int estado;
     @Column
-    private LocalDate fechaIngresoLaboral;
-    @Column
     private LocalDate fechaModificacion;
     @Column
     private LocalTime horaModificacion;
