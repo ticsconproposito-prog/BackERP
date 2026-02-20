@@ -36,7 +36,9 @@ public class FelService {
     public FelResult generarDte(DteRequestDto req) {
         validar(req);
         String pXml = xmlBuilder.buildDocElectronicoXml(req);
+        System.out.println("completo XML");
         String soapResponse = wsClient.generaDocumento(req.getTipoDoc(), pXml);
+        System.out.println("Respuesta WS" +soapResponse);
         return responseParser.parse(soapResponse);
     }
 

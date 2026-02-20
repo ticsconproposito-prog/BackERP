@@ -42,7 +42,7 @@ public class erpEncabezadoFacturas {
     @Column
     private double porcentajeDeDescuento;
     @Column
-    private double cantidadDedescuento ;
+    private double cantidadDeDescuento ;
     @Column
     private double exento ;
     @Column
@@ -191,12 +191,12 @@ public class erpEncabezadoFacturas {
         this.porcentajeDeDescuento = porcentajeDeDescuento;
     }
 
-    public double getCantidadDedescuento() {
-        return cantidadDedescuento;
+    public double getCantidadDeDescuento() {
+        return cantidadDeDescuento;
     }
 
-    public void setCantidadDedescuento(double cantidadDedescuento) {
-        this.cantidadDedescuento = cantidadDedescuento;
+    public void setCantidadDeDescuento(double cantidadDeDescuento) {
+        this.cantidadDeDescuento = cantidadDeDescuento;
     }
 
     public double getExento() {

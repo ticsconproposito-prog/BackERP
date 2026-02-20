@@ -23,9 +23,9 @@ public class erpDetalleFacturas {
     @Column
     private double precioVenta;
     @Column
-    private int cantidadDeDescuento;
+    private double cantidadDeDescuento;
     @Column
-    private int porcentajeDeDescuento;
+    private double porcentajeDeDescuento;
     @Column
     private double ImpBruto;
     @Column
@@ -35,9 +35,9 @@ public class erpDetalleFacturas {
     @Column
     private double ImpNeto;
     @Column
-    private int iva;
+    private double iva;
     @Column
-    private int isr;
+    private double isr;
     @Column
     private double ImpTotal;
     @Column
@@ -102,19 +102,19 @@ public class erpDetalleFacturas {
         this.precioVenta = precioVenta;
     }
 
-    public int getCantidadDeDescuento() {
+    public double getCantidadDeDescuento() {
         return cantidadDeDescuento;
     }
 
-    public void setCantidadDeDescuento(int cantidadDeDescuento) {
+    public void setCantidadDeDescuento(double cantidadDeDescuento) {
         this.cantidadDeDescuento = cantidadDeDescuento;
     }
 
-    public int getPorcentajeDeDescuento() {
+    public double getPorcentajeDeDescuento() {
         return porcentajeDeDescuento;
     }
 
-    public void setPorcentajeDeDescuento(int porcentajeDeDescuento) {
+    public void setPorcentajeDeDescuento(double porcentajeDeDescuento) {
         this.porcentajeDeDescuento = porcentajeDeDescuento;
     }
 
@@ -150,19 +150,19 @@ public class erpDetalleFacturas {
         ImpBruto = impBruto;
     }
 
-    public int getIva() {
+    public double getIva() {
         return iva;
     }
 
-    public void setIva(int iva) {
+    public void setIva(double iva) {
         this.iva = iva;
     }
 
-    public int getIsr() {
+    public double getIsr() {
         return isr;
     }
 
-    public void setIsr(int isr) {
+    public void setIsr(double isr) {
         this.isr = isr;
     }
 
