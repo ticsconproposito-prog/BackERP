@@ -12,6 +12,8 @@ public class erpclientes {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idCliente;
     @Column
+    private String documentoIdentificacion;
+    @Column
     private String nombreCliente;
     @Column
     private String direccionFisica;
@@ -47,6 +49,14 @@ public class erpclientes {
 
     public void setIdCliente(Integer idCliente) {
         this.idCliente = idCliente;
+    }
+
+    public String getDocumentoIdentificacion() {
+        return documentoIdentificacion;
+    }
+
+    public void setDocumentoIdentificacion(String documentoIdentificacion) {
+        this.documentoIdentificacion = documentoIdentificacion;
     }
 
     public String getNombreCliente() {

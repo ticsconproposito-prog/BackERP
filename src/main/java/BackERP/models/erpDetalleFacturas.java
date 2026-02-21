@@ -180,13 +180,6 @@ public class erpDetalleFacturas {
         this.estado = estado;
     }
 
-    public LocalDate getFechaIngresoLaboral() {
-        return fechaIngresoLaboral;
-    }
-
-    public void setFechaIngresoLaboral(LocalDate fechaIngresoLaboral) {
-        this.fechaIngresoLaboral = fechaIngresoLaboral;
-    }
 
     public LocalDate getFechaModificacion() {
         return fechaModificacion;

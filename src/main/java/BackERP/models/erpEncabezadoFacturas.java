@@ -60,6 +60,26 @@ public class erpEncabezadoFacturas {
     @Column
     private String direccionEntrega;
     @Column
+    private int tipoReceptor;
+    @Column
+    private String enviarCorreo;
+    @Column
+    private String serieResAPI;
+    @Column
+    private int preimpresoResAPI;
+    @Column
+    private String nombreResAPI;
+    @Column
+    private String direccionResAPI;
+    @Column
+    private String telefonoResAPI;
+    @Column
+    private String numeroAutorizacionResAPI;
+    @Column
+    private String referenciaResAPI;
+    @Column
+    private String respuestaXML;
+    @Column
     private int  estado;
     @Column
     private LocalDate fechaModificacion;
@@ -261,6 +281,86 @@ public class erpEncabezadoFacturas {
 
     public void setDireccionEntrega(String direccionEntrega) {
         this.direccionEntrega = direccionEntrega;
+    }
+
+    public int getTipoReceptor() {
+        return tipoReceptor;
+    }
+
+    public void setTipoReceptor(int tipoReceptor) {
+        this.tipoReceptor = tipoReceptor;
+    }
+
+    public String getEnviarCorreo() {
+        return enviarCorreo;
+    }
+
+    public void setEnviarCorreo(String enviarCorreo) {
+        this.enviarCorreo = enviarCorreo;
+    }
+
+    public String getSerieResAPI() {
+        return serieResAPI;
+    }
+
+    public void setSerieResAPI(String serieResAPI) {
+        this.serieResAPI = serieResAPI;
+    }
+
+    public int getPreimpresoResAPI() {
+        return preimpresoResAPI;
+    }
+
+    public void setPreimpresoResAPI(int preimpresoResAPI) {
+        this.preimpresoResAPI = preimpresoResAPI;
+    }
+
+    public String getNombreResAPI() {
+        return nombreResAPI;
+    }
+
+    public void setNombreResAPI(String nombreResAPI) {
+        this.nombreResAPI = nombreResAPI;
+    }
+
+    public String getDireccionResAPI() {
+        return direccionResAPI;
+    }
+
+    public void setDireccionResAPI(String direccionResAPI) {
+        this.direccionResAPI = direccionResAPI;
+    }
+
+    public String getTelefonoResAPI() {
+        return telefonoResAPI;
+    }
+
+    public void setTelefonoResAPI(String telefonoResAPI) {
+        this.telefonoResAPI = telefonoResAPI;
+    }
+
+    public String getNumeroAutorizacionResAPI() {
+        return numeroAutorizacionResAPI;
+    }
+
+    public void setNumeroAutorizacionResAPI(String numeroAutorizacionResAPI) {
+        this.numeroAutorizacionResAPI = numeroAutorizacionResAPI;
+    }
+
+    public String getReferenciaResAPI() {
+        return referenciaResAPI;
+    }
+
+    public void setReferenciaResAPI(String referenciaResAPI) {
+        this.referenciaResAPI = referenciaResAPI;
+    }
+
+    public String getRespuestaXML() {
+        return respuestaXML;
+    }
+
+    public void setRespuestaXML(String respuestaXML) {
+        this.respuestaXML = respuestaXML;
     }
 
     public int getEstado() {
