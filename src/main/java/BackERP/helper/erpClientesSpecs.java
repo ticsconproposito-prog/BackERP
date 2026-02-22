@@ -27,6 +27,17 @@ public class erpClientesSpecs {
         };
     }
 
+    public static Specification<erpclientes> DPIPasaporteClienteContains(String documentoIdentificacion) {
+        return (root, query, cb) -> {
+            if (documentoIdentificacion == null || documentoIdentificacion.isEmpty()) {
+                return null; // no aplica filtro si viene null
+            }
+            String pattern = LikeHelper.buildLikePattern(documentoIdentificacion, LikeHelper.MatchMode.ANYWHERE, true);
+
+            return cb.like(cb.lower(root.get("documentoIdentificacion")),pattern, '\\');
+        };
+    }
+
     public static Specification<erpclientes> idCLienteContains(Integer id) {
         return (root, query, cb) ->{
             if (id == null) {

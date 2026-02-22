@@ -23,8 +23,9 @@ public class ClientesRestController {
 
     @GetMapping("clientes")
     public Page<erpclientes> getClientes(
+            @RequestParam(required = false) Integer tipoDocumento,
             @RequestParam(required = false) String nombreCliente,
-            @RequestParam(required = false) String nitCliente,
+            @RequestParam(required = false) String documentoCliente,
             @RequestParam(required = false) Integer idCliente,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -42,8 +43,15 @@ public class ClientesRestController {
         Specification<erpclientes> spec = Specification
                 .where(erpClientesSpecs.estadoEquals(1))
                 .and(erpClientesSpecs.idCLienteContains(idCliente))
-                .and(erpClientesSpecs.nombreClienteContains(nombreCliente))
-                .and(erpClientesSpecs.nitClienteContains(nitCliente));
+                .and(erpClientesSpecs.nombreClienteContains(nombreCliente));
+        // Aquí aplicas la condición
+        if (tipoDocumento != null) {
+            if (tipoDocumento == 1) {
+                spec = spec.and(erpClientesSpecs.nitClienteContains(documentoCliente));
+            } else {
+                spec = spec.and(erpClientesSpecs.DPIPasaporteClienteContains(documentoCliente));
+            }
+        }
 
         return repcli.findAll(spec, pageable);
     }
