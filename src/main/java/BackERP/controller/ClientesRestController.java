@@ -75,6 +75,7 @@ public class ClientesRestController {
         erpclientes.setDeudaActual(clientes.getDeudaActual());
         erpclientes.setFechaModificacion(LocalDate.now());
         erpclientes.setHoraModificacion(LocalTime.now());
+        erpclientes.setDocumentoIdentificacion(clientes.getDocumentoIdentificacion());
         erpclientes.setIdUsuarioModificacion(clientes.getIdUsuarioModificacion());
         repcli.save(erpclientes);
 

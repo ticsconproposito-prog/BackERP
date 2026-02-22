@@ -50,11 +50,13 @@ public class FelXmlBuilder {
         sb.append(tag("Total",      req.getTotales().getTotal().toPlainString()));
         sb.append("</Totales>");
 
+        sb.append("</Encabezado>");
+
         // Detalles
         sb.append("<Detalles>");
         sb.append("<Productos>");
         for (ItemDto it : req.getItems()) {
-            sb.append("<Producto>");
+            //sb.append("<Producto>");
             sb.append(tag("Producto", it.getProducto()));
             sb.append(tag("Descripcion", it.getDescripcion()));
             sb.append(tag("Medida", String.valueOf(it.getMedida())));
@@ -69,8 +71,8 @@ public class FelXmlBuilder {
             sb.append(tag("ImpIsr", it.getImpIsr().toPlainString()));
             sb.append(tag("ImpIva", it.getImpIva().toPlainString()));
             sb.append(tag("ImpTotal", it.getImpTotal().toPlainString()));
-            if (it.getTipoVentaDet() != null) sb.append(tag("TipoVentaDet", it.getTipoVentaDet()));
-            sb.append("</Producto>");
+         //   if (it.getTipoVentaDet() != null) sb.append(tag("TipoVentaDet", it.getTipoVentaDet()));
+          //  sb.append("</Producto>");
         }
         sb.append("</Productos>");
 
@@ -83,7 +85,7 @@ public class FelXmlBuilder {
         }
 
         sb.append("</Detalles>");
-        sb.append("</Encabezado>");
+
         sb.append("</DocElectronico>");
         return sb.toString();
     }

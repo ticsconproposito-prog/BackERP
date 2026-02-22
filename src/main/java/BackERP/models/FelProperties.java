@@ -1,4 +1,3 @@
-
 package BackERP.models;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -8,16 +7,27 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "fel")
 public class FelProperties {
 
-    private String endpoint;
+    // Credenciales HTTP Basic
+    private String basicUser;
+    private String basicPass;
+
+    // Credenciales WebService
     private String usuario;
     private String password;
+
+    // Datos adicionales FEL
     private String nitEmisor;
     private int establecimiento;
     private String idMaquina;
     private String tipoRespuesta;
+    private String endpoint;
 
-    public String getEndpoint() { return endpoint; }
-    public void setEndpoint(String endpoint) { this.endpoint = endpoint; }
+    // ===== Getters y Setters =====
+    public String getBasicUser() { return basicUser; }
+    public void setBasicUser(String basicUser) { this.basicUser = basicUser; }
+
+    public String getBasicPass() { return basicPass; }
+    public void setBasicPass(String basicPass) { this.basicPass = basicPass; }
 
     public String getUsuario() { return usuario; }
     public void setUsuario(String usuario) { this.usuario = usuario; }
@@ -36,4 +46,7 @@ public class FelProperties {
 
     public String getTipoRespuesta() { return tipoRespuesta; }
     public void setTipoRespuesta(String tipoRespuesta) { this.tipoRespuesta = tipoRespuesta; }
+
+    public String getEndpoint() { return endpoint; }
+    public void setEndpoint(String endpoint) { this.endpoint = endpoint; }
 }
