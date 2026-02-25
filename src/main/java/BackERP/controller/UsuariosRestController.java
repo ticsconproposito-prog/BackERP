@@ -1,10 +1,17 @@
 package BackERP.controller;
 
+import BackERP.helper.segUsuariosSpecs;
 import BackERP.models.segusuarios;
 import BackERP.repository.RepositoryUsuarios;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -16,7 +23,28 @@ public class UsuariosRestController {
     private RepositoryUsuarios reusr;
 
     @GetMapping("usuarios")
-    public List<segusuarios> getUsuarios(){
+    public List<segusuarios> getUsuarios(
+            @RequestParam(required = false) String usuario,
+            @RequestParam(required = false) Integer idEmpleado,
+            @RequestParam(required = false) Integer idUsuario,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "idEmpleado,asc") String sort
+    ){
+
+        String[] sortParts = sort.split(",", 2);
+
+        Sort.Direction dir = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.ASC;
+
+        Sort s = Sort.by(dir, sortParts[0]);
+
+        Pageable pageable = PageRequest.of(page, size, s);
+
+        Specification<segusuarios> spec = Specification
+                .where(segUsuariosSpecs.estadoEquals(1))
+                .and(segUsuariosSpecs.idUsuarioContains(idUsuario))
+                .and(segUsuariosSpecs.idEmpleadoContains(idEmpleado))
+                .and(segUsuariosSpecs.usuarioContains(usuario));
 
         return reusr.findAll();
     }
@@ -24,26 +52,33 @@ public class UsuariosRestController {
     @PostMapping("grabarUsuario")
     public String grabarUsuario(@RequestBody segusuarios Usuario){
 
+
+        Usuario.setFechaModificacion(LocalDate.now());
+        Usuario.setHoraModificacion(LocalTime.now());
+        Usuario.setEstado(1);
+
         reusr.save(Usuario);
 
         return "Grabado";
     }
     @PutMapping("editarUsuario/{id_Usuario}")
-    public String editarUsuario(@PathVariable long id_Usuario, @RequestBody segusuarios Usuario){
-        segusuarios updateUsuario = reusr.findById(id_Usuario).get();
+    public String editarUsuario(@PathVariable long idUsuario, @RequestBody segusuarios Usuario){
+        segusuarios updateUsuario = reusr.findById(idUsuario).get();
         updateUsuario.setIdEmpleado(Usuario.getIdEmpleado());
         updateUsuario.setUsuario(Usuario.getUsuario());
         updateUsuario.setComentario(Usuario.getComentario());
         updateUsuario.setIdUsuarioModificacion(Usuario.getIdUsuarioModificacion());
+        updateUsuario.setFechaModificacion(LocalDate.now());
+        updateUsuario.setHoraModificacion(LocalTime.now());
         reusr.save(updateUsuario);
 
         return "Editado";
     }
 
     @DeleteMapping("eliminarUsuario/{id_Usuario}")
-    public String eliminarUsuario(@PathVariable long id_Usuario){
+    public String eliminarUsuario(@PathVariable long idUsuario){
         System.out.println("eliminar");
-        segusuarios updateUsuario = reusr.findById(id_Usuario).get();
+        segusuarios updateUsuario = reusr.findById(idUsuario).get();
         updateUsuario.setEstado(0);
         reusr.save(updateUsuario);
         return "Eliminado";
