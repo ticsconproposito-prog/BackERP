@@ -27,7 +27,7 @@ public class PerfilesRestController {
                                          @RequestParam(required = false) Integer idPerfil,
                                          @RequestParam(defaultValue = "0") int page,
                                          @RequestParam(defaultValue = "20") int size,
-                                         @RequestParam(defaultValue = "idEmpleado,asc") String sort
+                                         @RequestParam(defaultValue = "idPerfil,asc") String sort
     ){
 
         String[] sortParts = sort.split(",", 2);

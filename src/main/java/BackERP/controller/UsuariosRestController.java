@@ -29,7 +29,7 @@ public class UsuariosRestController {
             @RequestParam(required = false) Integer idUsuario,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "idEmpleado,asc") String sort
+            @RequestParam(defaultValue = "idUsuario,asc") String sort
     ){
 
         String[] sortParts = sort.split(",", 2);
@@ -61,7 +61,7 @@ public class UsuariosRestController {
 
         return "Grabado";
     }
-    @PutMapping("editarUsuario/{id_Usuario}")
+    @PutMapping("editarUsuario/{idUsuario}")
     public String editarUsuario(@PathVariable long idUsuario, @RequestBody segusuarios Usuario){
         segusuarios updateUsuario = reusr.findById(idUsuario).get();
         updateUsuario.setIdEmpleado(Usuario.getIdEmpleado());
