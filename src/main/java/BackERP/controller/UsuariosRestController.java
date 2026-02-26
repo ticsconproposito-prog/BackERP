@@ -75,7 +75,7 @@ public class UsuariosRestController {
         return "Editado";
     }
 
-    @DeleteMapping("eliminarUsuario/{id_Usuario}")
+    @DeleteMapping("eliminarUsuario/{idUsuario}")
     public String eliminarUsuario(@PathVariable long idUsuario){
         System.out.println("eliminar");
         segusuarios updateUsuario = reusr.findById(idUsuario).get();

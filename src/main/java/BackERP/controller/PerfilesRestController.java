@@ -1,10 +1,18 @@
 package BackERP.controller;
 
+import BackERP.helper.segPerfilesSpecs;
 import BackERP.models.segperfiles;
 import BackERP.repository.RepositoryPerfiles;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
@@ -15,34 +23,57 @@ public class PerfilesRestController {
     private RepositoryPerfiles reper;
 
     @GetMapping("perfiles")
-    public List<segperfiles> getPerfiles(){
+    public Page<segperfiles> getPerfiles(@RequestParam(required = false) String nombrePerfil,
+                                         @RequestParam(required = false) Integer idPerfil,
+                                         @RequestParam(defaultValue = "0") int page,
+                                         @RequestParam(defaultValue = "20") int size,
+                                         @RequestParam(defaultValue = "idEmpleado,asc") String sort
+    ){
 
-        return reper.findAll();
+        String[] sortParts = sort.split(",", 2);
+
+        Sort.Direction dir = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.ASC;
+
+        Sort s = Sort.by(dir, sortParts[0]);
+
+        Pageable pageable = PageRequest.of(page, size, s);
+
+        Specification<segperfiles> spec = Specification
+                .where(segPerfilesSpecs.estadoEquals(1))
+                .and(segPerfilesSpecs.nombrePerfilContains(nombrePerfil))
+                .and(segPerfilesSpecs.idPaginaContains(idPerfil));
+
+        return reper.findAll(spec, pageable);
     }
 
     @PostMapping("grabarPerfil")
     public String grabarPerfil(@RequestBody segperfiles Perfil){
 
+        Perfil.setFechaModificacion(LocalDate.now());
+        Perfil.setHoraModificacion(LocalTime.now());
+        Perfil.setEstado(1);
         reper.save(Perfil);
 
         return "Grabado";
     }
-    @PutMapping("editarPerfil/{id_Perfil}")
-    public String editarPerfil(@PathVariable long id_Perfil, @RequestBody segperfiles Perfil){
-        segperfiles updatePerfil = reper.findById(id_Perfil).get();
+    @PutMapping("editarPerfil/{idPerfil}")
+    public String editarPerfil(@PathVariable long idPerfil, @RequestBody segperfiles Perfil){
+        segperfiles updatePerfil = reper.findById(idPerfil).get();
         updatePerfil.setNombrePerfil(Perfil.getNombrePerfil());
-        updatePerfil.setFechaModificacion(Perfil.getFechaModificacion());
-        updatePerfil.setHoraModificacion(Perfil.getHoraModificacion());
+        updatePerfil.setFechaModificacion(LocalDate.now());
+        updatePerfil.setHoraModificacion(LocalTime.now());
         updatePerfil.setIdUsuarioModificacion(Perfil.getIdUsuarioModificacion());
         reper.save(updatePerfil);
 
         return "Editado";
     }
 
-    @DeleteMapping("eliminarPerfil/{id_Perfil}")
-    public String eliminarPerfil(@PathVariable long id_Perfil){
+    @DeleteMapping("eliminarPerfil/{idPerfil}")
+    public String eliminarPerfil(@PathVariable long idPerfil){
         System.out.println("eliminar");
-        segperfiles updatePerfil = reper.findById(id_Perfil).get();
+        segperfiles updatePerfil = reper.findById(idPerfil).get();
+        updatePerfil.setFechaModificacion(LocalDate.now());
+        updatePerfil.setHoraModificacion(LocalTime.now());
         updatePerfil.setEstado(0);
         reper.save(updatePerfil);
         return "Eliminado";
