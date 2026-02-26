@@ -50,6 +50,20 @@ public class FelXmlBuilder {
         sb.append(tag("Total",      req.getTotales().getTotal().toPlainString()));
         sb.append("</Totales>");
 
+        // DatosAdicionales
+        if (req.getDatosAdicionales() != null) {
+            sb.append("<DatosAdicionales>");
+            sb.append(tag("TipoReceptor", req.getDatosAdicionales().getTipoReceptor()));
+            if (req.getDatosAdicionales().getEmail() != null) sb.append(tag("Email", req.getDatosAdicionales().getEmail()));
+            if (req.getDatosAdicionales().getEnviar() != null) sb.append(tag("Enviar", req.getDatosAdicionales().getEnviar()));
+            if (req.getDatosAdicionales().getAdicional01() != null) sb.append(tag("Adicional01", req.getDatosAdicionales().getAdicional01()));
+            if (req.getDatosAdicionales().getAdicional02() != null) sb.append(tag("Adicional02", req.getDatosAdicionales().getAdicional02()));
+            if (req.getDatosAdicionales().getAdicional03() != null) sb.append(tag("Adicional03", req.getDatosAdicionales().getAdicional03()));
+            if (req.getDatosAdicionales().getAdicional04() != null) sb.append(tag("Adicional04", req.getDatosAdicionales().getAdicional04()));
+            sb.append("</DatosAdicionales>");
+        }
+
+
         sb.append("</Encabezado>");
 
         // Detalles
@@ -71,7 +85,14 @@ public class FelXmlBuilder {
             sb.append(tag("ImpIsr", it.getImpIsr().toPlainString()));
             sb.append(tag("ImpIva", it.getImpIva().toPlainString()));
             sb.append(tag("ImpTotal", it.getImpTotal().toPlainString()));
-         //   if (it.getTipoVentaDet() != null) sb.append(tag("TipoVentaDet", it.getTipoVentaDet()));
+            if (it.getDatosAdicionalesProd() != null) {
+                sb.append("<DatosAdicionalesProd>");
+                if (it.getDatosAdicionalesProd().getTipoVenta() != null) sb.append(tag("Tipo_Venta", it.getDatosAdicionalesProd().getTipoVenta()));
+                if (it.getDatosAdicionalesProd().getAdicional01() != null) sb.append(tag("Adicional01", it.getDatosAdicionalesProd().getAdicional01()));
+                sb.append("</DatosAdicionalesProd>");
+            }
+
+            //   if (it.getTipoVentaDet() != null) sb.append(tag("TipoVentaDet", it.getTipoVentaDet()));
           //  sb.append("</Producto>");
         }
         sb.append("</Productos>");

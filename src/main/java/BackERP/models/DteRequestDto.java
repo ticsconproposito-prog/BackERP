@@ -45,6 +45,11 @@ import java.util.List;
     @NotNull
     private TotalesDto totales;
 
+    @Valid
+    private DatosAdicionalesDto datosAdicionales;
+
+
+
     // Solo para Notas de Crédito/Débito
     private String daSerie;            // Serie documento asociado
     private Long daPreimpreso;         // Número documento asociado
@@ -89,10 +94,14 @@ import java.util.List;
     public TotalesDto getTotales() { return totales; }
     public void setTotales(TotalesDto totales) { this.totales = totales; }
 
+    public DatosAdicionalesDto getDatosAdicionales() { return datosAdicionales; }
+    public void setDatosAdicionales(DatosAdicionalesDto datosAdicionales) { this.datosAdicionales = datosAdicionales; }
+
     public String getDaSerie() { return daSerie; }
     public void setDaSerie(String daSerie) { this.daSerie = daSerie; }
 
     public Long getDaPreimpreso() { return daPreimpreso; }
     public void setDaPreimpreso(Long daPreimpreso) { this.daPreimpreso = daPreimpreso; }
+
 
 }

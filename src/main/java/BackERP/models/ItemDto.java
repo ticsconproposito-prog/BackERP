@@ -2,6 +2,7 @@ package BackERP.models;
 
 import java.math.BigDecimal;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -55,6 +56,10 @@ public class ItemDto {
 
     private String tipoVentaDet;       // B | S (opcional si ya envías a nivel documento)
 
+    @Valid
+    private DatosAdicionalesProdDto datosAdicionalesProd;
+
+
     // ===== Getters y Setters =====
     public String getProducto() { return producto; }
     public void setProducto(String producto) { this.producto = producto; }
@@ -100,4 +105,8 @@ public class ItemDto {
 
     public String getTipoVentaDet() { return tipoVentaDet; }
     public void setTipoVentaDet(String tipoVentaDet) { this.tipoVentaDet = tipoVentaDet; }
+
+    public DatosAdicionalesProdDto getDatosAdicionalesProd() { return datosAdicionalesProd; }
+    public void setDatosAdicionalesProd(DatosAdicionalesProdDto datosAdicionalesProd) { this.datosAdicionalesProd = datosAdicionalesProd; }
+
 }
