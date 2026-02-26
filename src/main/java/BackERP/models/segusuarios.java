@@ -12,7 +12,7 @@ public class segusuarios {
     @Column
     private long idUsuario;
     @Column
-    private String idEmpleado;
+    private int idEmpleado;
     @Column
     private String usuario;
     @Column
@@ -42,11 +42,11 @@ public class segusuarios {
         this.idUsuario = idUsuario;
     }
 
-    public String getIdEmpleado() {
+    public int getIdEmpleado() {
         return idEmpleado;
     }
 
-    public void setIdEmpleado(String idEmpleado) {
+    public void setIdEmpleado(int idEmpleado) {
         this.idEmpleado = idEmpleado;
     }
 
