@@ -43,6 +43,7 @@ public class PaginasRestController {
                 .and(segPaginasSpecs.idPaginaContains(idPagina))
                 .and(segPaginasSpecs.nombrePaginaContains(nombrePagina));
 
+
         return repag.findAll(spec, pageable);
     }
 
