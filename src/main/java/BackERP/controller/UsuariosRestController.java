@@ -68,6 +68,7 @@ public class UsuariosRestController {
         updateUsuario.setUsuario(Usuario.getUsuario());
         updateUsuario.setComentario(Usuario.getComentario());
         updateUsuario.setIdUsuarioModificacion(Usuario.getIdUsuarioModificacion());
+        updateUsuario.setContrasena(Usuario.getContrasena());
         updateUsuario.setFechaModificacion(LocalDate.now());
         updateUsuario.setHoraModificacion(LocalTime.now());
         reusr.save(updateUsuario);

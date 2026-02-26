@@ -16,6 +16,8 @@ public class segusuarios {
     @Column
     private String usuario;
     @Column
+    private String contrasena;
+    @Column
     private String comentario;
     @Column
     private int estado;
@@ -54,6 +56,14 @@ public class segusuarios {
 
     public void setUsuario(String usuario) {
         this.usuario = usuario;
+    }
+
+    public String getContrasena() {
+        return contrasena;
+    }
+
+    public void setContrasena(String contrasena) {
+        this.contrasena = contrasena;
     }
 
     public String getComentario() {
