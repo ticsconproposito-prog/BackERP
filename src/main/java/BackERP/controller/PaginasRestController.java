@@ -27,7 +27,7 @@ public class PaginasRestController {
                                        @RequestParam(required = false) Integer idPagina,
                                        @RequestParam(defaultValue = "0") int page,
                                        @RequestParam(defaultValue = "20") int size,
-                                       @RequestParam(defaultValue = "idEmpleado,asc") String sort
+                                       @RequestParam(defaultValue = "idPagina,asc") String sort
     ){
         String[] sortParts = sort.split(",", 2);
 
