@@ -46,7 +46,7 @@ public class UsuariosRestController {
                 .and(segUsuariosSpecs.idEmpleadoContains(idEmpleado))
                 .and(segUsuariosSpecs.usuarioContains(usuario));
 
-        return reusr.findAll();
+        return reusr.findAll(spec, pageable).getContent();
     }
 
     @PostMapping("grabarUsuario")

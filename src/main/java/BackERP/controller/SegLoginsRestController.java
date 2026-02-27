@@ -43,12 +43,13 @@ public class SegLoginsRestController {
     }
 
     @PostMapping("grabarSegLogin")
-    public String grabarSegLogin(@RequestBody segLogins login) {
+    public int grabarSegLogin(@RequestBody segLogins login) {
         login.setFechaModificacion(LocalDate.now());
         login.setHoraModificacion(LocalTime.now());
         login.setEstado(1);
-        repoSegLogins.save(login);
-        return "Grabado";
+        segLogins savedLogin = repoSegLogins.save(login);
+
+        return savedLogin.getIdLogin();
     }
 
     @PutMapping("editarSegLogin/{idLogin}")
