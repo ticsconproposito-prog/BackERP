@@ -12,6 +12,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("fel")
 public class FelController {
@@ -27,8 +30,12 @@ public class FelController {
     public ResponseEntity<?> generar(@Valid @RequestBody DteRequestDto req) {
         FelResult result = felService.generarDte(req);
         if (result.isOk()) {
-            return ResponseEntity.ok(result);
+            Map<String, Object> body = new HashMap<>();
+            body.put("fel", result);
+            body.put("mensaje", "Encabezado actualizado correctamente");
+            return ResponseEntity.ok(body);
         }
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(result);
     }
+
 }

@@ -5,6 +5,8 @@ import BackERP.models.DteRequestDto;
 import BackERP.models.FelProperties;
 import BackERP.models.ItemDto;
 
+import BackERP.models.erpEncabezadoFacturas;
+import BackERP.repository.RepositoryEncabezadoFacturas;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +24,9 @@ public class FelService {
     private final FelWsClient wsClient;
     private final FelResponseParser responseParser;
 
+
+    @Autowired 
+    private RepositoryEncabezadoFacturas repEncFac;
     @Autowired
     public FelService(FelProperties props,
                       FelXmlBuilder xmlBuilder,
@@ -35,11 +40,27 @@ public class FelService {
 
     public FelResult generarDte(DteRequestDto req) {
         validar(req);
+
         String pXml = xmlBuilder.buildDocElectronicoXml(req);
-        System.out.println("completo XML");
+        //System.out.println("completo XML");
         String soapResponse = wsClient.generaDocumento(req.getTipoDoc(), pXml);
-        System.out.println("Respuesta WS" +soapResponse);
-        return responseParser.parse(soapResponse);
+       // System.out.println("Respuesta WS" +soapResponse);
+        FelResult result = responseParser.parse(soapResponse);
+
+            if (result.isOk()) {
+                // Buscar encabezado por referencia y actualizar
+                String SID = req.getReferencia().substring(4);
+                long ID = Long.parseLong(SID);
+                erpEncabezadoFacturas enc = repEncFac.findById(ID).get();
+                enc.setSerieResAPI(result.getSerie());
+                enc.setPreimpresoResAPI(Integer.parseInt(result.getNumero()));
+                enc.setNumeroAutorizacionResAPI(result.getUuid());
+                enc.setRespuestaXML(result.getRawResponse());
+                enc.setFacturaProcesada("S");
+                repEncFac.save(enc);
+            }
+            return result;
+            
     }
 
     private void validar(DteRequestDto req) {
