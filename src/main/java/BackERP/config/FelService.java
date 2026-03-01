@@ -47,7 +47,9 @@ public class FelService {
        // System.out.println("Respuesta WS" +soapResponse);
         FelResult result = responseParser.parse(soapResponse);
 
+        System.out.println("Respuestas " + result.toString());
             if (result.isOk()) {
+                System.out.println("Ingresa insertar encabezadoFactura");
                 // Buscar encabezado por referencia y actualizar
                 String SID = req.getReferencia().substring(4);
                 long ID = Long.parseLong(SID);
