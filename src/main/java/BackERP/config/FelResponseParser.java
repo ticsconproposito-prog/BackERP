@@ -2,7 +2,7 @@
 package BackERP.config;
 
 import org.springframework.stereotype.Component;
-
+import org.apache.commons.text.StringEscapeUtils;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,21 +10,39 @@ import java.util.regex.Pattern;
 public class FelResponseParser {
 
     public FelResult parse(String soapXml) {
-        String payload = extractTag(soapXml, "return");
-        if (payload == null) payload = soapXml;
+        String payload = extractTag(soapXml, "result");
+        if (payload != null) {
+            payload = StringEscapeUtils.unescapeXml(payload);
+        }
 
-        String uuid   = findAny(payload, "NumeroAutorizacion", "UUID", "Numero_Autorizacion");
+
+        String numeroAutorizacion   = findAny(payload, "NumeroAutorizacion", "UUID", "NumeroAutorizacion");
         String serie  = findAny(payload, "Serie", "SERIE");
-        String numero = findAny(payload, "Preimpreso", "NUMERO", "Numero");
+        String preimpreso = findAny(payload, "Preimpreso", "NUMERO", "Numero");
+        String nombre = findAny(payload, "Nombre");
+        String direccion = findAny(payload, "Direccion");
+        String telefono  = findAny(payload, "Telefono");
+        String referencia = findAny(payload, "Referencia");
         String error  = findAny(payload, "ERROR", "Error", "MensajeError", "DescripcionError");
+        String resultado  =  findAny(payload, "Resultado");
 
+        System.out.println("3");
         FelResult res = new FelResult();
         res.setRawResponse(payload);
-        res.setUuid(uuid);
+        res.setNumeroAutorizacion(numeroAutorizacion);
         res.setSerie(serie);
-        res.setNumero(numero);
-        res.setError(error);
-        res.setOk(error == null && uuid != null);
+        res.setPreimpreso(preimpreso);
+        if (numeroAutorizacion == null) {
+            res.setError(resultado);
+        }
+        res.setOk(error == null && numeroAutorizacion != null);
+
+// si quieres extender FelResult con más campos:
+        res.setNombre(nombre);
+        res.setDireccion(direccion);
+        res.setTelefono(telefono);
+        res.setReferencia(referencia);
+        System.out.println("4");
         return res;
     }
 

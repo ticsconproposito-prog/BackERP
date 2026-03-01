@@ -47,7 +47,7 @@ public class FelService {
        // System.out.println("Respuesta WS" +soapResponse);
         FelResult result = responseParser.parse(soapResponse);
 
-        System.out.println("Respuestas " + result.toString());
+       // System.out.println("Respuestas " + result.toString());
             if (result.isOk()) {
                 System.out.println("Ingresa insertar encabezadoFactura");
                 // Buscar encabezado por referencia y actualizar
@@ -55,11 +55,17 @@ public class FelService {
                 long ID = Long.parseLong(SID);
                 erpEncabezadoFacturas enc = repEncFac.findById(ID).get();
                 enc.setSerieResAPI(result.getSerie());
-                enc.setPreimpresoResAPI(Integer.parseInt(result.getNumero()));
-                enc.setNumeroAutorizacionResAPI(result.getUuid());
+                enc.setPreimpresoResAPI(Integer.parseInt(result.getPreimpreso()));
+                enc.setNumeroAutorizacionResAPI(result.getNumeroAutorizacion());
                 enc.setRespuestaXML(result.getRawResponse());
                 enc.setReferencia(req.getReferencia());
                 enc.setFacturaProcesada("S");
+                enc.setNombreResAPI(result.getNombre());
+                enc.setDireccionResAPI(result.getDireccion());
+                enc.setTelefonoResAPI(result.getTelefono());
+                enc.setReferenciaResAPI(result.getReferencia());
+
+
                 repEncFac.save(enc);
             }
             return result;
