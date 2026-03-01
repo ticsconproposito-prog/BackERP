@@ -55,11 +55,11 @@ public class EmpleadosRestController {
 
         return "Grabado";
     }
-    @PutMapping("editarEmpleado/{id_empleado}")
-    public String editarEmpleado(@PathVariable long id_empleado, @RequestBody erpempleados empleado){
+    @PutMapping("editarEmpleado/{idEmpleado}")
+    public String editarEmpleado(@PathVariable long idEmpleado, @RequestBody erpempleados empleado){
 
 
-        erpempleados updateEmpleado = reemp.findById(id_empleado).get();
+        erpempleados updateEmpleado = reemp.findById(idEmpleado).get();
         updateEmpleado.setNombre(empleado.getNombre());
         updateEmpleado.setApellido(empleado.getApellido());
         updateEmpleado.setEmail(empleado.getEmail());
@@ -77,10 +77,10 @@ public class EmpleadosRestController {
         return "Editado";
     }
 
-    @DeleteMapping("eliminarEmpleado/{id_empleado}")
-    public String eliminarEmpleado(@PathVariable long id_empleado, @RequestBody erpempleados empleado){
+    @DeleteMapping("eliminarEmpleado/{idEmpleado}")
+    public String eliminarEmpleado(@PathVariable long idEmpleado, @RequestBody erpempleados empleado){
         System.out.println("eliminar");
-        erpempleados updateEmpleado = reemp.findById(id_empleado).get();
+        erpempleados updateEmpleado = reemp.findById(idEmpleado).get();
         updateEmpleado.setFechaModificacion(LocalDate.now());
         updateEmpleado.setHoraModificacion(LocalTime.now());
         updateEmpleado.setIdUsuarioModificacion(empleado.getIdUsuarioModificacion());
