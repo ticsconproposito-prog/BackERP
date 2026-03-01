@@ -56,6 +56,7 @@ public class FelService {
                 enc.setPreimpresoResAPI(Integer.parseInt(result.getNumero()));
                 enc.setNumeroAutorizacionResAPI(result.getUuid());
                 enc.setRespuestaXML(result.getRawResponse());
+                enc.setReferencia(req.getReferencia());
                 enc.setFacturaProcesada("S");
                 repEncFac.save(enc);
             }
