@@ -67,8 +67,11 @@ public class PerfilesPaginasRestController {
     }
 
     @DeleteMapping("eliminarPerfilPagina/{idPerfilPagina}")
-    public String eliminarPerfilPagina(@PathVariable int idPerfilPagina) {
+    public String eliminarPerfilPagina(@PathVariable int idPerfilPagina, @RequestBody segPerfilesPaginas perfilPagina) {
         segPerfilesPaginas update = repo.findById(idPerfilPagina).get();
+        update.setIdUsuarioModificacion(perfilPagina.getIdUsuarioModificacion());
+        update.setFechaModificacion(LocalDate.now());
+        update.setHoraModificacion(LocalTime.now());
         update.setEstado(0);
         repo.save(update);
         return "Eliminado";

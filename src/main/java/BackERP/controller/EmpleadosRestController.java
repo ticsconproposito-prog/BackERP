@@ -78,9 +78,12 @@ public class EmpleadosRestController {
     }
 
     @DeleteMapping("eliminarEmpleado/{id_empleado}")
-    public String eliminarEmpleado(@PathVariable long id_empleado){
+    public String eliminarEmpleado(@PathVariable long id_empleado, @RequestBody erpempleados empleado){
         System.out.println("eliminar");
         erpempleados updateEmpleado = reemp.findById(id_empleado).get();
+        updateEmpleado.setFechaModificacion(LocalDate.now());
+        updateEmpleado.setHoraModificacion(LocalTime.now());
+        updateEmpleado.setIdUsuarioModificacion(empleado.getIdUsuarioModificacion());
         updateEmpleado.setEstado(0);
         reemp.save(updateEmpleado);
         return "Eliminado";

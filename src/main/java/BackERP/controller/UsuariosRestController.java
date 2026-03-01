@@ -67,19 +67,23 @@ public class UsuariosRestController {
         updateUsuario.setIdEmpleado(Usuario.getIdEmpleado());
         updateUsuario.setUsuario(Usuario.getUsuario());
         updateUsuario.setComentario(Usuario.getComentario());
-        updateUsuario.setIdUsuarioModificacion(Usuario.getIdUsuarioModificacion());
+
         updateUsuario.setContrasena(Usuario.getContrasena());
         updateUsuario.setFechaModificacion(LocalDate.now());
         updateUsuario.setHoraModificacion(LocalTime.now());
+        updateUsuario.setIdUsuarioModificacion(Usuario.getIdUsuarioModificacion());
         reusr.save(updateUsuario);
 
         return "Editado";
     }
 
     @DeleteMapping("eliminarUsuario/{idUsuario}")
-    public String eliminarUsuario(@PathVariable long idUsuario){
+    public String eliminarUsuario(@PathVariable long idUsuario, @RequestBody segusuarios Usuario){
         System.out.println("eliminar");
         segusuarios updateUsuario = reusr.findById(idUsuario).get();
+        updateUsuario.setFechaModificacion(LocalDate.now());
+        updateUsuario.setHoraModificacion(LocalTime.now());
+        updateUsuario.setIdUsuarioModificacion(Usuario.getIdUsuarioModificacion());
         updateUsuario.setEstado(0);
         reusr.save(updateUsuario);
         return "Eliminado";

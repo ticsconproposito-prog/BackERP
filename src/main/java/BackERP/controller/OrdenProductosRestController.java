@@ -83,15 +83,21 @@ public class OrdenProductosRestController {
         updateOrdenProductos.setValorCancelado(OrdenProductos.getValorCancelado());
         updateOrdenProductos.setPrecioTotalOrden(OrdenProductos.getPrecioTotalOrden());
         updateOrdenProductos.setComentario(OrdenProductos.getComentario());
+        updateOrdenProductos.setFechaModificacion(LocalDate.now());
+        updateOrdenProductos.setHoraModificacion(LocalTime.now());
+        updateOrdenProductos.setIdUsuarioModificacion(OrdenProductos.getIdUsuarioModificacion());
         repordpro.save(updateOrdenProductos);
 
         return "Editado";
     }
 
     @DeleteMapping("eliminarOrdenProducto/{idOrdenProductos}")
-    public String eliminarOrdenProductos(@PathVariable long idOrdenProductos){
+    public String eliminarOrdenProductos(@PathVariable long idOrdenProductos, @RequestBody erpOrdenProductos OrdenProductos){
         System.out.println("eliminar");
         erpOrdenProductos updateOrdenProductos = repordpro.findById(idOrdenProductos).get();
+        updateOrdenProductos.setFechaModificacion(LocalDate.now());
+        updateOrdenProductos.setHoraModificacion(LocalTime.now());
+        updateOrdenProductos.setIdUsuarioModificacion(OrdenProductos.getIdUsuarioModificacion());
         updateOrdenProductos.setEstado(0);
         repordpro.save(updateOrdenProductos);
         return "Eliminado";

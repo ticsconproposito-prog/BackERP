@@ -75,16 +75,21 @@ public class DiccionariosRestController {
         updateDiccionario.setIndice(Diccionario.getIndice());
         updateDiccionario.setValor(Diccionario.getValor());
         updateDiccionario.setDescripcion(Diccionario.getDescripcion());
-
+        Diccionario.setFechaModificacion(LocalDate.now());
+        Diccionario.setHoraModificacion(LocalTime.now());
+        updateDiccionario.setIdUsuarioModificacion(Diccionario.getIdUsuarioModificacion());
         redic.save(updateDiccionario);
 
         return "Editado";
     }
 
     @DeleteMapping("eliminarDiccionario/{idDiccionario}")
-    public String eliminarDiccionario(@PathVariable long idDiccionario){
+    public String eliminarDiccionario(@PathVariable long idDiccionario, @RequestBody erpdiccionarios Diccionario){
         System.out.println("eliminar");
         erpdiccionarios updateDiccionario = redic.findById(idDiccionario).get();
+        updateDiccionario.setFechaModificacion(LocalDate.now());
+        updateDiccionario.setHoraModificacion(LocalTime.now());
+        updateDiccionario.setIdUsuarioModificacion(Diccionario.getIdUsuarioModificacion());
         updateDiccionario.setEstado(0);
         redic.save(updateDiccionario);
         return "Eliminado";

@@ -68,8 +68,11 @@ public class UsuariosPerfilesRestController {
     }
 
     @DeleteMapping("eliminarUsuarioPerfil/{idUsuarioPerfil}")
-    public String eliminarUsuarioPerfil(@PathVariable int idUsuarioPerfil) {
+    public String eliminarUsuarioPerfil(@PathVariable int idUsuarioPerfil, @RequestBody segUsuariosPerfiles usuarioPerfil) {
         segUsuariosPerfiles update = repo.findById(idUsuarioPerfil).get();
+        update.setIdUsuarioModificacion(usuarioPerfil.getIdUsuarioModificacion());
+        update.setFechaModificacion(LocalDate.now());
+        update.setHoraModificacion(LocalTime.now());
         update.setEstado(0);
         repo.save(update);
         return "Eliminado";

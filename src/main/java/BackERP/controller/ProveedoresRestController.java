@@ -83,9 +83,12 @@ public class ProveedoresRestController {
     }
 
     @DeleteMapping("eliminarProveedor/{idProveedor}")
-    public String eliminarProveedores(@PathVariable long idProveedor){
+    public String eliminarProveedores(@PathVariable long idProveedor, @RequestBody erpProveedores proveedores){
         System.out.println("eliminar");
         erpProveedores updateProveedores = repprove.findById(idProveedor).get();
+        updateProveedores.setFechaModificacion(LocalDate.now());
+        updateProveedores.setHoraModificacion(LocalTime.now());
+        updateProveedores.setIdUsuarioModificacion(proveedores.getIdUsuarioModificacion());
         updateProveedores.setEstado(0);
         repprove.save(updateProveedores);
         return "Eliminado";

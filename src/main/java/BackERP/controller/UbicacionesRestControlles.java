@@ -50,15 +50,19 @@ public class UbicacionesRestControlles {
         updateUbicaciones.setComentario(Ubicaciones.getComentario());
         updateUbicaciones.setFechaModificacion(LocalDate.now());
         updateUbicaciones.setHoraModificacion(LocalTime.now());
+        updateUbicaciones.setIdUsuarioModificacion(Ubicaciones.getIdUsuarioModificacion());
         remubi.save(updateUbicaciones);
 
         return "Editado";
     }
 
     @DeleteMapping("eliminarUbicacion/{idUbicacion}")
-    public String eliminarUbicacion(@PathVariable long idUbicacion){
+    public String eliminarUbicacion(@PathVariable long idUbicacion, @RequestBody erpUbicaciones Ubicaciones){
         System.out.println("eliminar");
         erpUbicaciones updateerpUbicaciones = remubi.findById(idUbicacion).get();
+        updateerpUbicaciones.setFechaModificacion(LocalDate.now());
+        updateerpUbicaciones.setHoraModificacion(LocalTime.now());
+        updateerpUbicaciones.setIdUsuarioModificacion(Ubicaciones.getIdUsuarioModificacion());
         updateerpUbicaciones.setEstado(0);
         remubi.save(updateerpUbicaciones);
         return "Eliminado";

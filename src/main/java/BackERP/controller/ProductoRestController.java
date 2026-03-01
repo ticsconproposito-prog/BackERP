@@ -75,8 +75,8 @@ public class ProductoRestController {
     updateProducto.setCodigoProductoProveedor(producto.getCodigoProductoProveedor());
     updateProducto.setDescripcionProducto(producto.getDescripcionProducto());
     updateProducto.setUnidadDeMedida(producto.getUnidadDeMedida());
-    updateProducto.setFechaModificacion(producto.getFechaModificacion());
-    updateProducto.setHoraModificacion(producto.getHoraModificacion());
+    updateProducto.setFechaModificacion(LocalDate.now());
+    updateProducto.setHoraModificacion(LocalTime.now());
     updateProducto.setIdUsuarioModificacion(producto.getIdUsuarioModificacion());
     repro.save(updateProducto);
 
@@ -84,9 +84,12 @@ public class ProductoRestController {
 }
 
 @DeleteMapping("eliminarProducto/{idProducto}")
-    public String eliminarProducto(@PathVariable long idProducto){
+    public String eliminarProducto(@PathVariable long idProducto, @RequestBody erpProductos producto){
     System.out.println("eliminar");
     erpProductos updateProducto = repro.findById(idProducto).get();
+    updateProducto.setFechaModificacion(LocalDate.now());
+    updateProducto.setHoraModificacion(LocalTime.now());
+    updateProducto.setIdUsuarioModificacion(producto.getIdUsuarioModificacion());
     updateProducto.setEstado(0);
     repro.save(updateProducto);
     return "Eliminado";

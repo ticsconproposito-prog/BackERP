@@ -76,9 +76,12 @@ public class InventarioRestController {
     }
 
     @DeleteMapping("eliminarInventario/{idProductoInventario}")
-    public String eliminarInventario(@PathVariable long idProductoInventario){
+    public String eliminarInventario(@PathVariable long idProductoInventario, @RequestBody erpinventario inventario){
         System.out.println("eliminar");
         erpinventario updateInventario = repinv.findById(idProductoInventario).get();
+        updateInventario.setFechaModificacion(LocalDate.now());
+        updateInventario.setHoraModificacion(LocalTime.now());
+        updateInventario.setIdUsuarioModificacion(inventario.getIdUsuarioModificacion());
         updateInventario.setEstado(0);
         repinv.save(updateInventario);
         return "Eliminado";

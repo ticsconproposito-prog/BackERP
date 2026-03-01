@@ -49,23 +49,28 @@ public class MovimientosProductosRestController {
         updatemovimientosProductos.setCantidad(MovimientosProductos.getCantidad());
         updatemovimientosProductos.setPrecioCompra(MovimientosProductos.getPrecioCompra());
         updatemovimientosProductos.setIdUbicacion(MovimientosProductos.getIdUbicacion());
-
+        updatemovimientosProductos.setFechaModificacion(LocalDate.now());
+        updatemovimientosProductos.setHoraModificacion(LocalTime.now());
+        updatemovimientosProductos.setIdUsuarioModificacion(MovimientosProductos.getIdUsuarioModificacion());
         removpro.save(updatemovimientosProductos);
 
         return "Editado";
     }
 
     @DeleteMapping("eliminarMovimientosProductos/{idMovimientoProducto}")
-    public String eliminarMovimientoProducto(@PathVariable long idMovimientoProducto){
+    public String eliminarMovimientoProducto(@PathVariable long idMovimientoProducto, @RequestBody erpMovimientosProductos MovimientosProductos){
         System.out.println("eliminar");
         erpMovimientosProductos updateerpMovimientosProductos = removpro.findById(idMovimientoProducto).get();
+        updateerpMovimientosProductos.setFechaModificacion(LocalDate.now());
+        updateerpMovimientosProductos.setHoraModificacion(LocalTime.now());
+        updateerpMovimientosProductos.setIdUsuarioModificacion(MovimientosProductos.getIdUsuarioModificacion());
         updateerpMovimientosProductos.setEstado(0);
         removpro.save(updateerpMovimientosProductos);
         return "Eliminado";
     }
 
     @DeleteMapping("eliminarMovProXIdOrden/{idOrdenProducto}")
-    public String eliminarMovProXIdOrden(@PathVariable long idOrdenProducto){
+    public String eliminarMovProXIdOrden(@PathVariable long idOrdenProducto, @RequestBody erpMovimientosProductos MovimientosProductos){
         System.out.println("eliminar");
         List<erpMovimientosProductos> updateerpMovimientosProductos = removpro.findByIdOrdenProducto(idOrdenProducto);
         if (updateerpMovimientosProductos.isEmpty()) {
@@ -74,6 +79,9 @@ public class MovimientosProductosRestController {
 
         updateerpMovimientosProductos.forEach(ump -> {
             ump.setEstado(0);
+            ump.setFechaModificacion(LocalDate.now());
+            ump.setHoraModificacion(LocalTime.now());
+            ump.setIdUsuarioModificacion(MovimientosProductos.getIdUsuarioModificacion());
             removpro.save(ump);
         });
         return "Eliminado";

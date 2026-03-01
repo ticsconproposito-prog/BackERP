@@ -65,8 +65,11 @@ public class SegLoginsRestController {
     }
 
     @DeleteMapping("eliminarSegLogin/{idLogin}")
-    public String eliminarSegLogin(@PathVariable int idLogin) {
+    public String eliminarSegLogin(@PathVariable int idLogin, @RequestBody segLogins login) {
         segLogins updateLogin = repoSegLogins.findById(idLogin).get();
+        updateLogin.setIdUsuarioModificacion(login.getIdUsuarioModificacion());
+        updateLogin.setFechaModificacion(LocalDate.now());
+        updateLogin.setHoraModificacion(LocalTime.now());
         updateLogin.setEstado(0);
         repoSegLogins.save(updateLogin);
         return "Eliminado";
