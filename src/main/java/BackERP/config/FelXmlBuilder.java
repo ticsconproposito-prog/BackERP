@@ -81,11 +81,18 @@ public class FelXmlBuilder {
             sb.append(tag("Cantidad", it.getCantidad().toPlainString()));
             sb.append(tag("Precio", it.getPrecio().toPlainString()));
 
-            BigDecimal PorcDescuento = it.getImpDescuento()
-                    .divide(it.getImpBruto(), 4, RoundingMode.HALF_UP) // división con escala y redondeo
-                    .multiply(BigDecimal.valueOf(100));
+            if(it.getImpDescuento() != null ||it.getImpDescuento().compareTo(BigDecimal.ZERO) != 0
+                    && (it.getPorcDesc() == null || it.getPorcDesc().compareTo(BigDecimal.ZERO) == 0 ) ) {
 
-            sb.append(tag("PorcDesc", String.valueOf(PorcDescuento)));
+                BigDecimal PorcDescuento = it.getImpDescuento()
+                        .divide(it.getImpBruto(), 4, RoundingMode.HALF_UP) // división con escala y redondeo
+                        .multiply(BigDecimal.valueOf(100));
+
+                sb.append(tag("PorcDesc", String.valueOf(PorcDescuento)));
+            }else{
+                sb.append(tag("PorcDesc", it.getPorcDesc().toPlainString()));
+            }
+
             sb.append(tag("ImpBruto", it.getImpBruto().toPlainString()));
             sb.append(tag("ImpDescuento", it.getImpDescuento().toPlainString()));
             sb.append(tag("ImpExento", it.getImpExento().toPlainString()));

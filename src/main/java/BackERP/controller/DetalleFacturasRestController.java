@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -29,6 +31,16 @@ public class DetalleFacturasRestController {
     @PostMapping("grabarDetalleFactura")
     public String grabarDetalleFacturas(@RequestBody erpDetalleFacturas detalleFacturas){
         // valor por defecto
+
+        if(detalleFacturas.getCantidadDeDescuento() != 0
+                && detalleFacturas.getPorcentajeDeDescuento() == 0) {
+
+            double PorcDescuento =
+                    (detalleFacturas.getCantidadDeDescuento() / detalleFacturas.getPorcentajeDeDescuento()) * 100;
+
+            detalleFacturas.setPorcentajeDeDescuento(PorcDescuento);
+        }
+
         detalleFacturas.setFechaModificacion(LocalDate.now());
         detalleFacturas.setHoraModificacion(LocalTime.now());
         detalleFacturas.setEstado(1);
