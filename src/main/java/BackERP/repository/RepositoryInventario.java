@@ -1,8 +1,20 @@
 package BackERP.repository;
 
-import BackERP.models.erpinventario;
+import BackERP.models.erpInventario;
+import BackERP.models.erpInventarioAgrupadoDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Query;
 
-public interface RepositoryInventario extends JpaRepository<erpinventario, Long>, JpaSpecificationExecutor<erpinventario> {
+import java.util.List;
+
+public interface RepositoryInventario extends JpaRepository<erpInventario, Long>, JpaSpecificationExecutor<erpInventario> {
+
+    @Query("SELECT new BackERP.dto.InventarioAgrupadoDTO(" +
+            "i.idProducto, SUM(i.cantidadExistencias), SUM(i.cantidadDanados)) " +
+            "FROM erpInventario i " +
+            "WHERE i.estado = 1 " +
+            "GROUP BY i.idProducto")
+    List<erpInventarioAgrupadoDTO> obtenerInventarioAgrupado();
+
 }

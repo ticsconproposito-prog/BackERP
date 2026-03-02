@@ -27,6 +27,10 @@ public class erpProductos
     @Column
     private int unidadDeMedida;
     @Column
+    private double precioCompra;
+    @Column
+    private double precioVenta;
+    @Column
     private int  estado;
     @Column
     private LocalDate fechaModificacion;
@@ -79,6 +83,22 @@ public class erpProductos
 
     public void setUnidadDeMedida(int unidadDeMedida) {
         this.unidadDeMedida = unidadDeMedida;
+    }
+
+    public double getPrecioCompra() {
+        return precioCompra;
+    }
+
+    public void setPrecioCompra(double precioCompra) {
+        this.precioCompra = precioCompra;
+    }
+
+    public double getPrecioVenta() {
+        return precioVenta;
+    }
+
+    public void setPrecioVenta(double precioVenta) {
+        this.precioVenta = precioVenta;
     }
 
     public int getEstado() {

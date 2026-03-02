@@ -6,12 +6,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-public class erpinventario {
+public class erpInventario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
-    private Long  idProductoInventario;
+    private Long idInventario;
     @ManyToOne
     @JoinColumn(name = "idProducto", referencedColumnName = "idProducto")
     private erpProductos idProducto;
@@ -21,10 +21,7 @@ public class erpinventario {
     private int cantidadDanados;
     @Column
     private int idUbicacion;
-    @Column
-    private double precioCompra;
-    @Column
-    private double precioVenta;
+
     @Column
     private int  estado;
     @Column
@@ -34,15 +31,15 @@ public class erpinventario {
     @Column
     private int idUsuarioModificacion;
 
-    public erpinventario() {
+    public erpInventario() {
     }
 
-    public Long getIdProductoInventario() {
-        return idProductoInventario;
+    public Long getIdInventario() {
+        return idInventario;
     }
 
-    public void setIdProductoInventario(Long idProductoInventario) {
-        this.idProductoInventario = idProductoInventario;
+    public void setIdInventario(Long idInventario) {
+        this.idInventario = idInventario;
     }
 
     public erpProductos getIdProducto() {
@@ -75,22 +72,6 @@ public class erpinventario {
 
     public void setIdUbicacion(int idUbicacion) {
         this.idUbicacion = idUbicacion;
-    }
-
-    public double getPrecioCompra() {
-        return precioCompra;
-    }
-
-    public void setPrecioCompra(double precioCompra) {
-        this.precioCompra = precioCompra;
-    }
-
-    public double getPrecioVenta() {
-        return precioVenta;
-    }
-
-    public void setPrecioVenta(double precioVenta) {
-        this.precioVenta = precioVenta;
     }
 
     public int getEstado() {

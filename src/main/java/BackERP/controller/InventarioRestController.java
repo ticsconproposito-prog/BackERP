@@ -2,7 +2,9 @@ package BackERP.controller;
 
 
 import BackERP.helper.erpInventarioSpecs;
-import BackERP.models.erpinventario;
+import BackERP.models.erpInventario;
+import BackERP.models.erpInventarioAgrupadoDTO;
+import BackERP.models.erpProductos;
 import BackERP.repository.RepositoryInventario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,6 +16,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -23,7 +29,7 @@ public class InventarioRestController {
     private RepositoryInventario repinv;
 
     @GetMapping("inventario")
-    public Page<erpinventario> getInventario(
+    public Page<erpInventario> getInventario(
             @RequestParam(required = false) String descripcion,
             @RequestParam(required = false) String codigoProductoProveedor,
             @RequestParam(required = false) String codigoProducto,
@@ -40,7 +46,7 @@ public class InventarioRestController {
 
         Pageable pageable = PageRequest.of(page, size, s);
 
-        Specification<erpinventario> spec = Specification
+        Specification<erpInventario> spec = Specification
                 .where(erpInventarioSpecs.estadoEquals(1))
                 .and(erpInventarioSpecs.descripcionProductoContains(descripcion))
                 .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
@@ -49,8 +55,37 @@ public class InventarioRestController {
         return repinv.findAll(spec, pageable);
     }
 
+    @GetMapping("inventarioAgrupado")
+    public List<erpInventarioAgrupadoDTO> getInventarioAgrupado(
+            @RequestParam(required = false) String descripcion,
+            @RequestParam(required = false) String codigoProducto,
+            @RequestParam(required = false) String codigoProductoProveedor
+    ) {
+        Specification<erpInventario> spec = Specification
+                .where(erpInventarioSpecs.estadoEquals(1))
+                .and(erpInventarioSpecs.descripcionProductoContains(descripcion))
+                .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
+                .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
+
+        List<erpInventario> inventarios = repinv.findAll(spec);
+
+        Map<erpProductos, List<erpInventario>> agrupado = inventarios.stream()
+                .collect(Collectors.groupingBy(erpInventario::getIdProducto));
+
+        List<erpInventarioAgrupadoDTO> resultado = new ArrayList<>();
+        for (Map.Entry<erpProductos, List<erpInventario>> entry : agrupado.entrySet()) {
+            erpProductos producto = entry.getKey();
+            Long totalExistencias = entry.getValue().stream().mapToLong(erpInventario::getCantidadExistencias).sum();
+            Long totalDanados = entry.getValue().stream().mapToLong(erpInventario::getCantidadDanados).sum();
+            resultado.add(new erpInventarioAgrupadoDTO(producto, totalExistencias, totalDanados));
+        }
+
+        return resultado;
+    }
+
+
     @PostMapping("grabarInventario")
-    public String grabarInventario(@RequestBody erpinventario inventario){
+    public String grabarInventario(@RequestBody erpInventario inventario){
 
 
         // valor por defecto
@@ -62,11 +97,9 @@ public class InventarioRestController {
         return "Grabado";
     }
     @PutMapping("editarInventario/{idProductoInventario}")
-    public String editarInventario(@PathVariable long idProductoInventario, @RequestBody erpinventario inventario){
+    public String editarInventario(@PathVariable long idProductoInventario, @RequestBody erpInventario inventario){
 
-        erpinventario updateInventario = repinv.findById(idProductoInventario).get();
-        updateInventario.setPrecioCompra(inventario.getPrecioCompra());
-        updateInventario.setPrecioVenta(inventario.getPrecioVenta());
+        erpInventario updateInventario = repinv.findById(idProductoInventario).get();
         updateInventario.setFechaModificacion(LocalDate.now());
         updateInventario.setHoraModificacion(LocalTime.now());
         updateInventario.setIdUsuarioModificacion(inventario.getIdUsuarioModificacion());
@@ -76,9 +109,9 @@ public class InventarioRestController {
     }
 
     @DeleteMapping("eliminarInventario/{idProductoInventario}")
-    public String eliminarInventario(@PathVariable long idProductoInventario, @RequestBody erpinventario inventario){
+    public String eliminarInventario(@PathVariable long idProductoInventario, @RequestBody erpInventario inventario){
         System.out.println("eliminar");
-        erpinventario updateInventario = repinv.findById(idProductoInventario).get();
+        erpInventario updateInventario = repinv.findById(idProductoInventario).get();
         updateInventario.setFechaModificacion(LocalDate.now());
         updateInventario.setHoraModificacion(LocalTime.now());
         updateInventario.setIdUsuarioModificacion(inventario.getIdUsuarioModificacion());
