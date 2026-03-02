@@ -10,11 +10,13 @@ import java.util.List;
 
 public interface RepositoryInventario extends JpaRepository<erpInventario, Long>, JpaSpecificationExecutor<erpInventario> {
 
-    @Query("SELECT new BackERP.dto.InventarioAgrupadoDTO(" +
+    @Query("SELECT new BackERP.models.erpInventarioAgrupadoDTO(" +
             "i.idProducto, SUM(i.cantidadExistencias), SUM(i.cantidadDanados)) " +
             "FROM erpInventario i " +
             "WHERE i.estado = 1 " +
             "GROUP BY i.idProducto")
     List<erpInventarioAgrupadoDTO> obtenerInventarioAgrupado();
+
+
 
 }
