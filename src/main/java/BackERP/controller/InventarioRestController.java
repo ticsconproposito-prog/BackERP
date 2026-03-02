@@ -35,7 +35,7 @@ public class InventarioRestController {
             @RequestParam(required = false) String codigoProducto,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "idProductoInventario,asc") String sort
+            @RequestParam(defaultValue = "idInventario,asc") String sort
     ) {
 
         String[] sortParts = sort.split(",", 2);
