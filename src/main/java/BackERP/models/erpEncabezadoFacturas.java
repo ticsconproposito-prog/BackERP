@@ -66,7 +66,7 @@ public class erpEncabezadoFacturas {
     @Column
     private String serieResAPI;
     @Column
-    private int preimpresoResAPI;
+    private long  preimpresoResAPI;
     @Column
     private String nombreResAPI;
     @Column
@@ -307,11 +307,11 @@ public class erpEncabezadoFacturas {
         this.serieResAPI = serieResAPI;
     }
 
-    public int getPreimpresoResAPI() {
+    public long  getPreimpresoResAPI() {
         return preimpresoResAPI;
     }
 
-    public void setPreimpresoResAPI(int preimpresoResAPI) {
+    public void setPreimpresoResAPI(long preimpresoResAPI) {
         this.preimpresoResAPI = preimpresoResAPI;
     }
 

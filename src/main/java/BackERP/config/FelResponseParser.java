@@ -26,7 +26,7 @@ public class FelResponseParser {
         String error  = findAny(payload, "ERROR", "Error", "MensajeError", "DescripcionError");
         String resultado  =  findAny(payload, "Resultado");
 
-        System.out.println("3");
+
         FelResult res = new FelResult();
         res.setRawResponse(payload);
         res.setNumeroAutorizacion(numeroAutorizacion);
@@ -42,7 +42,7 @@ public class FelResponseParser {
         res.setDireccion(direccion);
         res.setTelefono(telefono);
         res.setReferencia(referencia);
-        System.out.println("4");
+
         return res;
     }
 

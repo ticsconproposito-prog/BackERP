@@ -51,11 +51,13 @@ public class FelService {
             if (result.isOk()) {
                 System.out.println("Ingresa insertar encabezadoFactura");
                 // Buscar encabezado por referencia y actualizar
+
+
                 String SID = req.getReferencia().substring(4);
                 long ID = Long.parseLong(SID);
                 erpEncabezadoFacturas enc = repEncFac.findById(ID).get();
                 enc.setSerieResAPI(result.getSerie());
-                enc.setPreimpresoResAPI(Integer.parseInt(result.getPreimpreso()));
+                enc.setPreimpresoResAPI(Long.parseLong(result.getPreimpreso()));
                 enc.setNumeroAutorizacionResAPI(result.getNumeroAutorizacion());
                 enc.setRespuestaXML(result.getRawResponse());
                 enc.setReferencia(req.getReferencia());
