@@ -77,6 +77,8 @@ public class ProductoRestController {
     updateProducto.setUnidadDeMedida(producto.getUnidadDeMedida());
     updateProducto.setFechaModificacion(LocalDate.now());
     updateProducto.setHoraModificacion(LocalTime.now());
+    updateProducto.setPrecioCompra(producto.getPrecioCompra());
+    updateProducto.setPrecioVenta(producto.getPrecioVenta());
     updateProducto.setIdUsuarioModificacion(producto.getIdUsuarioModificacion());
     repro.save(updateProducto);
 
