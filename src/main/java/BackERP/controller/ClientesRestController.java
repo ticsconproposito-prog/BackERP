@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -57,15 +58,15 @@ public class ClientesRestController {
     }
 
     @PostMapping("grabarCliente")
-    public String grabarCliente(@RequestBody erpclientes clientes){
+    public ResponseEntity<Integer> grabarCliente(@RequestBody erpclientes clientes){
 
         // valor por defecto
         clientes.setFechaModificacion(LocalDate.now());
         clientes.setHoraModificacion(LocalTime.now());
         clientes.setEstado(1);
-        repcli.save(clientes);
+        erpclientes saved = repcli.save(clientes);
 
-        return "Grabado";
+        return ResponseEntity.ok(saved.getIdCliente());
     }
     @PutMapping("editarCliente/{idCliente}")
     public String editarCliente(@PathVariable long idCliente, @RequestBody erpclientes clientes){
