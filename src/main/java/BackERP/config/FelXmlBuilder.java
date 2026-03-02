@@ -5,6 +5,9 @@ import BackERP.models.DteRequestDto;
 import BackERP.models.ItemDto;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+
 // FelXmlBuilder.java
 @Component
 public class FelXmlBuilder {
@@ -77,7 +80,12 @@ public class FelXmlBuilder {
             sb.append(tag("Medida", String.valueOf(it.getMedida())));
             sb.append(tag("Cantidad", it.getCantidad().toPlainString()));
             sb.append(tag("Precio", it.getPrecio().toPlainString()));
-            sb.append(tag("PorcDesc", it.getPorcDesc().toPlainString()));
+
+            BigDecimal PorcDescuento = it.getImpDescuento()
+                    .divide(it.getImpBruto(), 4, RoundingMode.HALF_UP) // división con escala y redondeo
+                    .multiply(BigDecimal.valueOf(100));
+
+            sb.append(tag("PorcDesc", String.valueOf(PorcDescuento)));
             sb.append(tag("ImpBruto", it.getImpBruto().toPlainString()));
             sb.append(tag("ImpDescuento", it.getImpDescuento().toPlainString()));
             sb.append(tag("ImpExento", it.getImpExento().toPlainString()));
