@@ -84,12 +84,14 @@ public class FelXmlBuilder {
             if(it.getImpDescuento() != null ||it.getImpDescuento().compareTo(BigDecimal.ZERO) != 0
                     && (it.getPorcDesc() == null || it.getPorcDesc().compareTo(BigDecimal.ZERO) == 0 ) ) {
 
-                BigDecimal PorcDescuento = it.getImpDescuento()
-                        .divide(it.getImpBruto(), 4, RoundingMode.HALF_UP) // división con escala y redondeo
-                        .multiply(BigDecimal.valueOf(100));
+                BigDecimal porcDescuento = it.getImpDescuento()
+                        .divide(it.getImpBruto(), 10, RoundingMode.DOWN) // más precisión interna
+                        .multiply(BigDecimal.valueOf(100))
+                        .setScale(6, RoundingMode.DOWN);
 
-                sb.append(tag("PorcDesc", String.valueOf(PorcDescuento)));
+                sb.append(tag("PorcDesc", String.valueOf(porcDescuento)));
             }else{
+
                 sb.append(tag("PorcDesc", it.getPorcDesc().toPlainString()));
             }
 
