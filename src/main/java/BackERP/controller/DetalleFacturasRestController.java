@@ -36,7 +36,7 @@ public class DetalleFacturasRestController {
                 && detalleFacturas.getPorcentajeDeDescuento() == 0) {
 
             double PorcDescuento =
-                    (detalleFacturas.getCantidadDeDescuento() / detalleFacturas.getPorcentajeDeDescuento()) * 100;
+                    (detalleFacturas.getCantidadDeDescuento() / detalleFacturas.getImpBruto()) * 100;
 
             detalleFacturas.setPorcentajeDeDescuento(PorcDescuento);
         }
