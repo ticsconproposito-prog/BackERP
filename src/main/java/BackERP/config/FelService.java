@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Optional;
 
 @Service
 public class FelService {
@@ -37,42 +38,48 @@ public class FelService {
         this.wsClient = wsClient;
         this.responseParser = responseParser;
     }
-
     public FelResult generarDte(DteRequestDto req) {
         validar(req);
 
         String pXml = xmlBuilder.buildDocElectronicoXml(req);
-        //System.out.println("completo XML");
         String soapResponse = wsClient.generaDocumento(req.getTipoDoc(), pXml);
-       // System.out.println("Respuesta WS" +soapResponse);
         FelResult result = responseParser.parse(soapResponse);
 
-       // System.out.println("Respuestas " + result.toString());
-            if (result.isOk()) {
+        if (result.isOk()) {
+            try {
                 System.out.println("Ingresa insertar encabezadoFactura");
-                // Buscar encabezado por referencia y actualizar
-
 
                 String SID = req.getReferencia().substring(4);
                 long ID = Long.parseLong(SID);
-                erpEncabezadoFacturas enc = repEncFac.findById(ID).get();
-                enc.setSerieResAPI(result.getSerie());
-                enc.setPreimpresoResAPI(Long.parseLong(result.getPreimpreso()));
-                enc.setNumeroAutorizacionResAPI(result.getNumeroAutorizacion());
-                enc.setRespuestaXML(result.getRawResponse());
-                enc.setReferencia(req.getReferencia());
-                enc.setFacturaProcesada("S");
-                enc.setNombreResAPI(result.getNombre());
-                enc.setDireccionResAPI(result.getDireccion());
-                enc.setTelefonoResAPI(result.getTelefono());
-                enc.setReferenciaResAPI(result.getReferencia());
 
+                Optional<erpEncabezadoFacturas> optEnc = repEncFac.findById(ID);
+                if (optEnc.isPresent()) {
+                    erpEncabezadoFacturas enc = optEnc.get();
+                    enc.setSerieResAPI(result.getSerie());
+                    enc.setPreimpresoResAPI(Long.parseLong(result.getPreimpreso()));
+                    enc.setNumeroAutorizacionResAPI(result.getNumeroAutorizacion());
+                    enc.setRespuestaXML(result.getRawResponse());
+                    enc.setReferencia(req.getReferencia());
+                    enc.setFacturaProcesada("S");
+                    enc.setNombreResAPI(result.getNombre());
+                    enc.setDireccionResAPI(result.getDireccion());
+                    enc.setTelefonoResAPI(result.getTelefono());
+                    enc.setReferenciaResAPI(result.getReferencia());
 
-                repEncFac.save(enc);
+                    repEncFac.save(enc);
+                } else {
+                    // Registrar el error en el campo error del resultado
+                    result.setError("No se encontró encabezado de factura con ID " + ID);
+                }
+            } catch (Exception e) {
+                // Captura cualquier otro error inesperado
+                result.setError("Error al procesar encabezado de factura: " + e.getMessage());
             }
-            return result;
-            
+        }
+
+        return result;
     }
+
 
     private void validar(DteRequestDto req) {
         // Validaciones por línea

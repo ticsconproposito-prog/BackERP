@@ -7,10 +7,7 @@ import BackERP.models.erpInventarioAgrupadoDTO;
 import BackERP.models.erpProductos;
 import BackERP.repository.RepositoryInventario;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
@@ -56,20 +53,33 @@ public class InventarioRestController {
     }
 
     @GetMapping("inventarioAgrupado")
-    public List<erpInventarioAgrupadoDTO> getInventarioAgrupado(
+    public Page<erpInventarioAgrupadoDTO> getInventarioAgrupado(
             @RequestParam(required = false) String descripcion,
             @RequestParam(required = false) String codigoProducto,
-            @RequestParam(required = false) String codigoProductoProveedor
+            @RequestParam(required = false) String codigoProductoProveedor,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "idInventario,asc") String sort
     ) {
+
+        String[] sortParts = sort.split(",", 2);
+
+        Sort.Direction dir = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.ASC;
+
+        Sort s = Sort.by(dir, sortParts[0]);
+
+        Pageable pageable = PageRequest.of(page, size, s);
+
         Specification<erpInventario> spec = Specification
                 .where(erpInventarioSpecs.estadoEquals(1))
                 .and(erpInventarioSpecs.descripcionProductoContains(descripcion))
                 .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
                 .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
 
-        List<erpInventario> inventarios = repinv.findAll(spec);
+        Page<erpInventario> inventariosPage = repinv.findAll(spec, pageable);
 
-        Map<erpProductos, List<erpInventario>> agrupado = inventarios.stream()
+        // Agrupar por producto
+        Map<erpProductos, List<erpInventario>> agrupado = inventariosPage.getContent().stream()
                 .collect(Collectors.groupingBy(erpInventario::getIdProducto));
 
         List<erpInventarioAgrupadoDTO> resultado = new ArrayList<>();
@@ -80,7 +90,8 @@ public class InventarioRestController {
             resultado.add(new erpInventarioAgrupadoDTO(producto, totalExistencias, totalDanados));
         }
 
-        return resultado;
+        // Devolver un Page<DTO> usando el mismo pageable y total
+        return new PageImpl<>(resultado, pageable, inventariosPage.getTotalElements());
     }
 
 
