@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -46,16 +47,28 @@ public class EncabezadoFacturasRestController {
         Specification<erpEncabezadoFacturas> spec = Specification.where(erpEncabezadoFacturasSpecs.referenciaFacturaContains(referenciaFactura))
                 .and(erpEncabezadoFacturasSpecs.tipoDocumentoContains(tipoDocumento))
                 .and(erpEncabezadoFacturasSpecs.nombreClienteContains(nombreCliente))
-                .and(erpEncabezadoFacturasSpecs.nitClienteContains(nit))
+                .and(erpEncabezadoFacturasSpecs.nitClienteContains(nit.replaceAll("[\\s-]", "")))
                 .and(erpEncabezadoFacturasSpecs.fechaFacturaBetween(fechaInicio, fechaFin));
 
         return repencfac.findAll(spec, pageable);
     }
 
+    @GetMapping("facturasPorFecha")
+    public List<erpEncabezadoFacturas> getFacturasPorFecha(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+
+        Specification<erpEncabezadoFacturas> spec = (root, query, cb) ->
+                cb.equal(root.get("FechaFactura"), fecha);
+
+        return repencfac.findAll(spec);
+    }
+
+
     @PostMapping("grabarEncabezadoFacturas")
     public ResponseEntity<Long> grabarEncabezadoFacturas(@RequestBody erpEncabezadoFacturas EncabezadoFacturas){
 
         // valor por defecto
+
         EncabezadoFacturas.setFechaModificacion(LocalDate.now());
         EncabezadoFacturas.setHoraModificacion(LocalTime.now());
         EncabezadoFacturas.setReversion("N");

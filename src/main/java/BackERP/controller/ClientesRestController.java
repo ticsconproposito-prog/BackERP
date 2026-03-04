@@ -61,6 +61,7 @@ public class ClientesRestController {
     public ResponseEntity<Integer> grabarCliente(@RequestBody erpclientes clientes){
 
         // valor por defecto
+        clientes.setNit(clientes.getNit().replaceAll("[\\s-]", ""));
         clientes.setFechaModificacion(LocalDate.now());
         clientes.setHoraModificacion(LocalTime.now());
         clientes.setEstado(1);
@@ -77,7 +78,7 @@ public class ClientesRestController {
         erpclientes.setDireccionFisica(clientes.getDireccionFisica());
         erpclientes.setCorreoElectronico(clientes.getCorreoElectronico());
         erpclientes.setNombreFacturacion(clientes.getNombreFacturacion());
-        erpclientes.setNit(clientes.getNit());
+        erpclientes.setNit(clientes.getNit().replaceAll("[\\s-]", ""));
         erpclientes.setTelefono1(clientes.getTelefono1());
         erpclientes.setTelefono2(clientes.getTelefono2());
         erpclientes.setCreditoAutorizado(clientes.getCreditoAutorizado());

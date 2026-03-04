@@ -2,6 +2,7 @@ package BackERP.controller;
 
 
 import BackERP.helper.erpDetalleFacturaSpecs;
+import BackERP.models.ResumenDiarioDTO;
 import BackERP.models.erpDetalleFacturas;
 import BackERP.repository.RepositoryDetalleFacturas;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +22,35 @@ public class DetalleFacturasRestController {
     private RepositoryDetalleFacturas repdetfac;
 
     @GetMapping("detalleFactura")
-    public List<erpDetalleFacturas> getDetalleFacturas(@RequestParam(required = false) Integer idEncabezadoFactura){
+    public List<erpDetalleFacturas> getDetalleFacturas(
+            @RequestParam(required = false) Integer idEncabezadoFactura,
+            @RequestParam(required = false) LocalDate fechaInicio,
+            @RequestParam(required = false) LocalDate fechaFin) {
 
-        Specification<erpDetalleFacturas> spec = Specification.where(erpDetalleFacturaSpecs.idEncabezadoFacturaContains(idEncabezadoFactura));
+        Specification<erpDetalleFacturas> spec = Specification
+                .where(erpDetalleFacturaSpecs.idEncabezadoFacturaContains(idEncabezadoFactura))
+                .and(erpDetalleFacturaSpecs.fechaBetween(fechaInicio, fechaFin));
 
         return repdetfac.findAll(spec);
     }
+
+    @GetMapping("resumenDiario")
+    public ResumenDiarioDTO getResumenDiario(@RequestParam LocalDate fecha) {
+        List<erpDetalleFacturas> facturas = repdetfac.findAll(
+                (root, query, cb) -> cb.equal(root.get("fechaModificacion"), fecha)
+        );
+
+        double totalVentas = facturas.stream()
+                .mapToDouble(erpDetalleFacturas::getImpTotal)
+                .sum();
+
+        int totalProductos = facturas.stream()
+                .mapToInt(erpDetalleFacturas::getCantidad)
+                .sum();
+
+        return new ResumenDiarioDTO(fecha, totalVentas, totalProductos);
+    }
+
 
     @PostMapping("grabarDetalleFactura")
     public String grabarDetalleFacturas(@RequestBody erpDetalleFacturas detalleFacturas){
