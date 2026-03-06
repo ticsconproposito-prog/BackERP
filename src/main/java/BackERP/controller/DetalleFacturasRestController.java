@@ -4,7 +4,9 @@ package BackERP.controller;
 import BackERP.helper.erpDetalleFacturaSpecs;
 import BackERP.models.ResumenDiarioDTO;
 import BackERP.models.erpDetalleFacturas;
+import BackERP.models.erpInventario;
 import BackERP.repository.RepositoryDetalleFacturas;
+import BackERP.repository.RepositoryInventario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,8 @@ public class DetalleFacturasRestController {
 
     @Autowired
     private RepositoryDetalleFacturas repdetfac;
+    @Autowired
+    private RepositoryInventario repinv;
 
     @GetMapping("detalleFactura")
     public List<erpDetalleFacturas> getDetalleFacturas(
@@ -55,7 +59,6 @@ public class DetalleFacturasRestController {
     @PostMapping("grabarDetalleFactura")
     public String grabarDetalleFacturas(@RequestBody erpDetalleFacturas detalleFacturas){
         // valor por defecto
-
         if(detalleFacturas.getCantidadDeDescuento() != 0
                 && detalleFacturas.getPorcentajeDeDescuento() == 0) {
 
@@ -70,8 +73,32 @@ public class DetalleFacturasRestController {
         detalleFacturas.setEstado(1);
         repdetfac.save(detalleFacturas);
 
-        return "Grabado";
+        // 🔹 Descontar inventario
+
+        erpInventario inventario = repinv.findAll(
+                (root, query, cb) -> cb.equal(root.get("idProducto").get("idProducto"), detalleFacturas.getIdProducto())
+        ).stream().findFirst().orElse(null);
+
+     /*   if (inventario.getCantidadExistencias() < detalleFacturas.getCantidad()) {
+            return "Error: stock insuficiente";
+        }*/
+
+
+        if (inventario != null) {
+            int nuevaCantidad = inventario.getCantidadExistencias() - detalleFacturas.getCantidad();
+
+            inventario.setCantidadExistencias(nuevaCantidad);// Permitir negativos
+
+            // inventario.setCantidadExistencias(Math.max(nuevaCantidad, 0)); // evitar negativos
+
+            inventario.setFechaModificacion(LocalDate.now());
+            inventario.setHoraModificacion(LocalTime.now());
+            repinv.save(inventario);
+        }
+
+        return "Grabado y actualizado inventario";
     }
+
 
     @DeleteMapping("eliminarDetalleFactura/{idDetalleFactura}")
     public String eliminarDetalleFactura(@PathVariable long idDetalleFactura, @RequestBody erpDetalleFacturas  DetalleFacturas){

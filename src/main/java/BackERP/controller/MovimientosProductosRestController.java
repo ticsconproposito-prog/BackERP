@@ -1,7 +1,10 @@
 package BackERP.controller;
 
 import BackERP.helper.erpMovimientosProductosSpecs;
+import BackERP.models.erpInventario;
 import BackERP.models.erpMovimientosProductos;
+import BackERP.models.erpProductos;
+import BackERP.repository.RepositoryInventario;
 import BackERP.repository.RepositoryMovimientosProductos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
@@ -19,6 +22,9 @@ public class MovimientosProductosRestController {
     @Autowired
     private RepositoryMovimientosProductos removpro;
 
+    @Autowired
+    private RepositoryInventario repinv;
+
     @GetMapping("movimientosProductos")
     public List<erpMovimientosProductos> getMovimientosProductos( @RequestParam(required = false) Integer idOrdenProducto){
 
@@ -30,15 +36,50 @@ public class MovimientosProductosRestController {
     }
 
     @PostMapping("grabarMovimientosProductos")
-    public String grabarMovimientosProductos(@RequestBody erpMovimientosProductos MovimientosProductos){
+    public String grabarMovimientosProductos(@RequestBody erpMovimientosProductos movimientosProductos) {
         // valor por defecto
-        MovimientosProductos.setFechaModificacion(LocalDate.now());
-        MovimientosProductos.setHoraModificacion(LocalTime.now());
-        MovimientosProductos.setEstado(1);
-        removpro.save(MovimientosProductos);
+        movimientosProductos.setFechaModificacion(LocalDate.now());
+        movimientosProductos.setHoraModificacion(LocalTime.now());
+        movimientosProductos.setEstado(1);
+        removpro.save(movimientosProductos);
+
+        // Validar si el tipo de movimiento es 0 (entrada)
+        if (movimientosProductos.getIdOrdenProducto() == 0) {
+            erpInventario inventarioExistente = repinv.findByIdProducto_IdProductoAndIdUbicacion(
+                    movimientosProductos.getIdProducto(),
+                    movimientosProductos.getIdUbicacion()
+            );
+
+            if (inventarioExistente != null) {
+                // Si existe, sumar cantidad
+                inventarioExistente.setCantidadExistencias(
+                        inventarioExistente.getCantidadExistencias() + movimientosProductos.getCantidad()
+                );
+                inventarioExistente.setFechaModificacion(LocalDate.now());
+                inventarioExistente.setHoraModificacion(LocalTime.now());
+                inventarioExistente.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
+                repinv.save(inventarioExistente);
+            } else {
+                // Si no existe, crear nuevo registro
+                erpInventario nuevoInventario = new erpInventario();
+                erpProductos producto = new erpProductos();
+                producto.setIdProducto((long) movimientosProductos.getIdProducto());
+
+                nuevoInventario.setIdProducto(producto);
+                nuevoInventario.setIdUbicacion(movimientosProductos.getIdUbicacion());
+                nuevoInventario.setCantidadExistencias(movimientosProductos.getCantidad());
+                nuevoInventario.setCantidadDanados(0);
+                nuevoInventario.setEstado(1);
+                nuevoInventario.setFechaModificacion(LocalDate.now());
+                nuevoInventario.setHoraModificacion(LocalTime.now());
+                nuevoInventario.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
+                repinv.save(nuevoInventario);
+            }
+        }
 
         return "Grabado";
     }
+
 
     @PutMapping("editarMovimientosProductos/{idMovimientosProductos}")
     public String editarMovimientosProductos(@PathVariable long idMovimientosProductos, @RequestBody erpMovimientosProductos MovimientosProductos){

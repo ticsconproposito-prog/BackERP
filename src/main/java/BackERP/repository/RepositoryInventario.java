@@ -17,6 +17,6 @@ public interface RepositoryInventario extends JpaRepository<erpInventario, Long>
             "GROUP BY i.idProducto")
     List<erpInventarioAgrupadoDTO> obtenerInventarioAgrupado();
 
-
-
+    // Nuevo método para buscar inventario por producto y ubicación
+    erpInventario findByIdProducto_IdProductoAndIdUbicacion(int idProducto, int idUbicacion);
 }
