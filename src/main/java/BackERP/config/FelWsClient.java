@@ -70,6 +70,32 @@ public class FelWsClient {
                 .block();
     }
 
+    public String anulaDocumento(String uuid, String motivo) {
+        String soap = ""
+                + "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:guat=\"http://dbguatefac/Guatefac.wsdl\">"
+                + "  <soapenv:Header/>"
+                + "  <soapenv:Body>"
+                + "    <guat:anulaDocumento>"
+                + tag("pUsuario", props.getUsuario())
+                + tag("pPassword", props.getPassword())
+                + tag("pNitEmisor", props.getNitEmisor())
+                + tag("pUUID", uuid)
+                + tag("pMotivo", motivo)
+                + "    </guat:anulaDocumento>"
+                + "  </soapenv:Body>"
+                + "</soapenv:Envelope>";
+
+        return webClient.post()
+                .uri(props.getEndpoint())
+                .contentType(MediaType.TEXT_XML)
+                .header(HttpHeaders.AUTHORIZATION, basic(props.getBasicUser(), props.getBasicPass()))
+                .bodyValue(soap)
+                .retrieve()
+                .bodyToMono(String.class)
+                .block();
+    }
+
+
     private String buildSoapEnvelope(String pUsuario, String pPassword, String pNitEmisor,
                                      int pEstablecimiento, int pTipoDoc, String pIdMaquina,
                                      String pTipoRespuesta, String pXml) {

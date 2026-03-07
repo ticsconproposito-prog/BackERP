@@ -80,6 +80,28 @@ public class FelService {
         return result;
     }
 
+    public FelResult anularFactura(String idFacturaEncabezado, String motivo) {
+        String soapResponse = wsClient.anulaDocumento(idFacturaEncabezado, motivo);
+        FelResult result = responseParser.parse(soapResponse);
+
+        if (result.isOk()) {
+            try {
+                Optional<erpEncabezadoFacturas> optEnc = repEncFac.findByNumeroAutorizacionResAPI(idFacturaEncabezado);
+                if (optEnc.isPresent()) {
+                    erpEncabezadoFacturas enc = optEnc.get();
+                    enc.setFacturaProcesada("A"); // A = Anulada
+                    enc.setRespuestaXML(result.getRawResponse());
+                    repEncFac.save(enc);
+                }
+            } catch (Exception e) {
+                result.setError("Error al actualizar estado de factura: " + e.getMessage());
+            }
+        }
+
+        return result;
+    }
+
+
 
     private void validar(DteRequestDto req) {
         // Validaciones por línea
