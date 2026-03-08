@@ -49,7 +49,7 @@ public class MovimientosProductosRestController {
                 " ubicacion=" + movimientosProductos.getIdUbicacion());
 
 
-        if (movimientosProductos.getIdOrdenProducto() == 0) {
+        if (tipoDeOrden == 0) {
             erpInventario inventarioExistente = repinv.findByIdProducto_IdProductoAndIdUbicacion(
                     movimientosProductos.getIdProducto().getIdProducto(),
                     movimientosProductos.getIdUbicacion()
