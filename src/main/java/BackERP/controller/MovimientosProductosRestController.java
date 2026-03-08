@@ -48,7 +48,7 @@ public class MovimientosProductosRestController {
         // Validar si el tipo de movimiento es 0 (entrada)
         if (movimientosProductos.getIdOrdenProducto() == 0) {
             erpInventario inventarioExistente = repinv.findByIdProducto_IdProductoAndIdUbicacion(
-                    movimientosProductos.getIdProducto(),
+                    (long) movimientosProductos.getIdProducto(),
                     movimientosProductos.getIdUbicacion()
             );
 
