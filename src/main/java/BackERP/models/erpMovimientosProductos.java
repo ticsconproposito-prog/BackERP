@@ -14,8 +14,10 @@ public class erpMovimientosProductos {
     private Long idMovimientoProducto;
     @Column
     private int idOrdenProducto;
-    @Column
-    private Long idProducto;
+    @ManyToOne
+    @JoinColumn(name = "idProducto", referencedColumnName = "idProducto")
+    private erpProductos idProducto;
+
     @Column
     private int cantidad;
     @Column
@@ -54,11 +56,11 @@ public class erpMovimientosProductos {
 
 
 
-    public Long getIdProducto() {
+    public erpProductos getIdProducto() {
         return idProducto;
     }
 
-    public void setIdProducto(Long idProducto) {
+    public void setIdProducto(erpProductos idProducto) {
         this.idProducto = idProducto;
     }
 

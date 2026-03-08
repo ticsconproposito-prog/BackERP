@@ -42,7 +42,7 @@ public class erpProductosSpecs{
 
     }
 
-    public static Specification<erpProductos> idProductoContains(Integer id) {
+    public static Specification<erpProductos> idProductoContains(Long id) {
         return (root, query, cb) ->{
             if (id == null) {
                 System.out.println("entre"+id);

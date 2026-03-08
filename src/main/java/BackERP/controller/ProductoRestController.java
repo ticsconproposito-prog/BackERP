@@ -26,7 +26,7 @@ public class ProductoRestController {
         @RequestParam(required = false) String codigoProducto,
         @RequestParam(required = false) String codigoProductoProveedor,
         @RequestParam(required = false) String descripcionProducto,
-        @RequestParam(required = false) Integer idProducto,
+        @RequestParam(required = false) Long idProducto,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "20") int size,
         @RequestParam(defaultValue = "idProducto,asc") String sort

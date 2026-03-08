@@ -48,7 +48,7 @@ public class MovimientosProductosRestController {
         // Validar si el tipo de movimiento es 0 (entrada)
         if (movimientosProductos.getIdOrdenProducto() == 0) {
             erpInventario inventarioExistente = repinv.findByIdProducto_IdProductoAndIdUbicacion(
-                    (long) movimientosProductos.getIdProducto(),
+                    movimientosProductos.getIdProducto().getIdProducto(),
                     movimientosProductos.getIdUbicacion()
             );
 
@@ -70,7 +70,7 @@ public class MovimientosProductosRestController {
                 System.out.println("Inventario No Existe ");
                 erpInventario nuevoInventario = new erpInventario();
                 erpProductos producto = new erpProductos();
-                producto.setIdProducto((long) movimientosProductos.getIdProducto());
+                producto.setIdProducto(movimientosProductos.getIdProducto().getIdProducto());
 
                 nuevoInventario.setIdProducto(producto);
                 nuevoInventario.setIdUbicacion(movimientosProductos.getIdUbicacion());
