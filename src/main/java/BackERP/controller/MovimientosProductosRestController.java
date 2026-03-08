@@ -6,6 +6,7 @@ import BackERP.models.erpMovimientosProductos;
 import BackERP.models.erpProductos;
 import BackERP.repository.RepositoryInventario;
 import BackERP.repository.RepositoryMovimientosProductos;
+import BackERP.repository.RepositoryProductos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -25,6 +26,10 @@ public class MovimientosProductosRestController {
     @Autowired
     private RepositoryInventario repinv;
 
+    @Autowired
+    private RepositoryProductos repro;
+
+
     @GetMapping("movimientosProductos")
     public List<erpMovimientosProductos> getMovimientosProductos( @RequestParam(required = false) Integer idOrdenProducto){
 
@@ -36,17 +41,16 @@ public class MovimientosProductosRestController {
     }
 
     @PostMapping("grabarMovimientosProductos")
-    public String grabarMovimientosProductos(@RequestBody erpMovimientosProductos movimientosProductos,
-                                             @RequestParam int tipoDeMovimiento,
-                                             @RequestParam(defaultValue = "0") int ubicacionSalida,
-                                             @RequestParam(defaultValue = "0") int ubicacionIngreso) {
+    public Long grabarMovimientosProductos(@RequestBody erpMovimientosProductos movimientosProductos,
+                                           @RequestParam int tipoDeMovimiento,
+                                           @RequestParam(defaultValue = "0") int ubicacionSalida,
+                                           @RequestParam(defaultValue = "0") int ubicacionIngreso) {
         movimientosProductos.setFechaModificacion(LocalDate.now());
         movimientosProductos.setHoraModificacion(LocalTime.now());
         movimientosProductos.setEstado(1);
-        removpro.save(movimientosProductos);
 
-        System.out.println("Buscando inventario con producto=" + movimientosProductos.getIdProducto().getIdProducto() +
-                " ubicacion=" + movimientosProductos.getIdUbicacion() + " tipoDeMovimiento " + tipoDeMovimiento);
+        // Guardar movimiento y obtener ID
+        erpMovimientosProductos savedMovimiento = removpro.save(movimientosProductos);
 
         erpInventario inventarioExistente = repinv.findByIdProducto_IdProductoAndIdUbicacion(
                 movimientosProductos.getIdProducto().getIdProducto(),
@@ -54,7 +58,7 @@ public class MovimientosProductosRestController {
         );
 
         if (tipoDeMovimiento == 0) {
-            // Entrada: sumar al inventario
+            // Entrada
             if (inventarioExistente != null) {
                 inventarioExistente.setCantidadExistencias(
                         inventarioExistente.getCantidadExistencias() + movimientosProductos.getCantidad()
@@ -75,8 +79,20 @@ public class MovimientosProductosRestController {
                 nuevoInventario.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
                 repinv.save(nuevoInventario);
             }
+
+            // 🔎 Actualizar el producto en la tabla de productos
+            erpProductos producto = repro.findById(movimientosProductos.getIdProducto().getIdProducto()).orElse(null);
+            if (producto != null) {
+                producto.setPrecioCompra(movimientosProductos.getPrecioCompra()); // ejemplo: actualizar precio
+                producto.setFechaModificacion(LocalDate.now());
+                producto.setHoraModificacion(LocalTime.now());
+                producto.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
+                repro.save(producto);
+            }
+
+
         } else if (tipoDeMovimiento == 1) {
-            // Salida: restar al inventario
+            // Salida
             if (inventarioExistente != null) {
                 inventarioExistente.setCantidadExistencias(
                         inventarioExistente.getCantidadExistencias() - movimientosProductos.getCantidad()
@@ -86,7 +102,6 @@ public class MovimientosProductosRestController {
                 inventarioExistente.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
                 repinv.save(inventarioExistente);
             } else {
-                // Si no existe inventario, crear con cantidad negativa
                 erpInventario nuevoInventario = new erpInventario();
                 nuevoInventario.setIdProducto(movimientosProductos.getIdProducto());
                 nuevoInventario.setIdUbicacion(movimientosProductos.getIdUbicacion());
@@ -100,8 +115,12 @@ public class MovimientosProductosRestController {
             }
         }
 
-        return "Grabado";
+
+
+        // Retornar el ID del movimiento recién grabado
+        return savedMovimiento.getIdMovimientoProducto();
     }
+
 
 
     @PutMapping("editarMovimientosProductos/{idMovimientosProductos}")
