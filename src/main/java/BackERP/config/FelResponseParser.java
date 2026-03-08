@@ -32,9 +32,13 @@ public class FelResponseParser {
         res.setNumeroAutorizacion(numeroAutorizacion);
         res.setSerie(serie);
         res.setPreimpreso(preimpreso);
-        if (numeroAutorizacion == null) {
-            res.setError(resultado);
+        if (numeroAutorizacion == null || error != null) {
+            res.setError(error != null ? error : resultado);
+            res.setOk(false);
+        } else {
+            res.setOk(true);
         }
+
         res.setOk(error == null && numeroAutorizacion != null);
 
 // si quieres extender FelResult con más campos:

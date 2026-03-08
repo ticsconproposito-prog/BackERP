@@ -70,10 +70,13 @@ public class FelService {
                 } else {
                     // Registrar el error en el campo error del resultado
                     result.setError("No se encontró encabezado de factura con ID " + ID);
+                    result.setOk(false);
+
                 }
             } catch (Exception e) {
                 // Captura cualquier otro error inesperado
                 result.setError("Error al procesar encabezado de factura: " + e.getMessage());
+                result.setOk(false);
             }
         }
 
@@ -95,6 +98,8 @@ public class FelService {
                 }
             } catch (Exception e) {
                 result.setError("Error al actualizar estado de factura: " + e.getMessage());
+                result.setOk(false);
+
             }
         }
 
