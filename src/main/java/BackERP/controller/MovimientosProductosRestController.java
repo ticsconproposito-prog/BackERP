@@ -38,23 +38,23 @@ public class MovimientosProductosRestController {
     @PostMapping("grabarMovimientosProductos")
     public String grabarMovimientosProductos(@RequestBody erpMovimientosProductos movimientosProductos,
                                              @RequestParam int tipoDeMovimiento,
-                                             @RequestParam (defaultValue = "0") int ubicacionSalida,
-                                             @RequestParam (defaultValue = "0") int ubicacionIngreso) {
+                                             @RequestParam(defaultValue = "0") int ubicacionSalida,
+                                             @RequestParam(defaultValue = "0") int ubicacionIngreso) {
         movimientosProductos.setFechaModificacion(LocalDate.now());
         movimientosProductos.setHoraModificacion(LocalTime.now());
         movimientosProductos.setEstado(1);
         removpro.save(movimientosProductos);
 
         System.out.println("Buscando inventario con producto=" + movimientosProductos.getIdProducto().getIdProducto() +
-                " ubicacion=" + movimientosProductos.getIdUbicacion() +" tipoDeMovimiento "+ tipoDeMovimiento);
+                " ubicacion=" + movimientosProductos.getIdUbicacion() + " tipoDeMovimiento " + tipoDeMovimiento);
 
+        erpInventario inventarioExistente = repinv.findByIdProducto_IdProductoAndIdUbicacion(
+                movimientosProductos.getIdProducto().getIdProducto(),
+                movimientosProductos.getIdUbicacion()
+        );
 
         if (tipoDeMovimiento == 0) {
-            erpInventario inventarioExistente = repinv.findByIdProducto_IdProductoAndIdUbicacion(
-                    movimientosProductos.getIdProducto().getIdProducto(),
-                    movimientosProductos.getIdUbicacion()
-            );
-
+            // Entrada: sumar al inventario
             if (inventarioExistente != null) {
                 inventarioExistente.setCantidadExistencias(
                         inventarioExistente.getCantidadExistencias() + movimientosProductos.getCantidad()
@@ -65,7 +65,7 @@ public class MovimientosProductosRestController {
                 repinv.save(inventarioExistente);
             } else {
                 erpInventario nuevoInventario = new erpInventario();
-                nuevoInventario.setIdProducto(movimientosProductos.getIdProducto()); // usar el objeto completo
+                nuevoInventario.setIdProducto(movimientosProductos.getIdProducto());
                 nuevoInventario.setIdUbicacion(movimientosProductos.getIdUbicacion());
                 nuevoInventario.setCantidadExistencias(movimientosProductos.getCantidad());
                 nuevoInventario.setCantidadDanados(0);
@@ -74,7 +74,29 @@ public class MovimientosProductosRestController {
                 nuevoInventario.setHoraModificacion(LocalTime.now());
                 nuevoInventario.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
                 repinv.save(nuevoInventario);
-
+            }
+        } else if (tipoDeMovimiento == 1) {
+            // Salida: restar al inventario
+            if (inventarioExistente != null) {
+                inventarioExistente.setCantidadExistencias(
+                        inventarioExistente.getCantidadExistencias() - movimientosProductos.getCantidad()
+                );
+                inventarioExistente.setFechaModificacion(LocalDate.now());
+                inventarioExistente.setHoraModificacion(LocalTime.now());
+                inventarioExistente.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
+                repinv.save(inventarioExistente);
+            } else {
+                // Si no existe inventario, crear con cantidad negativa
+                erpInventario nuevoInventario = new erpInventario();
+                nuevoInventario.setIdProducto(movimientosProductos.getIdProducto());
+                nuevoInventario.setIdUbicacion(movimientosProductos.getIdUbicacion());
+                nuevoInventario.setCantidadExistencias(-movimientosProductos.getCantidad());
+                nuevoInventario.setCantidadDanados(0);
+                nuevoInventario.setEstado(1);
+                nuevoInventario.setFechaModificacion(LocalDate.now());
+                nuevoInventario.setHoraModificacion(LocalTime.now());
+                nuevoInventario.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
+                repinv.save(nuevoInventario);
             }
         }
 
