@@ -42,6 +42,7 @@ public class MovimientosProductosRestController {
         movimientosProductos.setHoraModificacion(LocalTime.now());
         movimientosProductos.setEstado(1);
         System.out.println("idProducto MOV "+ movimientosProductos.getIdProducto());
+        System.out.println("idUbicacion MOV "+ movimientosProductos.getIdUbicacion());
 
         // Validar si el tipo de movimiento es 0 (entrada)
         if (movimientosProductos.getIdOrdenProducto() == 0) {
