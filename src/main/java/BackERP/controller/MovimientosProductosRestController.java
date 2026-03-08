@@ -36,7 +36,10 @@ public class MovimientosProductosRestController {
     }
 
     @PostMapping("grabarMovimientosProductos")
-    public String grabarMovimientosProductos(@RequestBody erpMovimientosProductos movimientosProductos) {
+    public String grabarMovimientosProductos(@RequestBody erpMovimientosProductos movimientosProductos,
+                                             @RequestParam int tipoDeOrden,
+                                             @RequestParam int ubicacionSalida,
+                                             @RequestParam int ubicacionIngreso) {
         movimientosProductos.setFechaModificacion(LocalDate.now());
         movimientosProductos.setHoraModificacion(LocalTime.now());
         movimientosProductos.setEstado(1);
