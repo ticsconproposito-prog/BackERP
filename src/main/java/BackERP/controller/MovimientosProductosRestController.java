@@ -41,7 +41,7 @@ public class MovimientosProductosRestController {
         movimientosProductos.setFechaModificacion(LocalDate.now());
         movimientosProductos.setHoraModificacion(LocalTime.now());
         movimientosProductos.setEstado(1);
-        removpro.save(movimientosProductos);
+        System.out.println("idProducto "+ movimientosProductos.getIdProducto());
 
         // Validar si el tipo de movimiento es 0 (entrada)
         if (movimientosProductos.getIdOrdenProducto() == 0) {
@@ -76,7 +76,7 @@ public class MovimientosProductosRestController {
                 repinv.save(nuevoInventario);
             }
         }
-
+        removpro.save(movimientosProductos);
         return "Grabado";
     }
 

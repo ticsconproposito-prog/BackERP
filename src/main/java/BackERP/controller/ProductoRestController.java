@@ -31,7 +31,7 @@ public class ProductoRestController {
         @RequestParam(defaultValue = "20") int size,
         @RequestParam(defaultValue = "idProducto,asc") String sort
     ) {
-        System.out.println("idProducto"+idProducto);
+        System.out.println("idProducto " +idProducto);
             String[] sortParts = sort.split(",", 2);
 
             Sort.Direction dir = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.ASC;
