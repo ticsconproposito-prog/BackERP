@@ -52,6 +52,8 @@ public class MovimientosProductosRestController {
                     movimientosProductos.getIdUbicacion()
             );
 
+            System.out.println("Salio de Inventario ");
+
             if (inventarioExistente != null) {
                 // Si existe, sumar cantidad
 
