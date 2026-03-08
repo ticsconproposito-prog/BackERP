@@ -15,7 +15,7 @@ public class erpMovimientosProductos {
     @Column
     private int idOrdenProducto;
     @Column
-    private int idProducto;
+    private Long idProducto;
     @Column
     private int cantidad;
     @Column
@@ -54,11 +54,11 @@ public class erpMovimientosProductos {
 
 
 
-    public int getIdProducto() {
+    public Long getIdProducto() {
         return idProducto;
     }
 
-    public void setIdProducto(int idProducto) {
+    public void setIdProducto(Long idProducto) {
         this.idProducto = idProducto;
     }
 
