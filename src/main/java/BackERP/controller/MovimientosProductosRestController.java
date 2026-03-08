@@ -42,8 +42,9 @@ public class MovimientosProductosRestController {
         movimientosProductos.setEstado(1);
         removpro.save(movimientosProductos);
 
-        System.out.println("idProducto MOV " + movimientosProductos.getIdProducto().getIdProducto());
-        System.out.println("idUbicacion MOV " + movimientosProductos.getIdUbicacion());
+        System.out.println("Buscando inventario con producto=" + movimientosProductos.getIdProducto().getIdProducto() +
+                " ubicacion=" + movimientosProductos.getIdUbicacion());
+
 
         if (movimientosProductos.getIdOrdenProducto() == 0) {
             erpInventario inventarioExistente = repinv.findByIdProducto_IdProductoAndIdUbicacion(
@@ -61,7 +62,7 @@ public class MovimientosProductosRestController {
                 repinv.save(inventarioExistente);
             } else {
                 erpInventario nuevoInventario = new erpInventario();
-                nuevoInventario.setIdProducto(movimientosProductos.getIdProducto());
+                nuevoInventario.setIdProducto(movimientosProductos.getIdProducto()); // usar el objeto completo
                 nuevoInventario.setIdUbicacion(movimientosProductos.getIdUbicacion());
                 nuevoInventario.setCantidadExistencias(movimientosProductos.getCantidad());
                 nuevoInventario.setCantidadDanados(0);
@@ -70,6 +71,7 @@ public class MovimientosProductosRestController {
                 nuevoInventario.setHoraModificacion(LocalTime.now());
                 nuevoInventario.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
                 repinv.save(nuevoInventario);
+
             }
         }
 
