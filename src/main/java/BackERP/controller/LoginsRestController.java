@@ -16,7 +16,7 @@ import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-public class SegLoginsRestController {
+public class LoginsRestController {
 
     @Autowired
     private RepositorySegLogins repoSegLogins;

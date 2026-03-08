@@ -1,7 +1,7 @@
 package BackERP.controller;
 
 import BackERP.helper.erpEmpleadosSpecs;
-import BackERP.models.erpempleados;
+import BackERP.models.erpEmpleados;
 import BackERP.repository.RepositoryEmpleados;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,7 +22,7 @@ public class EmpleadosRestController {
     private RepositoryEmpleados reemp;
 
     @GetMapping("empleados")
-    public Page<erpempleados> getEmpleados(
+    public Page<erpEmpleados> getEmpleados(
             @RequestParam(required = false) String nombreEmpleado,
             @RequestParam(required = false) Integer idEmpleado,
             @RequestParam(defaultValue = "0") int page,
@@ -37,7 +37,7 @@ public class EmpleadosRestController {
 
         Pageable pageable = PageRequest.of(page, size, s);
 
-        Specification<erpempleados> spec = Specification
+        Specification<erpEmpleados> spec = Specification
                 .where(erpEmpleadosSpecs.estadoEquals(1))
                 .and(erpEmpleadosSpecs.idEmpleadoContains(idEmpleado))
                 .and(erpEmpleadosSpecs.nombreEmpleadoContains(nombreEmpleado));
@@ -46,7 +46,7 @@ public class EmpleadosRestController {
     }
 
     @PostMapping("grabarEmpleado")
-    public String grabarEmpleado(@RequestBody erpempleados empleado){
+    public String grabarEmpleado(@RequestBody erpEmpleados empleado){
 
         empleado.setFechaModificacion(LocalDate.now());
         empleado.setHoraModificacion(LocalTime.now());
@@ -56,10 +56,10 @@ public class EmpleadosRestController {
         return "Grabado";
     }
     @PutMapping("editarEmpleado/{idEmpleado}")
-    public String editarEmpleado(@PathVariable long idEmpleado, @RequestBody erpempleados empleado){
+    public String editarEmpleado(@PathVariable long idEmpleado, @RequestBody erpEmpleados empleado){
 
 
-        erpempleados updateEmpleado = reemp.findById(idEmpleado).get();
+        erpEmpleados updateEmpleado = reemp.findById(idEmpleado).get();
         updateEmpleado.setNombre(empleado.getNombre());
         updateEmpleado.setApellido(empleado.getApellido());
         updateEmpleado.setEmail(empleado.getEmail());
@@ -78,9 +78,9 @@ public class EmpleadosRestController {
     }
 
     @DeleteMapping("eliminarEmpleado/{idEmpleado}")
-    public String eliminarEmpleado(@PathVariable long idEmpleado, @RequestBody erpempleados empleado){
+    public String eliminarEmpleado(@PathVariable long idEmpleado, @RequestBody erpEmpleados empleado){
         System.out.println("eliminar");
-        erpempleados updateEmpleado = reemp.findById(idEmpleado).get();
+        erpEmpleados updateEmpleado = reemp.findById(idEmpleado).get();
         updateEmpleado.setFechaModificacion(LocalDate.now());
         updateEmpleado.setHoraModificacion(LocalTime.now());
         updateEmpleado.setIdUsuarioModificacion(empleado.getIdUsuarioModificacion());

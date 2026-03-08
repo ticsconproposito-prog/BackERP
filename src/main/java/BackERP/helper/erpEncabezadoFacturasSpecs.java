@@ -15,7 +15,7 @@ public class erpEncabezadoFacturasSpecs {
             if (nombreCliente == null || nombreCliente.isEmpty()) {
                 return null; // no aplica filtro si viene null
             }
-            String pattern = LikeHelper.buildLikePattern(nombreCliente, LikeHelper.MatchMode.ANYWHERE, true);
+            String pattern = likeHelper.buildLikePattern(nombreCliente, likeHelper.MatchMode.ANYWHERE, true);
 
             return cb.like(cb.lower(root.get("idCliente").get("nombreCliente")),pattern, '\\');
         };
@@ -26,7 +26,7 @@ public class erpEncabezadoFacturasSpecs {
             if (nit == null || nit.isEmpty()) {
                 return null; // no aplica filtro si viene null
             }
-            String pattern = LikeHelper.buildLikePattern(nit, LikeHelper.MatchMode.ANYWHERE, true);
+            String pattern = likeHelper.buildLikePattern(nit, likeHelper.MatchMode.ANYWHERE, true);
 
             return cb.like(cb.lower(root.get("idCliente").get("nit")),pattern, '\\');
         };
@@ -34,7 +34,7 @@ public class erpEncabezadoFacturasSpecs {
 
     public static Specification<erpEncabezadoFacturas> referenciaFacturaContains(String referencia) {
         return (root, query, cb) -> {
-            String pattern = LikeHelper.buildLikePattern(referencia, LikeHelper.MatchMode.ANYWHERE, false);
+            String pattern = likeHelper.buildLikePattern(referencia, likeHelper.MatchMode.ANYWHERE, false);
             if (pattern == null) return cb.conjunction();
             return cb.like(cb.lower(root.get("referencia")), pattern, '\\');
         };
@@ -42,7 +42,7 @@ public class erpEncabezadoFacturasSpecs {
 
     public static Specification<erpEncabezadoFacturas> tipoDocumentoContains(String tipoDocumento) {
         return (root, query, cb) -> {
-            String pattern = LikeHelper.buildLikePattern(tipoDocumento, LikeHelper.MatchMode.ANYWHERE, false);
+            String pattern = likeHelper.buildLikePattern(tipoDocumento, likeHelper.MatchMode.ANYWHERE, false);
             if (pattern == null) return cb.conjunction();
             return cb.like(cb.lower(root.get("tipoDocumento")), pattern, '\\');
         };

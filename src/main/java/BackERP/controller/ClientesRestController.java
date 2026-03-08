@@ -2,7 +2,7 @@ package BackERP.controller;
 
 
 import BackERP.helper.erpClientesSpecs;
-import BackERP.models.erpclientes;
+import BackERP.models.erpClientes;
 import BackERP.repository.RepositoryClientes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +23,7 @@ public class ClientesRestController {
     private RepositoryClientes repcli;
 
     @GetMapping("clientes")
-    public Page<erpclientes> getClientes(
+    public Page<erpClientes> getClientes(
             @RequestParam(required = false) Integer tipoDocumento,
             @RequestParam(required = false) String nombreCliente,
             @RequestParam(required = false) String documentoCliente,
@@ -41,7 +41,7 @@ public class ClientesRestController {
 
         Pageable pageable = PageRequest.of(page, size, s);
 
-        Specification<erpclientes> spec = Specification
+        Specification<erpClientes> spec = Specification
                 .where(erpClientesSpecs.estadoEquals(1))
                 .and(erpClientesSpecs.idCLienteContains(idCliente))
                 .and(erpClientesSpecs.nombreClienteContains(nombreCliente));
@@ -58,22 +58,22 @@ public class ClientesRestController {
     }
 
     @PostMapping("grabarCliente")
-    public ResponseEntity<Integer> grabarCliente(@RequestBody erpclientes clientes){
+    public ResponseEntity<Integer> grabarCliente(@RequestBody erpClientes clientes){
 
         // valor por defecto
         clientes.setNit(clientes.getNit().replaceAll("[\\s-]", ""));
         clientes.setFechaModificacion(LocalDate.now());
         clientes.setHoraModificacion(LocalTime.now());
         clientes.setEstado(1);
-        erpclientes saved = repcli.save(clientes);
+        erpClientes saved = repcli.save(clientes);
 
         return ResponseEntity.ok(saved.getIdCliente());
     }
     @PutMapping("editarCliente/{idCliente}")
-    public String editarCliente(@PathVariable long idCliente, @RequestBody erpclientes clientes){
+    public String editarCliente(@PathVariable long idCliente, @RequestBody erpClientes clientes){
 
 
-        erpclientes erpclientes = repcli.findById(idCliente).get();
+        erpClientes erpclientes = repcli.findById(idCliente).get();
         erpclientes.setNombreCliente(clientes.getNombreCliente());
         erpclientes.setDireccionFisica(clientes.getDireccionFisica());
         erpclientes.setCorreoElectronico(clientes.getCorreoElectronico());
@@ -93,9 +93,9 @@ public class ClientesRestController {
     }
 
     @DeleteMapping("eliminarCliente/{idCliente}")
-    public String eliminarCliente(@PathVariable long idCliente, @RequestBody erpclientes clientes){
+    public String eliminarCliente(@PathVariable long idCliente, @RequestBody erpClientes clientes){
         System.out.println("eliminar");
-        erpclientes erpclientes = repcli.findById(idCliente).get();
+        erpClientes erpclientes = repcli.findById(idCliente).get();
         erpclientes.setFechaModificacion(LocalDate.now());
         erpclientes.setHoraModificacion(LocalTime.now());
         erpclientes.setIdUsuarioModificacion(clientes.getIdUsuarioModificacion());

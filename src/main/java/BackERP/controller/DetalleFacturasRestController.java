@@ -2,7 +2,7 @@ package BackERP.controller;
 
 
 import BackERP.helper.erpDetalleFacturaSpecs;
-import BackERP.models.ResumenDiarioDTO;
+import BackERP.models.felResumenDiarioDTO;
 import BackERP.models.erpDetalleFacturas;
 import BackERP.models.erpInventario;
 import BackERP.repository.RepositoryDetalleFacturas;
@@ -11,8 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -39,7 +37,7 @@ public class DetalleFacturasRestController {
     }
 
     @GetMapping("resumenDiario")
-    public ResumenDiarioDTO getResumenDiario(@RequestParam LocalDate fecha) {
+    public felResumenDiarioDTO getResumenDiario(@RequestParam LocalDate fecha) {
         List<erpDetalleFacturas> facturas = repdetfac.findAll(
                 (root, query, cb) -> cb.equal(root.get("fechaModificacion"), fecha)
         );
@@ -52,7 +50,7 @@ public class DetalleFacturasRestController {
                 .mapToInt(erpDetalleFacturas::getCantidad)
                 .sum();
 
-        return new ResumenDiarioDTO(fecha, totalVentas, totalProductos);
+        return new felResumenDiarioDTO(fecha, totalVentas, totalProductos);
     }
 
 

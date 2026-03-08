@@ -1,24 +1,24 @@
 package BackERP.helper;
 
 
-import BackERP.models.erpempleados;
+import BackERP.models.erpEmpleados;
 import org.springframework.data.jpa.domain.Specification;
 
 public class erpEmpleadosSpecs {
 
-    public static Specification<erpempleados> nombreEmpleadoContains(String nombre) {
+    public static Specification<erpEmpleados> nombreEmpleadoContains(String nombre) {
         return (root, query, cb) -> {
             if (nombre == null || nombre.isEmpty()) {
                 return null; // no aplica filtro si viene null
             }
-            String pattern = LikeHelper.buildLikePattern(nombre, LikeHelper.MatchMode.ANYWHERE, true);
+            String pattern = likeHelper.buildLikePattern(nombre, likeHelper.MatchMode.ANYWHERE, true);
 
             return cb.like(cb.lower(root.get("nombre")),pattern, '\\');
         };
     }
 
 
-    public static Specification<erpempleados> idEmpleadoContains(Integer id) {
+    public static Specification<erpEmpleados> idEmpleadoContains(Integer id) {
         return (root, query, cb) ->{
             if (id == null) {
                 return null; // <-- al devolver null, no se agrega restricción }
@@ -27,7 +27,7 @@ public class erpEmpleadosSpecs {
         };
     }
 
-    public static Specification<erpempleados> estadoEquals(int estado) {
+    public static Specification<erpEmpleados> estadoEquals(int estado) {
         return (root, query, cb) ->
                 cb.equal(root.get("estado").as(Integer.class), estado);
 

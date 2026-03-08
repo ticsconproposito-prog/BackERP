@@ -17,7 +17,7 @@ public class erpUbicacionesSpecs {
 
     public static Specification<erpUbicaciones> nombreUbicacionContains(String nombreUbicacion) {
         return (root, query, cb) -> {
-            String pattern = LikeHelper.buildLikePattern(nombreUbicacion, LikeHelper.MatchMode.ANYWHERE, false);
+            String pattern = likeHelper.buildLikePattern(nombreUbicacion, likeHelper.MatchMode.ANYWHERE, false);
             if (pattern == null) return cb.conjunction();
             return cb.like(cb.lower(root.get("nombreUbicacion")), pattern, '\\');
         };

@@ -12,7 +12,7 @@ import java.util.List;
  * Alineado con el Anexo 13: Receptor, InfoDoc, Totales y Detalles/Productos.
  */
 
- public class DteRequestDto {
+ public class felDteRequestDto {
 
     @NotNull
     private Integer tipoDoc;           // 1..10 (FACT, FCAM, FPEQ, FCAP, FESP, NABN, RDON, RECI, NDEB, NCRE)
@@ -35,18 +35,18 @@ import java.util.List;
 
     @Valid
     @NotNull
-    private List<ItemDto> items;
+    private List<felItemDto> items;
 
     @Valid
     @NotNull
-    private FelReceptorDto receptor;
+    private felReceptorDto receptor;
 
     @Valid
     @NotNull
-    private TotalesDto totales;
+    private felTotalesDto totales;
 
     @Valid
-    private DatosAdicionalesDto datosAdicionales;
+    private felDatosAdicionalesDto datosAdicionales;
 
 
 
@@ -85,17 +85,17 @@ import java.util.List;
     public Long getNumeroAdmin() { return numeroAdmin; }
     public void setNumeroAdmin(Long numeroAdmin) { this.numeroAdmin = numeroAdmin; }
 
-    public List<ItemDto> getItems() { return items; }
-    public void setItems(List<ItemDto> items) { this.items = items; }
+    public List<felItemDto> getItems() { return items; }
+    public void setItems(List<felItemDto> items) { this.items = items; }
 
-    public FelReceptorDto getReceptor() { return receptor; }
-    public void setReceptor(FelReceptorDto receptor) { this.receptor = receptor; }
+    public felReceptorDto getReceptor() { return receptor; }
+    public void setReceptor(felReceptorDto receptor) { this.receptor = receptor; }
 
-    public TotalesDto getTotales() { return totales; }
-    public void setTotales(TotalesDto totales) { this.totales = totales; }
+    public felTotalesDto getTotales() { return totales; }
+    public void setTotales(felTotalesDto totales) { this.totales = totales; }
 
-    public DatosAdicionalesDto getDatosAdicionales() { return datosAdicionales; }
-    public void setDatosAdicionales(DatosAdicionalesDto datosAdicionales) { this.datosAdicionales = datosAdicionales; }
+    public felDatosAdicionalesDto getDatosAdicionales() { return datosAdicionales; }
+    public void setDatosAdicionales(felDatosAdicionalesDto datosAdicionales) { this.datosAdicionales = datosAdicionales; }
 
     public String getDaSerie() { return daSerie; }
     public void setDaSerie(String daSerie) { this.daSerie = daSerie; }

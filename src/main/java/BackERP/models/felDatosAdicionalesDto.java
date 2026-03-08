@@ -2,7 +2,7 @@ package BackERP.models;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class DatosAdicionalesDto {
+public class felDatosAdicionalesDto {
 
     @NotBlank
     private String tipoReceptor;

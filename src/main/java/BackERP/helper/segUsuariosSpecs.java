@@ -10,7 +10,7 @@ public class segUsuariosSpecs {
             if (nombre == null || nombre.isEmpty()) {
                 return null; // no aplica filtro si viene null
             }
-            String pattern = LikeHelper.buildLikePattern(nombre, LikeHelper.MatchMode.ANYWHERE, true);
+            String pattern = likeHelper.buildLikePattern(nombre, likeHelper.MatchMode.ANYWHERE, true);
 
             return cb.like(cb.lower(root.get("usuario")),pattern, '\\');
         };

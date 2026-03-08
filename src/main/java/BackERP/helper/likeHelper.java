@@ -1,9 +1,9 @@
 package BackERP.helper;
 
-public class LikeHelper {
+public class likeHelper {
 
 
-        private LikeHelper() {}
+        private likeHelper() {}
 
         /**
          * Escapa los caracteres especiales del patrón LIKE: \, %, _

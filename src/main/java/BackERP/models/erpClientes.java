@@ -6,7 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-public class erpclientes {
+public class erpClientes {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +40,7 @@ public class erpclientes {
     @Column
     private Integer idUsuarioModificacion;
 
-    public erpclientes() {
+    public erpClientes() {
     }
 
     public Integer getIdCliente() {

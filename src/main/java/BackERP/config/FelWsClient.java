@@ -1,13 +1,12 @@
 
 package BackERP.config;
 
-import BackERP.models.FelProperties;
+import BackERP.models.felProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -15,11 +14,11 @@ import java.util.Base64;
 @Component
 public class FelWsClient {
 
-    private final FelProperties props;
+    private final felProperties props;
     private final WebClient webClient;
 
     @Autowired
-    public FelWsClient(FelProperties props) {
+    public FelWsClient(felProperties props) {
         this.props = props;
         this.webClient = WebClient.builder().build();
     }

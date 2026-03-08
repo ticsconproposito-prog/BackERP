@@ -3,7 +3,7 @@ package BackERP.controller;
 
 import BackERP.config.FelResult;
 import BackERP.config.FelService;
-import BackERP.models.DteRequestDto;
+import BackERP.models.felDteRequestDto;
 
 import jakarta.validation.Valid;
 
@@ -27,7 +27,7 @@ public class FelController {
     }
 
     @PostMapping("/dtes")
-    public ResponseEntity<?> generar(@Valid @RequestBody DteRequestDto req) {
+    public ResponseEntity<?> generar(@Valid @RequestBody felDteRequestDto req) {
         FelResult result = felService.generarDte(req);
         if (result.isOk()) {
             Map<String, Object> body = new HashMap<>();

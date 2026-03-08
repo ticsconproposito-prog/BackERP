@@ -10,7 +10,7 @@ import jakarta.validation.constraints.NotNull;
  * DTO de detalle (producto/servicio) del DTE.
  * Incluye montos calculados para validación/consistencia con la guía FEL.
  */
-public class ItemDto {
+public class felItemDto {
 
     @NotBlank
     private String producto;
@@ -57,7 +57,7 @@ public class ItemDto {
     private String tipoVentaDet;       // B | S (opcional si ya envías a nivel documento)
 
     @Valid
-    private DatosAdicionalesProdDto datosAdicionalesProd;
+    private felDatosAdicionalesProdDto datosAdicionalesProd;
 
 
     // ===== Getters y Setters =====
@@ -106,7 +106,7 @@ public class ItemDto {
     public String getTipoVentaDet() { return tipoVentaDet; }
     public void setTipoVentaDet(String tipoVentaDet) { this.tipoVentaDet = tipoVentaDet; }
 
-    public DatosAdicionalesProdDto getDatosAdicionalesProd() { return datosAdicionalesProd; }
-    public void setDatosAdicionalesProd(DatosAdicionalesProdDto datosAdicionalesProd) { this.datosAdicionalesProd = datosAdicionalesProd; }
+    public felDatosAdicionalesProdDto getDatosAdicionalesProd() { return datosAdicionalesProd; }
+    public void setDatosAdicionalesProd(felDatosAdicionalesProdDto datosAdicionalesProd) { this.datosAdicionalesProd = datosAdicionalesProd; }
 
 }

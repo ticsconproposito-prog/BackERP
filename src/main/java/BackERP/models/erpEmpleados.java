@@ -5,7 +5,7 @@ import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 @Entity
-public class erpempleados {
+public class erpEmpleados {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column
@@ -37,7 +37,7 @@ public class erpempleados {
     @Column
     private int idUsuarioModificacion;
 
-    public erpempleados() {
+    public erpEmpleados() {
 
     }
 

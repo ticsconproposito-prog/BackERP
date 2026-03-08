@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
  * DTO de totales del documento (suma de líneas).
  * Deben cuadrar con las sumatorias y tolerancia permitida.
  */
-public class TotalesDto {
+public class felTotalesDto {
 
     @NotNull
     private BigDecimal bruto;

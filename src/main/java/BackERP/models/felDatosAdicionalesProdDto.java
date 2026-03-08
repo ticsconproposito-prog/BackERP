@@ -1,6 +1,6 @@
 package BackERP.models;
 
-public class DatosAdicionalesProdDto {
+public class felDatosAdicionalesProdDto {
     private String tipoVenta;
     private String adicional01;
 

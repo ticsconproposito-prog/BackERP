@@ -42,7 +42,7 @@ public class erpOrdenProductosSpecs {
 
     public static Specification<erpOrdenProductos> numeroDeDocumentoContains(String numeroDeDocumento) {
         return (root, query, cb) -> {
-            String pattern = LikeHelper.buildLikePattern(numeroDeDocumento, LikeHelper.MatchMode.ANYWHERE, false);
+            String pattern = likeHelper.buildLikePattern(numeroDeDocumento, likeHelper.MatchMode.ANYWHERE, false);
             if (pattern == null) return cb.conjunction();
             return cb.like(cb.lower(root.get("numeroDeDocumento")), pattern, '\\');
         };

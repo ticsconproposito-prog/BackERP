@@ -7,7 +7,7 @@ import java.time.LocalTime;
 
 
 @Entity
-public class erpdiccionarios {
+public class erpDiccionarios {
 
 
     @Id
@@ -31,7 +31,7 @@ public class erpdiccionarios {
     @Column
     private int idUsuarioModificacion;
 
-    public erpdiccionarios() {
+    public erpDiccionarios() {
     }
 
     public Long getIdDiccionario() {

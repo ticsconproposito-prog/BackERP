@@ -7,7 +7,7 @@ import jakarta.validation.constraints.NotBlank;
  * DTO del receptor (cliente). Para C/F (Consumidor Final) la guía exige
  * nombre y dirección.
  */
-public class FelReceptorDto {
+public class felReceptorDto {
 
     @NotBlank
     private String nitReceptor; // "C/F" o NIT

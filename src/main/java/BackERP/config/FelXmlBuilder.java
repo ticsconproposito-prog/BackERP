@@ -1,8 +1,8 @@
 package BackERP.config;
 
 
-import BackERP.models.DteRequestDto;
-import BackERP.models.ItemDto;
+import BackERP.models.felDteRequestDto;
+import BackERP.models.felItemDto;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -12,7 +12,7 @@ import java.math.RoundingMode;
 @Component
 public class FelXmlBuilder {
 
-    public String buildDocElectronicoXml(DteRequestDto req) {
+    public String buildDocElectronicoXml(felDteRequestDto req) {
         StringBuilder sb = new StringBuilder();
         sb.append("<DocElectronico>");
         sb.append("<Encabezado>");
@@ -72,7 +72,7 @@ public class FelXmlBuilder {
         // Detalles
         sb.append("<Detalles>");
 
-        for (ItemDto it : req.getItems()) {
+        for (felItemDto it : req.getItems()) {
             //sb.append("<Producto>");
             sb.append("<Productos>");
             sb.append(tag("Producto", it.getProducto()));

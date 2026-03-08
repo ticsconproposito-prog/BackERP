@@ -9,7 +9,7 @@ public class erpProveedoresSpecs {
 
     public static Specification<erpProveedores> nombreContains(String nombre) {
         return (root, query, cb) -> {
-            String pattern = LikeHelper.buildLikePattern(nombre, LikeHelper.MatchMode.ANYWHERE, false);
+            String pattern = likeHelper.buildLikePattern(nombre, likeHelper.MatchMode.ANYWHERE, false);
             if (pattern == null) return cb.conjunction();
             return cb.like(cb.lower(root.get("nombre")), pattern, '\\');
         };
@@ -17,7 +17,7 @@ public class erpProveedoresSpecs {
 
     public static Specification<erpProveedores> nombreDeContacto1Contains(String nombre) {
         return (root, query, cb) -> {
-            String pattern = LikeHelper.buildLikePattern(nombre, LikeHelper.MatchMode.ANYWHERE, false);
+            String pattern = likeHelper.buildLikePattern(nombre, likeHelper.MatchMode.ANYWHERE, false);
             if (pattern == null) return cb.conjunction();
             return cb.like(cb.lower(root.get("nombreDeContacto1")), pattern, '\\');
         };

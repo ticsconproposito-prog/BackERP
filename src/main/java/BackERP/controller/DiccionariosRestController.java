@@ -2,7 +2,7 @@ package BackERP.controller;
 
 
 import BackERP.helper.erpDiccionariosSpecs;
-import BackERP.models.erpdiccionarios;
+import BackERP.models.erpDiccionarios;
 import BackERP.repository.RepositoryDiccionarios;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -23,7 +23,7 @@ public class DiccionariosRestController {
     private RepositoryDiccionarios redic;
 
     @GetMapping("diccionarios")
-    public Page<erpdiccionarios> getDiccionarios(
+    public Page<erpDiccionarios> getDiccionarios(
             @RequestParam(required = false) String diccionario,
             @RequestParam(required = false) String indice,
             @RequestParam(required = false) String valor,
@@ -40,7 +40,7 @@ public class DiccionariosRestController {
 
         Pageable pageable = PageRequest.of(page, size, s);
 
-        Specification<erpdiccionarios> spec = Specification
+        Specification<erpDiccionarios> spec = Specification
                 .where(erpDiccionariosSpecs.diccionarioContains(diccionario))
                 .and(erpDiccionariosSpecs.indiceContiene(indice))
                 .and(erpDiccionariosSpecs.valorContiene(valor))
@@ -50,7 +50,7 @@ public class DiccionariosRestController {
     }
 
     @PostMapping("grabarDiccionario")
-    public String grabarDiccionario(@RequestBody erpdiccionarios Diccionario){
+    public String grabarDiccionario(@RequestBody erpDiccionarios Diccionario){
 
         //  normalizar código
         Diccionario.setDiccionario(
@@ -67,10 +67,10 @@ public class DiccionariosRestController {
     }
 
     @PutMapping("editarDiccionario/{idDiccionario}")
-    public String editarDiccionario(@PathVariable long idDiccionario, @RequestBody erpdiccionarios Diccionario){
+    public String editarDiccionario(@PathVariable long idDiccionario, @RequestBody erpDiccionarios Diccionario){
 
 
-        erpdiccionarios updateDiccionario = redic.findById(idDiccionario).get();
+        erpDiccionarios updateDiccionario = redic.findById(idDiccionario).get();
         updateDiccionario.setDiccionario(Diccionario.getDiccionario());
         updateDiccionario.setIndice(Diccionario.getIndice());
         updateDiccionario.setValor(Diccionario.getValor());
@@ -84,9 +84,9 @@ public class DiccionariosRestController {
     }
 
     @DeleteMapping("eliminarDiccionario/{idDiccionario}")
-    public String eliminarDiccionario(@PathVariable long idDiccionario, @RequestBody erpdiccionarios Diccionario){
+    public String eliminarDiccionario(@PathVariable long idDiccionario, @RequestBody erpDiccionarios Diccionario){
         System.out.println("eliminar");
-        erpdiccionarios updateDiccionario = redic.findById(idDiccionario).get();
+        erpDiccionarios updateDiccionario = redic.findById(idDiccionario).get();
         updateDiccionario.setFechaModificacion(LocalDate.now());
         updateDiccionario.setHoraModificacion(LocalTime.now());
         updateDiccionario.setIdUsuarioModificacion(Diccionario.getIdUsuarioModificacion());

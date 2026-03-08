@@ -1,9 +1,9 @@
 
 package BackERP.config;
 
-import BackERP.models.DteRequestDto;
-import BackERP.models.FelProperties;
-import BackERP.models.ItemDto;
+import BackERP.models.felDteRequestDto;
+import BackERP.models.felProperties;
+import BackERP.models.felItemDto;
 
 import BackERP.models.erpEncabezadoFacturas;
 import BackERP.repository.RepositoryEncabezadoFacturas;
@@ -20,7 +20,7 @@ public class FelService {
     private static final BigDecimal IVA_RATE = new BigDecimal("0.12");
     private static final BigDecimal TOL = new BigDecimal("0.01");
 
-    private final FelProperties props;
+    private final felProperties props;
     private final FelXmlBuilder xmlBuilder;
     private final FelWsClient wsClient;
     private final FelResponseParser responseParser;
@@ -29,7 +29,7 @@ public class FelService {
     @Autowired 
     private RepositoryEncabezadoFacturas repEncFac;
     @Autowired
-    public FelService(FelProperties props,
+    public FelService(felProperties props,
                       FelXmlBuilder xmlBuilder,
                       FelWsClient wsClient,
                       FelResponseParser responseParser) {
@@ -38,7 +38,7 @@ public class FelService {
         this.wsClient = wsClient;
         this.responseParser = responseParser;
     }
-    public FelResult generarDte(DteRequestDto req) {
+    public FelResult generarDte(felDteRequestDto req) {
         validar(req);
 
         String pXml = xmlBuilder.buildDocElectronicoXml(req);
@@ -103,9 +103,9 @@ public class FelService {
 
 
 
-    private void validar(DteRequestDto req) {
+    private void validar(felDteRequestDto req) {
         // Validaciones por línea
-        for (ItemDto it : req.getItems()) {
+        for (felItemDto it : req.getItems()) {
             // IVA = 12% del neto (±0.01)
             BigDecimal ivaCalc = it.getImpNeto().multiply(IVA_RATE).setScale(2, RoundingMode.HALF_UP);
             if (it.getImpIva().subtract(ivaCalc).abs().compareTo(TOL) > 0) {
@@ -119,14 +119,14 @@ public class FelService {
         }
 
         // Totales vs sumatoria de líneas (±0.01 por campo)
-        assertClose("Bruto",     req.getTotales().getBruto(),     req.getItems().stream().map(ItemDto::getImpBruto).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Descuento", req.getTotales().getDescuento(), req.getItems().stream().map(ItemDto::getImpDescuento).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Exento",    req.getTotales().getExento(),    req.getItems().stream().map(ItemDto::getImpExento).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Otros",     req.getTotales().getOtros(),     req.getItems().stream().map(ItemDto::getImpOtros).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Neto",      req.getTotales().getNeto(),      req.getItems().stream().map(ItemDto::getImpNeto).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Iva",       req.getTotales().getIva(),       req.getItems().stream().map(ItemDto::getImpIva).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Isr",       req.getTotales().getIsr(),       req.getItems().stream().map(ItemDto::getImpIsr).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Total",     req.getTotales().getTotal(),     req.getItems().stream().map(ItemDto::getImpTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
+        assertClose("Bruto",     req.getTotales().getBruto(),     req.getItems().stream().map(felItemDto::getImpBruto).reduce(BigDecimal.ZERO, BigDecimal::add));
+        assertClose("Descuento", req.getTotales().getDescuento(), req.getItems().stream().map(felItemDto::getImpDescuento).reduce(BigDecimal.ZERO, BigDecimal::add));
+        assertClose("Exento",    req.getTotales().getExento(),    req.getItems().stream().map(felItemDto::getImpExento).reduce(BigDecimal.ZERO, BigDecimal::add));
+        assertClose("Otros",     req.getTotales().getOtros(),     req.getItems().stream().map(felItemDto::getImpOtros).reduce(BigDecimal.ZERO, BigDecimal::add));
+        assertClose("Neto",      req.getTotales().getNeto(),      req.getItems().stream().map(felItemDto::getImpNeto).reduce(BigDecimal.ZERO, BigDecimal::add));
+        assertClose("Iva",       req.getTotales().getIva(),       req.getItems().stream().map(felItemDto::getImpIva).reduce(BigDecimal.ZERO, BigDecimal::add));
+        assertClose("Isr",       req.getTotales().getIsr(),       req.getItems().stream().map(felItemDto::getImpIsr).reduce(BigDecimal.ZERO, BigDecimal::add));
+        assertClose("Total",     req.getTotales().getTotal(),     req.getItems().stream().map(felItemDto::getImpTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
 
         // Moneda/Tasa
         if (req.getMoneda() == 1 && req.getTasa().compareTo(BigDecimal.ONE) != 0) {

@@ -12,7 +12,7 @@ public class erpInventarioSpecs {
             if (descripcion == null || descripcion.isEmpty()) {
                 return null; // no aplica filtro si viene null
                  }
-            String pattern = LikeHelper.buildLikePattern(descripcion, LikeHelper.MatchMode.ANYWHERE, true);
+            String pattern = likeHelper.buildLikePattern(descripcion, likeHelper.MatchMode.ANYWHERE, true);
 
             return cb.like(cb.lower(root.get("idProducto").get("descripcionProducto")),pattern, '\\');
         };
@@ -23,7 +23,7 @@ public class erpInventarioSpecs {
             if (codigoProducto == null || codigoProducto.isEmpty()) {
                 return null; // no aplica filtro si viene null
             }
-            String pattern = LikeHelper.buildLikePattern(codigoProducto, LikeHelper.MatchMode.ANYWHERE, true);
+            String pattern = likeHelper.buildLikePattern(codigoProducto, likeHelper.MatchMode.ANYWHERE, true);
             return cb.like(cb.lower(root.get("idProducto").get("codigoProducto")),pattern, '\\');
         };
     }
@@ -33,7 +33,7 @@ public class erpInventarioSpecs {
             if (codigoProductoProveedor == null || codigoProductoProveedor.isEmpty()) {
                 return null; // no aplica filtro si viene null
             }
-            String pattern = LikeHelper.buildLikePattern(codigoProductoProveedor, LikeHelper.MatchMode.ANYWHERE, true);
+            String pattern = likeHelper.buildLikePattern(codigoProductoProveedor, likeHelper.MatchMode.ANYWHERE, true);
             return cb.like(cb.lower(root.get("idProducto").get("codigoProductoProveedor")),pattern, '\\');
         };
     }

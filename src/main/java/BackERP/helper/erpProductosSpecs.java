@@ -12,7 +12,7 @@ public class erpProductosSpecs{
 
     public static Specification<erpProductos> codigoProductoContains(String codigo) {
         return (root, query, cb) -> {
-            String pattern = LikeHelper.buildLikePattern(codigo, LikeHelper.MatchMode.ANYWHERE, false);
+            String pattern = likeHelper.buildLikePattern(codigo, likeHelper.MatchMode.ANYWHERE, false);
             if (pattern == null) return cb.conjunction();
             return cb.like(cb.lower(root.get("codigoProducto")), pattern, '\\');
         };
@@ -21,7 +21,7 @@ public class erpProductosSpecs{
 
     public static Specification<erpProductos> codigoProductoProveedorContains(String codigoProv) {
         return (root, query, cb) -> {
-            String pattern = LikeHelper.buildLikePattern(codigoProv, LikeHelper.MatchMode.ANYWHERE, false);
+            String pattern = likeHelper.buildLikePattern(codigoProv, likeHelper.MatchMode.ANYWHERE, false);
             if (pattern == null) return cb.conjunction();
             return cb.like(cb.lower(root.get("codigoProductoProveedor")), pattern, '\\');
         };
@@ -30,7 +30,7 @@ public class erpProductosSpecs{
 
     public static Specification<erpProductos> descripcionContiene(String descripcion) {
         return (root, query, cb) -> {
-            String pattern = LikeHelper.buildLikePattern(descripcion, LikeHelper.MatchMode.ANYWHERE, true);
+            String pattern = likeHelper.buildLikePattern(descripcion, likeHelper.MatchMode.ANYWHERE, true);
             if (pattern == null) return cb.conjunction();
             return cb.like(cb.lower(root.get("descripcionProducto")), pattern, '\\');
         };

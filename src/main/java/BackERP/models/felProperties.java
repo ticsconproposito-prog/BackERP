@@ -5,7 +5,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @ConfigurationProperties(prefix = "fel")
-public class FelProperties {
+public class felProperties {
 
     // Credenciales HTTP Basic
     private String basicUser;

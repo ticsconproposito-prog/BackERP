@@ -16,7 +16,7 @@ public class erpEncabezadoFacturas {
     private int tipoDocumento;
     @ManyToOne
     @JoinColumn(name = "idCliente", referencedColumnName = "idCliente")
-    private erpclientes idCliente ;
+    private erpClientes idCliente ;
     @Column
     private String tipoVenta ;
     @Column
@@ -107,11 +107,11 @@ public class erpEncabezadoFacturas {
         this.tipoDocumento = tipoDocumento;
     }
 
-    public erpclientes getIdCliente() {
+    public erpClientes getIdCliente() {
         return idCliente;
     }
 
-    public void setIdCliente(erpclientes idCliente) {
+    public void setIdCliente(erpClientes idCliente) {
         this.idCliente = idCliente;
     }
 
