@@ -41,7 +41,7 @@ public class MovimientosProductosRestController {
         movimientosProductos.setFechaModificacion(LocalDate.now());
         movimientosProductos.setHoraModificacion(LocalTime.now());
         movimientosProductos.setEstado(1);
-        System.out.println("idProducto "+ movimientosProductos.getIdProducto());
+        System.out.println("idProducto MOV "+ movimientosProductos.getIdProducto());
 
         // Validar si el tipo de movimiento es 0 (entrada)
         if (movimientosProductos.getIdOrdenProducto() == 0) {
@@ -52,6 +52,8 @@ public class MovimientosProductosRestController {
 
             if (inventarioExistente != null) {
                 // Si existe, sumar cantidad
+
+                System.out.println("Inventario Existe ");
                 inventarioExistente.setCantidadExistencias(
                         inventarioExistente.getCantidadExistencias() + movimientosProductos.getCantidad()
                 );
@@ -61,6 +63,7 @@ public class MovimientosProductosRestController {
                 repinv.save(inventarioExistente);
             } else {
                 // Si no existe, crear nuevo registro
+                System.out.println("Inventario No Existe ");
                 erpInventario nuevoInventario = new erpInventario();
                 erpProductos producto = new erpProductos();
                 producto.setIdProducto((long) movimientosProductos.getIdProducto());
