@@ -78,6 +78,32 @@ public class FelService {
                 result.setError("Error al procesar encabezado de factura: " + e.getMessage());
                 result.setOk(false);
             }
+        }else {
+
+            try {
+                System.out.println("Ingresa insertar encabezadoFactura");
+
+                String SID = req.getReferencia().substring(4);
+                long ID = Long.parseLong(SID);
+
+                Optional<erpEncabezadoFacturas> optEnc = repEncFac.findById(ID);
+                if (optEnc.isPresent()) {
+                    erpEncabezadoFacturas enc = optEnc.get();
+                    enc.setRespuestaXML(result.getRawResponse());
+                    enc.setReferencia(req.getReferencia());
+                    enc.setFacturaProcesada("N");
+                    repEncFac.save(enc);
+                } else {
+                    // Registrar el error en el campo error del resultado
+                    result.setError("No se encontró encabezado de factura con ID " + ID);
+                    result.setOk(false);
+                }
+            } catch (Exception e) {
+                // Captura cualquier otro error inesperado
+                result.setError("Error al procesar encabezado de factura: " + e.getMessage());
+                result.setOk(false);
+            }
+
         }
 
         return result;
