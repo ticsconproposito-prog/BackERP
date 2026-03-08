@@ -37,19 +37,19 @@ public class MovimientosProductosRestController {
 
     @PostMapping("grabarMovimientosProductos")
     public String grabarMovimientosProductos(@RequestBody erpMovimientosProductos movimientosProductos,
-                                             @RequestParam int tipoDeOrden,
-                                             @RequestParam int ubicacionSalida,
-                                             @RequestParam int ubicacionIngreso) {
+                                             @RequestParam int tipoDeMovimiento,
+                                             @RequestParam (defaultValue = "0") int ubicacionSalida,
+                                             @RequestParam (defaultValue = "0") int ubicacionIngreso) {
         movimientosProductos.setFechaModificacion(LocalDate.now());
         movimientosProductos.setHoraModificacion(LocalTime.now());
         movimientosProductos.setEstado(1);
         removpro.save(movimientosProductos);
 
         System.out.println("Buscando inventario con producto=" + movimientosProductos.getIdProducto().getIdProducto() +
-                " ubicacion=" + movimientosProductos.getIdUbicacion());
+                " ubicacion=" + movimientosProductos.getIdUbicacion() +" tipoDeMovimiento "+ tipoDeMovimiento);
 
 
-        if (tipoDeOrden == 0) {
+        if (tipoDeMovimiento == 0) {
             erpInventario inventarioExistente = repinv.findByIdProducto_IdProductoAndIdUbicacion(
                     movimientosProductos.getIdProducto().getIdProducto(),
                     movimientosProductos.getIdUbicacion()
