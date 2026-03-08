@@ -37,27 +37,21 @@ public class MovimientosProductosRestController {
 
     @PostMapping("grabarMovimientosProductos")
     public String grabarMovimientosProductos(@RequestBody erpMovimientosProductos movimientosProductos) {
-        // valor por defecto
         movimientosProductos.setFechaModificacion(LocalDate.now());
         movimientosProductos.setHoraModificacion(LocalTime.now());
         movimientosProductos.setEstado(1);
         removpro.save(movimientosProductos);
-        System.out.println("idProducto MOV "+ movimientosProductos.getIdProducto());
-        System.out.println("idUbicacion MOV "+ movimientosProductos.getIdUbicacion());
 
-        // Validar si el tipo de movimiento es 0 (entrada)
+        System.out.println("idProducto MOV " + movimientosProductos.getIdProducto().getIdProducto());
+        System.out.println("idUbicacion MOV " + movimientosProductos.getIdUbicacion());
+
         if (movimientosProductos.getIdOrdenProducto() == 0) {
             erpInventario inventarioExistente = repinv.findByIdProducto_IdProductoAndIdUbicacion(
                     movimientosProductos.getIdProducto().getIdProducto(),
                     movimientosProductos.getIdUbicacion()
             );
 
-            System.out.println("Salio de Inventario ");
-
             if (inventarioExistente != null) {
-                // Si existe, sumar cantidad
-
-                System.out.println("Inventario Existe ");
                 inventarioExistente.setCantidadExistencias(
                         inventarioExistente.getCantidadExistencias() + movimientosProductos.getCantidad()
                 );
@@ -66,13 +60,8 @@ public class MovimientosProductosRestController {
                 inventarioExistente.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
                 repinv.save(inventarioExistente);
             } else {
-                // Si no existe, crear nuevo registro
-                System.out.println("Inventario No Existe ");
                 erpInventario nuevoInventario = new erpInventario();
-                erpProductos producto = new erpProductos();
-                producto.setIdProducto(movimientosProductos.getIdProducto().getIdProducto());
-
-                nuevoInventario.setIdProducto(producto);
+                nuevoInventario.setIdProducto(movimientosProductos.getIdProducto());
                 nuevoInventario.setIdUbicacion(movimientosProductos.getIdUbicacion());
                 nuevoInventario.setCantidadExistencias(movimientosProductos.getCantidad());
                 nuevoInventario.setCantidadDanados(0);
