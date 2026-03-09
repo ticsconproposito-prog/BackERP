@@ -1,17 +1,21 @@
 
 package BackERP.config;
 
-import BackERP.models.felDteRequestDto;
-import BackERP.models.felProperties;
-import BackERP.models.felItemDto;
+import BackERP.helper.erpDetalleFacturaSpecs;
+import BackERP.models.*;
 
-import BackERP.models.erpEncabezadoFacturas;
+import BackERP.repository.RepositoryDetalleFacturas;
 import BackERP.repository.RepositoryEncabezadoFacturas;
+import BackERP.repository.RepositoryInventario;
+import BackERP.repository.RepositoryMovimientosProductos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -25,9 +29,17 @@ public class FelService {
     private final FelWsClient wsClient;
     private final FelResponseParser responseParser;
 
+    @Autowired
+    private RepositoryDetalleFacturas repDetFac;
+
+    @Autowired
+    private RepositoryInventario repInv;
 
     @Autowired 
     private RepositoryEncabezadoFacturas repEncFac;
+
+    @Autowired
+    private RepositoryMovimientosProductos repMovPro;
     @Autowired
     public FelService(felProperties props,
                       FelXmlBuilder xmlBuilder,
@@ -47,8 +59,6 @@ public class FelService {
 
         if (result.isOk()) {
             try {
-                System.out.println("Ingresa insertar encabezadoFactura");
-
                 String SID = req.getReferencia().substring(4);
                 long ID = Long.parseLong(SID);
 
@@ -81,18 +91,74 @@ public class FelService {
         }else {
 
             try {
-                System.out.println("Ingresa insertar encabezadoFactura");
+                
 
                 String SID = req.getReferencia().substring(4);
                 long ID = Long.parseLong(SID);
 
                 Optional<erpEncabezadoFacturas> optEnc = repEncFac.findById(ID);
                 if (optEnc.isPresent()) {
+
                     erpEncabezadoFacturas enc = optEnc.get();
+                    if ("2-NO EXISTE EL NIT/CUI DEL CONTRIBUYENTE".equals(result.getError())) {
+                        enc.setEstado(0);
+
+                        // Consultar los detalles de la factura
+                        List<erpDetalleFacturas> detalles = repDetFac.findAll(
+                                erpDetalleFacturaSpecs.idEncabezadoFacturaContains(Math.toIntExact(enc.getIdEncabezadoFactura()))
+                        );
+
+                        for (erpDetalleFacturas det : detalles) {
+                            // Buscar inventario solo por producto
+                            erpInventario inventario = repInv.findByIdProducto_IdProducto(Long.valueOf(det.getIdProducto()));
+
+                            if (inventario != null) {
+                                // Sumar de regreso la cantidad
+                                inventario.setCantidadExistencias(
+                                        inventario.getCantidadExistencias() + det.getCantidad()
+                                );
+                                inventario.setFechaModificacion(LocalDate.now());
+                                inventario.setHoraModificacion(LocalTime.now());
+                                inventario.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
+                                repInv.save(inventario);
+                            } else {
+                                // Crear inventario nuevo si no existía
+                                erpInventario nuevo = new erpInventario();
+                                erpProductos prod = new erpProductos();
+                                prod.setIdProducto((long) det.getIdProducto());
+
+                                nuevo.setIdProducto(prod);
+                                nuevo.setCantidadExistencias(det.getCantidad());
+                                nuevo.setCantidadDanados(0);
+                                nuevo.setEstado(1);
+                                nuevo.setFechaModificacion(LocalDate.now());
+                                nuevo.setHoraModificacion(LocalTime.now());
+                                nuevo.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
+                                repInv.save(nuevo);
+                            }
+                        }
+
+                        // 🔎 Marcar movimientos como inactivos
+                        List<erpMovimientosProductos> movimientos = repMovPro.findByIdOrdenProducto((long) enc.getIdEncabezadoFactura());
+                        for (erpMovimientosProductos mov : movimientos) {
+                            mov.setEstado(0);
+                            mov.setFechaModificacion(LocalDate.now());
+                            mov.setHoraModificacion(LocalTime.now());
+                            mov.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
+                            repMovPro.save(mov);
+                        }
+                    }
+
+
+
                     enc.setRespuestaXML(result.getRawResponse());
                     enc.setReferencia(req.getReferencia());
                     enc.setFacturaProcesada("N");
                     repEncFac.save(enc);
+
+
+
+
                 } else {
                     // Registrar el error en el campo error del resultado
                     result.setError("No se encontró encabezado de factura con ID " + ID);

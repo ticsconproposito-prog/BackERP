@@ -20,4 +20,6 @@ public interface RepositoryInventario extends JpaRepository<erpInventario, Long>
     // Nuevo metodo para buscar inventario por producto y ubicación
 
     erpInventario findByIdProducto_IdProductoAndIdUbicacion(Long idProducto, int idUbicacion);
+    erpInventario findByIdProducto_IdProducto(Long idProducto);
+
 }
