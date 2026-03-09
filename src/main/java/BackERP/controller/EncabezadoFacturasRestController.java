@@ -44,11 +44,15 @@ public class EncabezadoFacturasRestController {
 
         Pageable pageable = PageRequest.of(page, size, s);
 
-        Specification<erpEncabezadoFacturas> spec = Specification.where(erpEncabezadoFacturasSpecs.referenciaFacturaContains(referenciaFactura))
+        Specification<erpEncabezadoFacturas> spec = Specification
+                .where(erpEncabezadoFacturasSpecs.referenciaFacturaContains(referenciaFactura))
                 .and(erpEncabezadoFacturasSpecs.tipoDocumentoContains(tipoDocumento))
                 .and(erpEncabezadoFacturasSpecs.nombreClienteContains(nombreCliente))
-                .and(erpEncabezadoFacturasSpecs.nitClienteContains(nit.replaceAll("[\\s-]", "")))
+                .and(nit != null && !nit.isEmpty()
+                        ? erpEncabezadoFacturasSpecs.nitClienteContains(nit.replaceAll("[\\s-]", ""))
+                        : null)
                 .and(erpEncabezadoFacturasSpecs.fechaFacturaBetween(fechaInicio, fechaFin));
+
 
         return repencfac.findAll(spec, pageable);
     }
