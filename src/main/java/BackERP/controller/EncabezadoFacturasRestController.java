@@ -48,9 +48,7 @@ public class EncabezadoFacturasRestController {
                 .where(erpEncabezadoFacturasSpecs.referenciaFacturaContains(referenciaFactura))
                 .and(erpEncabezadoFacturasSpecs.tipoDocumentoContains(tipoDocumento))
                 .and(erpEncabezadoFacturasSpecs.nombreClienteContains(nombreCliente))
-                .and(nit != null && !nit.isEmpty()
-                        ? erpEncabezadoFacturasSpecs.nitClienteContains(nit.replaceAll("[\\s-]", ""))
-                        : null)
+                .and(erpEncabezadoFacturasSpecs.nitClienteContains(nit))
                 .and(erpEncabezadoFacturasSpecs.fechaFacturaBetween(fechaInicio, fechaFin));
 
 

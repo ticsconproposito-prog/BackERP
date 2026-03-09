@@ -26,7 +26,10 @@ public class erpEncabezadoFacturasSpecs {
             if (nit == null || nit.isEmpty()) {
                 return null; // no aplica filtro si viene null
             }
-            String pattern = likeHelper.buildLikePattern(nit, likeHelper.MatchMode.ANYWHERE, true);
+            // limpiar espacios y guiones
+            String nitLimpio = nit.replaceAll("[\\s-]", "");
+
+            String pattern = likeHelper.buildLikePattern(nitLimpio, likeHelper.MatchMode.ANYWHERE, true);
 
             return cb.like(cb.lower(root.get("idCliente").get("nit")),pattern, '\\');
         };
