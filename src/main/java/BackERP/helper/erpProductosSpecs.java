@@ -3,7 +3,8 @@ package BackERP.helper;
 
 import BackERP.models.erpProductos;
 import org.springframework.data.jpa.domain.Specification;
-
+import jakarta.persistence.criteria.Predicate;
+import java.util.Arrays;
 
 
 public class erpProductosSpecs{
@@ -24,6 +25,28 @@ public class erpProductosSpecs{
             String pattern = likeHelper.buildLikePattern(codigoProv, likeHelper.MatchMode.ANYWHERE, false);
             if (pattern == null) return cb.conjunction();
             return cb.like(cb.lower(root.get("codigoProductoProveedor")), pattern, '\\');
+        };
+    }
+
+   public static Specification<erpProductos> descripcionContieneFlexible(String descripcion) {
+        return (root, query, cb) -> {
+            if (descripcion == null || descripcion.trim().isEmpty()) {
+                return cb.conjunction();
+            }
+
+            // Dividir la frase en palabras
+            String[] palabras = descripcion.toLowerCase().trim().split("\\s+");
+
+            // Crear un predicado AND: todas las palabras deben aparecer en la descripción
+            Predicate[] predicates = Arrays.stream(palabras)
+                    .map(p -> cb.like(
+                            cb.lower(root.get("descripcionProducto")),
+                            "%" + likeHelper.escapeForLike(p) + "%",
+                            '\\'
+                    ))
+                    .toArray(Predicate[]::new);
+
+            return cb.and(predicates);
         };
     }
 

@@ -43,7 +43,7 @@ public class ProductoRestController {
             Specification<erpProductos> spec = Specification
                     .where(erpProductosSpecs.estadoEquals(1))
                     .and(erpProductosSpecs.codigoProductoProveedorContains(codigoProductoProveedor))
-                    .and(erpProductosSpecs.descripcionContiene(descripcionProducto))
+                    .and(erpProductosSpecs.descripcionContieneFlexible(descripcionProducto))
                     .and(erpProductosSpecs.idProductoContains(idProducto))
                     .and(erpProductosSpecs.codigoProductoContains(codigoProducto));
 
