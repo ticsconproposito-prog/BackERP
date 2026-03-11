@@ -45,7 +45,7 @@ public class InventarioRestController {
 
         Specification<erpInventario> spec = Specification
                 .where(erpInventarioSpecs.estadoEquals(1))
-                .and(erpInventarioSpecs.descripcionProductoContains(descripcion))
+                .and(erpInventarioSpecs.descripcionProductoContieneFlexible(descripcion))
                 .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
                 .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
 
