@@ -70,7 +70,7 @@ public class FelWsClient {
                     .block();
         } catch (Exception e) {
             // Retornar un XML simulado con el error para que el parser lo capture
-            return "<result><Error>Error de conexión FEL: " + e.getMessage() + "</Error></result>";
+            return "<result><Error>Error de conexión FEL al generar documento: " + e.getMessage() + "</Error></result>";
         }
 
     }
@@ -90,15 +90,21 @@ public class FelWsClient {
                 + "  </soapenv:Body>"
                 + "</soapenv:Envelope>";
 
-        return webClient.post()
-                .uri(props.getEndpoint())
-                .contentType(MediaType.TEXT_XML)
-                .header(HttpHeaders.AUTHORIZATION, basic(props.getBasicUser(), props.getBasicPass()))
-                .bodyValue(soap)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        try {
+            return webClient.post()
+                    .uri(props.getEndpoint())
+                    .contentType(MediaType.TEXT_XML)
+                    .header(HttpHeaders.AUTHORIZATION, basic(props.getBasicUser(), props.getBasicPass()))
+                    .bodyValue(soap)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (Exception e) {
+            // Retornar un XML simulado con el error para que el parser lo capture
+            return "<result><Error>Error de conexión FEL al anular: " + e.getMessage() + "</Error></result>";
+        }
     }
+
 
 
     private String buildSoapEnvelope(String pUsuario, String pPassword, String pNitEmisor,

@@ -51,6 +51,7 @@ public class FelService {
         this.responseParser = responseParser;
     }
     public FelResult generarDte(felDteRequestDto req) {
+
         validar(req);
 
         String pXml = xmlBuilder.buildDocElectronicoXml(req);
