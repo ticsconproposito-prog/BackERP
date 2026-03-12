@@ -65,4 +65,15 @@ public class erpEncabezadoFacturasSpecs {
             return cb.lessThanOrEqualTo(root.get("FechaFactura"), fechaFin);
         };
     }
+
+    public static Specification<erpEncabezadoFacturas> numeroPreimpresoContains(String numeroPreimpreso) {
+        return (root, query, cb) -> {
+            if (numeroPreimpreso == null || numeroPreimpreso.isEmpty()) {
+                return cb.conjunction(); // no aplica filtro si viene null
+            }
+            String pattern = likeHelper.buildLikePattern(numeroPreimpreso, likeHelper.MatchMode.ANYWHERE, false);
+            return cb.like(cb.lower(root.get("preimpreso")), pattern, '\\');
+        };
+    }
+
 }

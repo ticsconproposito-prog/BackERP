@@ -32,16 +32,14 @@ public class EncabezadoFacturasRestController {
             @RequestParam(required = false) String nit,
             @RequestParam(required = false) String referenciaFactura,
             @RequestParam(required = false) String tipoDocumento,
+            @RequestParam(required = false) String preimpreso,   // 🔎 nuevo parámetro
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "idEncabezadoFactura,asc") String sort
     ) {
         String[] sortParts = sort.split(",", 2);
-
         Sort.Direction dir = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.ASC;
-
         Sort s = Sort.by(dir, sortParts[0]);
-
         Pageable pageable = PageRequest.of(page, size, s);
 
         Specification<erpEncabezadoFacturas> spec = Specification
@@ -49,8 +47,8 @@ public class EncabezadoFacturasRestController {
                 .and(erpEncabezadoFacturasSpecs.tipoDocumentoContains(tipoDocumento))
                 .and(erpEncabezadoFacturasSpecs.nombreClienteContains(nombreCliente))
                 .and(erpEncabezadoFacturasSpecs.nitClienteContains(nit))
-                .and(erpEncabezadoFacturasSpecs.fechaFacturaBetween(fechaInicio, fechaFin));
-
+                .and(erpEncabezadoFacturasSpecs.fechaFacturaBetween(fechaInicio, fechaFin))
+                .and(erpEncabezadoFacturasSpecs.numeroPreimpresoContains(preimpreso)); // 🔎 nuevo filtro
 
         return repencfac.findAll(spec, pageable);
     }
