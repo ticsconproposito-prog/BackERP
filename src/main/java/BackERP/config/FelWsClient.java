@@ -58,15 +58,21 @@ public class FelWsClient {
             System.err.println("Response body: " + e.getResponseBodyAsString()); }
 */
 
-        // Enviar la petición con Basic Auth (usr_guatefac / usrguatefac)
-        return  webClient.post()
-                .uri(props.getEndpoint())
-                .contentType(MediaType.TEXT_XML)
-                .header(HttpHeaders.AUTHORIZATION, basic(props.getBasicUser(), props.getBasicPass()))
-                .bodyValue(soap)
-                .retrieve()
-                .bodyToMono(String.class)
-                .block();
+        try {
+            // Enviar la petición con Basic Auth (usr_guatefac / usrguatefac)
+            return webClient.post()
+                    .uri(props.getEndpoint())
+                    .contentType(MediaType.TEXT_XML)
+                    .header(HttpHeaders.AUTHORIZATION, basic(props.getBasicUser(), props.getBasicPass()))
+                    .bodyValue(soap)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+        } catch (Exception e) {
+            // Retornar un XML simulado con el error para que el parser lo capture
+            return "<result><Error>Error de conexión FEL: " + e.getMessage() + "</Error></result>";
+        }
+
     }
 
     public String anulaDocumento(String uuid, String motivo) {
