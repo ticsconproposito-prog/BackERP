@@ -39,7 +39,6 @@ public class FelResponseParser {
             res.setOk(true);
         }
 
-        res.setOk(error == null && numeroAutorizacion != null);
 
 // si quieres extender FelResult con más campos:
         res.setNombre(nombre);
