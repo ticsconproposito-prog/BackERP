@@ -1,95 +1,132 @@
 package BackERP.models;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
+@Table(name = "erpEncabezadoFacturas", schema = "erpConfig")
 public class erpEncabezadoFacturas {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
+    @Column(name = "idEncabezadoFactura")
     private Long idEncabezadoFactura;
-    @Column
+
+    @Column(name = "tipoDocumento")
     private int tipoDocumento;
+
     @ManyToOne
     @JoinColumn(name = "idCliente", referencedColumnName = "idCliente")
-    private erpClientes idCliente ;
-    @Column
-    private String tipoVenta ;
-    @Column
-    private int destinoVenta ;
-    @Column
-    private LocalDate FechaFactura ;
-    @Column
-    private int moneda ;
-    @Column
+    private erpClientes idCliente;
+
+    @Column(name = "tipoVenta", length = 10)
+    private String tipoVenta;
+
+    @Column(name = "destinoVenta")
+    private int destinoVenta;
+
+    @Column(name = "FechaFactura")
+    private LocalDate FechaFactura;
+
+    @Column(name = "moneda")
+    private int moneda;
+
+    @Column(name = "tasaDeCambio")
     private double tasaDeCambio;
-    @Column
-    private String referencia ;
-    @Column
-    private int numeroAcceso ;
-    @Column
-    private String serieAdmin ;
-    @Column
-    private int numeroAdmin ;
-    @Column
-    private String reversion ;
-    @Column
-    private double totalBruto ;
-    @Column
+
+    @Column(name = "referencia", length = 40, nullable = false)
+    private String referencia;
+
+    @Column(name = "numeroAcceso")
+    private int numeroAcceso;
+
+    @Column(name = "serieAdmin", length = 20)
+    private String serieAdmin;
+
+    @Column(name = "numeroAdmin")
+    private int numeroAdmin;
+
+    @Column(name = "reversion", length = 1)
+    private String reversion;
+
+    @Column(name = "totalBruto")
+    private double totalBruto;
+
+    @Column(name = "porcentajeDeDescuento")
     private double porcentajeDeDescuento;
-    @Column
-    private double cantidadDeDescuento ;
-    @Column
-    private double exento ;
-    @Column
+
+    @Column(name = "cantidadDeDescuento")
+    private double cantidadDeDescuento;
+
+    @Column(name = "exento")
+    private double exento;
+
+    @Column(name = "otro")
     private double otro;
-    @Column
+
+    @Column(name = "totalNeto")
     private double totalNeto;
-    @Column
+
+    @Column(name = "isr")
     private double isr;
-    @Column
+
+    @Column(name = "iva")
     private double iva;
-    @Column
+
+    @Column(name = "total")
     private double total;
-    @Column
+
+    @Column(name = "facturaProcesada", length = 2)
     private String facturaProcesada;
-    @Column
+
+    @Column(name = "direccionEntrega", length = 2000)
     private String direccionEntrega;
-    @Column
+
+    @Column(name = "tipoReceptor")
     private int tipoReceptor;
-    @Column
+
+    @Column(name = "enviarCorreo", length = 1)
     private String enviarCorreo;
-    @Column
+
+    @Column(name = "serieResAPI", length = 50)
     private String serieResAPI;
-    @Column
-    private long  preimpresoResAPI;
-    @Column
+
+    @Column(name = "preimpresoResAPI")
+    private long preimpresoResAPI;
+
+    @Column(name = "nombreResAPI", length = 200)
     private String nombreResAPI;
-    @Column
+
+    @Column(name = "direccionResAPI", length = 500)
     private String direccionResAPI;
-    @Column
+
+    @Column(name = "telefonoResAPI", length = 20)
     private String telefonoResAPI;
-    @Column
+
+    @Column(name = "numeroAutorizacionResAPI", length = 50)
     private String numeroAutorizacionResAPI;
-    @Column
+
+    @Column(name = "referenciaResAPI", length = 40)
     private String referenciaResAPI;
-    @Column
+
+    @Column(name = "respuestaXML", length = 4000)
     private String respuestaXML;
-    @Column
-    private int  estado;
-    @Column
+
+    @Column(name = "estado")
+    private int estado;
+
+    @Column(name = "fechaModificacion")
     private LocalDate fechaModificacion;
-    @Column
+
+    @Column(name = "horaModificacion")
     private LocalTime horaModificacion;
-    @Column
+
+    @Column(name = "idUsuarioModificacion")
     private int idUsuarioModificacion;
 
-    public erpEncabezadoFacturas() {
-    }
+    public erpEncabezadoFacturas() {}
+    // getters y setters...
 
     public Long getIdEncabezadoFactura() {
         return idEncabezadoFactura;

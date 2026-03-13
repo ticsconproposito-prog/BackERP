@@ -1,7 +1,7 @@
 package BackERP.controller;
 
 import BackERP.helper.segUsuariosSpecs;
-import BackERP.models.segusuarios;
+import BackERP.models.segUsuarios;
 import BackERP.repository.RepositoryUsuarios;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +23,7 @@ public class UsuariosRestController {
     private RepositoryUsuarios reusr;
 
     @GetMapping("usuarios")
-    public List<segusuarios> getUsuarios(
+    public List<segUsuarios> getUsuarios(
             @RequestParam(required = false) String usuario,
             @RequestParam(required = false) Integer idEmpleado,
             @RequestParam(required = false) Integer idUsuario,
@@ -40,7 +40,7 @@ public class UsuariosRestController {
 
         Pageable pageable = PageRequest.of(page, size, s);
 
-        Specification<segusuarios> spec = Specification
+        Specification<segUsuarios> spec = Specification
                 .where(segUsuariosSpecs.estadoEquals(1))
                 .and(segUsuariosSpecs.idUsuarioContains(idUsuario))
                 .and(segUsuariosSpecs.idEmpleadoContains(idEmpleado))
@@ -50,7 +50,7 @@ public class UsuariosRestController {
     }
 
     @PostMapping("grabarUsuario")
-    public String grabarUsuario(@RequestBody segusuarios Usuario){
+    public String grabarUsuario(@RequestBody segUsuarios Usuario){
 
 
         Usuario.setFechaModificacion(LocalDate.now());
@@ -62,8 +62,8 @@ public class UsuariosRestController {
         return "Grabado";
     }
     @PutMapping("editarUsuario/{idUsuario}")
-    public String editarUsuario(@PathVariable long idUsuario, @RequestBody segusuarios Usuario){
-        segusuarios updateUsuario = reusr.findById(idUsuario).get();
+    public String editarUsuario(@PathVariable long idUsuario, @RequestBody segUsuarios Usuario){
+        segUsuarios updateUsuario = reusr.findById(idUsuario).get();
         updateUsuario.setIdEmpleado(Usuario.getIdEmpleado());
         updateUsuario.setUsuario(Usuario.getUsuario());
         updateUsuario.setComentario(Usuario.getComentario());
@@ -78,9 +78,9 @@ public class UsuariosRestController {
     }
 
     @DeleteMapping("eliminarUsuario/{idUsuario}")
-    public String eliminarUsuario(@PathVariable long idUsuario, @RequestBody segusuarios Usuario){
+    public String eliminarUsuario(@PathVariable long idUsuario, @RequestBody segUsuarios Usuario){
         System.out.println("eliminar");
-        segusuarios updateUsuario = reusr.findById(idUsuario).get();
+        segUsuarios updateUsuario = reusr.findById(idUsuario).get();
         updateUsuario.setFechaModificacion(LocalDate.now());
         updateUsuario.setHoraModificacion(LocalTime.now());
         updateUsuario.setIdUsuarioModificacion(Usuario.getIdUsuarioModificacion());

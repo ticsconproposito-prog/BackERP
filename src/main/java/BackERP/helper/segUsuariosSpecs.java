@@ -1,11 +1,11 @@
 package BackERP.helper;
 
-import BackERP.models.segusuarios;
+import BackERP.models.segUsuarios;
 import org.springframework.data.jpa.domain.Specification;
 
 public class segUsuariosSpecs {
 
-    public static Specification<segusuarios> usuarioContains(String nombre) {
+    public static Specification<segUsuarios> usuarioContains(String nombre) {
         return (root, query, cb) -> {
             if (nombre == null || nombre.isEmpty()) {
                 return null; // no aplica filtro si viene null
@@ -16,7 +16,7 @@ public class segUsuariosSpecs {
         };
     }
 
-    public static Specification<segusuarios> idEmpleadoContains(Integer id) {
+    public static Specification<segUsuarios> idEmpleadoContains(Integer id) {
         return (root, query, cb) ->{
             if (id == null) {
                 return null; // <-- al devolver null, no se agrega restricción }
@@ -25,7 +25,7 @@ public class segUsuariosSpecs {
         };
     }
 
-    public static Specification<segusuarios> idUsuarioContains(Integer id) {
+    public static Specification<segUsuarios> idUsuarioContains(Integer id) {
         return (root, query, cb) ->{
             if (id == null) {
                 return null; // <-- al devolver null, no se agrega restricción }
@@ -34,7 +34,7 @@ public class segUsuariosSpecs {
         };
     }
 
-    public static Specification<segusuarios> estadoEquals(int estado) {
+    public static Specification<segUsuarios> estadoEquals(int estado) {
         return (root, query, cb) ->
                 cb.equal(root.get("estado").as(Integer.class), estado);
 

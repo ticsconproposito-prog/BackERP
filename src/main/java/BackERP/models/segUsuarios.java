@@ -1,38 +1,45 @@
 package BackERP.models;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
+
 @Entity
-public class segusuarios {
+@Table(name = "segUsuarios", schema = "erpConfig")
+public class segUsuarios {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
+    @Column(name = "idUsuario")
     private long idUsuario;
-    @Column
+
+    @Column(name = "idEmpleado")
     private int idEmpleado;
-    @Column
+
+    @Column(name = "usuario", length = 50, nullable = false)
     private String usuario;
-    @Column
+
+    @Column(name = "contrasena", length = 50, nullable = false)
     private String contrasena;
-    @Column
+
+    @Column(name = "comentario", length = 500)
     private String comentario;
-    @Column
+
+    @Column(name = "estado")
     private int estado;
-    @Column
+
+    @Column(name = "fechaModificacion")
     private LocalDate fechaModificacion;
-    @Column
+
+    @Column(name = "horaModificacion")
     private LocalTime horaModificacion;
-    @Column
+
+    @Column(name = "idUsuarioModificacion")
     private int idUsuarioModificacion;
 
+    public segUsuarios() {}
 
-    public segusuarios() {
-
-    }
-
+    // getters y setters...
 
     public long getIdUsuario() {
         return idUsuario;

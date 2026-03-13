@@ -1,56 +1,75 @@
 package BackERP.models;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
+@Table(name = "erpDetalleFacturas", schema = "erpConfig")
 public class erpDetalleFacturas {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
+    @Column(name = "idDetalleFactura")
     private Long idDetalleFactura;
-    @Column
+
+    @Column(name = "idEncabezadoFactura")
     private int idEncabezadoFactura;
-    @Column
+
+    @Column(name = "idProducto")
     private int idProducto;
-    @Column
+
+    @Column(name = "idUnidadDeMedida")
     private int idUnidadDeMedida;
-    @Column
+
+    @Column(name = "cantidad")
     private int cantidad;
-    @Column
+
+    @Column(name = "precioVenta")
     private double precioVenta;
-    @Column
+
+    @Column(name = "cantidadDeDescuento")
     private double cantidadDeDescuento;
-    @Column
+
+    @Column(name = "porcentajeDeDescuento")
     private double porcentajeDeDescuento;
-    @Column
+
+    @Column(name = "ImpBruto")
     private double ImpBruto;
-    @Column
+
+    @Column(name = "ImpExento")
     private double ImpExento;
-    @Column
+
+    @Column(name = "ImpOtros")
     private double ImpOtros;
-    @Column
+
+    @Column(name = "ImpNeto")
     private double ImpNeto;
-    @Column
+
+    @Column(name = "iva")
     private double iva;
-    @Column
+
+    @Column(name = "isr")
     private double isr;
-    @Column
+
+    @Column(name = "ImpTotal")
     private double ImpTotal;
-    @Column
+
+    @Column(name = "estado")
     private int estado;
-    @Column
+
+    @Column(name = "fechaModificacion")
     private LocalDate fechaModificacion;
-    @Column
+
+    @Column(name = "horaModificacion")
     private LocalTime horaModificacion;
-    @Column
+
+    @Column(name = "idUsuarioModificacion")
     private int idUsuarioModificacion;
 
-    public erpDetalleFacturas() {
-    }
+    public erpDetalleFacturas() {}
+    // getters y setters...
+
 
     public Long getIdDetalleFactura() {
         return idDetalleFactura;

@@ -1,45 +1,61 @@
 package BackERP.models;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
+
 @Entity
+@Table(name = "erpEmpleados", schema = "erpConfig")
 public class erpEmpleados {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
+    @Column(name = "idEmpleado")
     private long idEmpleado;
-    @Column
+
+    @Column(name = "nombre", length = 60, nullable = false)
     private String nombre;
-    @Column
+
+    @Column(name = "apellido", length = 60, nullable = false)
     private String apellido;
-    @Column
+
+    @Column(name = "email", length = 80, nullable = false, unique = true)
     private String email;
-    @Column
-    private int telefono;
-    @Column
-    private int idCargo;
-    @Column
-    private int idUbicacion;
-    @Column
+
+    @Column(name = "telefono")
+    private Integer telefono;
+
+    @Column(name = "idCargo")
+    private Integer idCargo;
+
+    @Column(name = "idUbicacion")
+    private Integer idUbicacion;
+
+    @Column(name = "direccionResidencia", length = 250)
     private String direccionResidencia;
-    @Column
+
+    @Column(name = "fechaNacimiento")
     private LocalDate fechaNacimiento;
-    @Column
-    private int estado;
-    @Column
+
+    @Column(name = "estado")
+    private Integer estado;
+
+    @Column(name = "fechaIngresoLaboral")
     private LocalDate fechaIngresoLaboral;
-    @Column
+
+    @Column(name = "fechaModificacion")
     private LocalDate fechaModificacion;
-    @Column
+
+    @Column(name = "horaModificacion")
     private LocalTime horaModificacion;
-    @Column
-    private int idUsuarioModificacion;
 
-    public erpEmpleados() {
+    @Column(name = "idUsuarioModificacion")
+    private Integer idUsuarioModificacion;
 
-    }
+    // constructor vacío
+    public erpEmpleados() {}
+
+    // getters y setters...
 
     public long getIdEmpleado() {
         return idEmpleado;
