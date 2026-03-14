@@ -22,6 +22,11 @@ public class PaginasRestController {
     @Autowired
     private RepositoryPaginas repag;
 
+
+    @GetMapping("ping")
+    public String ping() {
+        return "OK";
+    }
     @GetMapping("paginas")
     public Page<segpaginas> getPaginas(@RequestParam(required = false) String nombrePagina,
                                        @RequestParam(required = false) Integer idPagina,
