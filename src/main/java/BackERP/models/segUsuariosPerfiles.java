@@ -10,31 +10,31 @@ public class segUsuariosPerfiles {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
+    @Column(name = "idUsuarioPerfil")
     private int idUsuarioPerfil;
 
-    @Column
+    @Column(name = "idUsuario")
     private int idUsuario;
 
-    @Column
+    @Column(name = "idPerfil")
     private int idPerfil;
 
-    @Column(length = 20)
+    @Column(name = "permiso", length = 20)
     private String permiso;
 
-    @Column(length = 250)
+    @Column(name = "comentario", length = 250)
     private String comentario;
 
-    @Column
+    @Column(name = "estado")
     private int estado;
 
-    @Column
+    @Column(name = "fechaModificacion")
     private LocalDate fechaModificacion;
 
-    @Column
+    @Column(name = "horaModificacion")
     private LocalTime horaModificacion;
 
-    @Column
+    @Column(name = "idUsuarioModificacion")
     private int idUsuarioModificacion;
 
     public segUsuariosPerfiles() {}

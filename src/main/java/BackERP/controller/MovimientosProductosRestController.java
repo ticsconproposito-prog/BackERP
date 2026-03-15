@@ -12,6 +12,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -83,7 +84,7 @@ public class MovimientosProductosRestController {
             // 🔎 Actualizar el producto en la tabla de productos
             erpProductos producto = repro.findById(movimientosProductos.getIdProducto().getIdProducto()).orElse(null);
             if (producto != null) {
-                producto.setPrecioCompra(movimientosProductos.getPrecioCompra()); // ejemplo: actualizar precio
+                producto.setPrecioCompra(movimientosProductos.getPrecioCompra().doubleValue()); // ejemplo: actualizar precio
                 producto.setFechaModificacion(LocalDate.now());
                 producto.setHoraModificacion(LocalTime.now());
                 producto.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());

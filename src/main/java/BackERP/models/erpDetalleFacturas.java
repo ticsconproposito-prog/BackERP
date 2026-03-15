@@ -55,6 +55,9 @@ public class erpDetalleFacturas {
     @Column(name = "ImpTotal")
     private double ImpTotal;
 
+    @Column(name = "consignacionFacturada")
+    private int consignacionFacturada;
+
     @Column(name = "estado")
     private int estado;
 
@@ -189,6 +192,14 @@ public class erpDetalleFacturas {
 
     public void setImpTotal(double impTotal) {
         ImpTotal = impTotal;
+    }
+
+    public int getConsignacionFacturada() {
+        return consignacionFacturada;
+    }
+
+    public void setConsignacionFacturada(int consignacionFacturada) {
+        this.consignacionFacturada = consignacionFacturada;
     }
 
     public int getEstado() {

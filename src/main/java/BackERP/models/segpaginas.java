@@ -1,91 +1,57 @@
 package BackERP.models;
 
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
+@Table(name = "segPaginas", schema = "erpConfig")
 public class segpaginas {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private long idPagina;
-    @Column
+    @Column(name = "idPagina")
+    private int idPagina;
+
+    @Column(name = "nombrePagina")
     private String nombrePagina;
-    @Column
+
+    @Column(name = "URL")
     private String URL;
-    @Column
+
+    @Column(name = "estado")
     private int estado;
-    @Column
+
+    @Column(name = "fechaModificacion")
     private LocalDate fechaModificacion;
-    @Column
+
+    @Column(name = "horaModificacion")
     private LocalTime horaModificacion;
-    @Column
+
+    @Column(name = "idUsuarioModificacion")
     private int idUsuarioModificacion;
 
-    public segpaginas() {
+    public segpaginas() {}
 
-    }
+    // Getters y setters
+    public int getIdPagina() { return idPagina; }
+    public void setIdPagina(int idPagina) { this.idPagina = idPagina; }
 
-    public long getIdPagina() {
-        return idPagina;
-    }
+    public String getNombrePagina() { return nombrePagina; }
+    public void setNombrePagina(String nombrePagina) { this.nombrePagina = nombrePagina; }
 
-    public void setIdPagina(long idPagina) {
-        this.idPagina = idPagina;
-    }
+    public String getURL() { return URL; }
+    public void setURL(String URL) { this.URL = URL; }
 
-    public String getNombrePagina() {
-        return nombrePagina;
-    }
+    public int getEstado() { return estado; }
+    public void setEstado(int estado) { this.estado = estado; }
 
-    public void setNombrePagina(String nombrePagina) {
-        this.nombrePagina = nombrePagina;
-    }
+    public LocalDate getFechaModificacion() { return fechaModificacion; }
+    public void setFechaModificacion(LocalDate fechaModificacion) { this.fechaModificacion = fechaModificacion; }
 
-    public String getURL() {
-        return URL;
-    }
+    public LocalTime getHoraModificacion() { return horaModificacion; }
+    public void setHoraModificacion(LocalTime horaModificacion) { this.horaModificacion = horaModificacion; }
 
-    public void setURL(String URL) {
-        this.URL = URL;
-    }
-
-    public int getEstado() {
-        return estado;
-    }
-
-    public void setEstado(int estado) {
-        this.estado = estado;
-    }
-
-    public LocalDate getFechaModificacion() {
-        return fechaModificacion;
-    }
-
-    public void setFechaModificacion(LocalDate fechaModificacion) {
-        this.fechaModificacion = fechaModificacion;
-    }
-
-    public LocalTime getHoraModificacion() {
-        return horaModificacion;
-    }
-
-    public void setHoraModificacion(LocalTime horaModificacion) {
-        this.horaModificacion = horaModificacion;
-    }
-
-    public int getIdUsuarioModificacion() {
-        return idUsuarioModificacion;
-    }
-
-    public void setIdUsuarioModificacion(int idUsuarioModificacion) {
-        this.idUsuarioModificacion = idUsuarioModificacion;
-    }
-
-
-
-
+    public int getIdUsuarioModificacion() { return idUsuarioModificacion; }
+    public void setIdUsuarioModificacion(int idUsuarioModificacion) { this.idUsuarioModificacion = idUsuarioModificacion; }
 }

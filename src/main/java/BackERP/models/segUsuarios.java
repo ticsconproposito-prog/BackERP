@@ -16,10 +16,10 @@ public class segUsuarios {
     @Column(name = "idEmpleado")
     private int idEmpleado;
 
-    @Column(name = "usuario", length = 50, nullable = false)
+    @Column(name = "usuario", length = 50)
     private String usuario;
 
-    @Column(name = "contrasena", length = 50, nullable = false)
+    @Column(name = "contrasena", length = 50)
     private String contrasena;
 
     @Column(name = "comentario", length = 500)

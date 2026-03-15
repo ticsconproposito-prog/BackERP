@@ -35,7 +35,7 @@ public class erpEncabezadoFacturas {
     @Column(name = "tasaDeCambio")
     private double tasaDeCambio;
 
-    @Column(name = "referencia", length = 40, nullable = false)
+    @Column(name = "referencia", length = 40)
     private String referencia;
 
     @Column(name = "numeroAcceso")

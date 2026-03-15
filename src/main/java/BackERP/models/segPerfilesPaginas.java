@@ -10,28 +10,28 @@ public class segPerfilesPaginas {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
+    @Column(name = "idPerfilPagina")
     private int idPerfilPagina;
 
-    @Column
+    @Column(name = "idPerfil")
     private int idPerfil;
 
-    @Column
+    @Column(name = "idPagina")
     private int idPagina;
 
-    @Column
+    @Column(name = "permiso")
     private int permiso;
 
-    @Column
+    @Column(name = "estado")
     private int estado;
 
-    @Column
+    @Column(name = "fechaModificacion")
     private LocalDate fechaModificacion;
 
-    @Column
+    @Column(name = "horaModificacion")
     private LocalTime horaModificacion;
 
-    @Column
+    @Column(name = "idUsuarioModificacion")
     private int idUsuarioModificacion;
 
     public segPerfilesPaginas() {}

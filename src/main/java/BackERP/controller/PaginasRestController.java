@@ -65,7 +65,7 @@ public class PaginasRestController {
     }
     @PutMapping("editarPagina/{idPagina}")
     public String editarPagina(@PathVariable long idPagina, @RequestBody segpaginas pagina){
-        segpaginas updatePagina = repag.findById(pagina.getIdPagina()).get();
+        segpaginas updatePagina = repag.findById((long) pagina.getIdPagina()).get();
         updatePagina.setNombrePagina(pagina.getNombrePagina());
         updatePagina.setURL(pagina.getURL());
         updatePagina.setFechaModificacion(LocalDate.now());

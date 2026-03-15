@@ -101,7 +101,8 @@ public class FelService {
                 if (optEnc.isPresent()) {
 
                     erpEncabezadoFacturas enc = optEnc.get();
-                    if ("2-NO EXISTE EL NIT/CUI DEL CONTRIBUYENTE".equals(result.getError())) {
+                    if ("2-NO EXISTE EL NIT/CUI DEL CONTRIBUYENTE".equals(result.getError()) ||
+                            "186-NUMERO DE DOCUMENTO DE IDENTIFICACION INVALIDO".equals(result.getError())) {
                         enc.setEstado(0);
 
                         // Consultar los detalles de la factura

@@ -13,13 +13,13 @@ public class erpEmpleados {
     @Column(name = "idEmpleado")
     private long idEmpleado;
 
-    @Column(name = "nombre", length = 60, nullable = false)
+    @Column(name = "nombre", length = 60)
     private String nombre;
 
-    @Column(name = "apellido", length = 60, nullable = false)
+    @Column(name = "apellido", length = 60)
     private String apellido;
 
-    @Column(name = "email", length = 80, nullable = false, unique = true)
+    @Column(name = "email", length = 80)
     private String email;
 
     @Column(name = "telefono")

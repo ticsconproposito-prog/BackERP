@@ -1,137 +1,81 @@
 package BackERP.models;
 
-
 import jakarta.persistence.*;
-
 import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-// Usa los nombres exactos en tu BD
-public class erpProductos
-{
-
-
-
+@Table(name = "erpProductos", schema = "erpConfig")
+public class erpProductos {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column
-    private Long idProducto;       // nombre de la propiedad en Java (camelCase)
-    @Column
+    @Column(name = "idProducto")
+    private Long idProducto;
+
+    @Column(name = "codigoProducto", length = 120)
     private String codigoProducto;
-    @Column
+
+    @Column(name = "codigoProductoProveedor", length = 500)
     private String codigoProductoProveedor;
-    @Column
+
+    @Column(name = "descripcionProducto", length = 500)
     private String descripcionProducto;
-    @Column
+
+    @Column(name = "unidadDeMedida")
     private int unidadDeMedida;
-    @Column
+
+    @Column(name = "precioCompra")
     private double precioCompra;
-    @Column
+
+    @Column(name = "precioVenta")
     private double precioVenta;
-    @Column
-    private int  estado;
-    @Column
+
+    @Column(name = "estado")
+    private int estado;
+
+    @Column(name = "fechaModificacion")
     private LocalDate fechaModificacion;
-    @Column
+
+    @Column(name = "horaModificacion")
     private LocalTime horaModificacion;
-    @Column
+
+    @Column(name = "idUsuarioModificacion")
     private int idUsuarioModificacion;
 
+    public erpProductos() {}
 
+    // Getters y Setters
+    public Long getIdProducto() { return idProducto; }
+    public void setIdProducto(Long idProducto) { this.idProducto = idProducto; }
 
-    public erpProductos() {
+    public String getCodigoProducto() { return codigoProducto; }
+    public void setCodigoProducto(String codigoProducto) { this.codigoProducto = codigoProducto; }
 
-    }
+    public String getCodigoProductoProveedor() { return codigoProductoProveedor; }
+    public void setCodigoProductoProveedor(String codigoProductoProveedor) { this.codigoProductoProveedor = codigoProductoProveedor; }
 
-    public Long getIdProducto() {
-        return idProducto;
-    }
+    public String getDescripcionProducto() { return descripcionProducto; }
+    public void setDescripcionProducto(String descripcionProducto) { this.descripcionProducto = descripcionProducto; }
 
-    public void setIdProducto(Long idProducto) {
-        this.idProducto = idProducto;
-    }
+    public int getUnidadDeMedida() { return unidadDeMedida; }
+    public void setUnidadDeMedida(int unidadDeMedida) { this.unidadDeMedida = unidadDeMedida; }
 
-    public String getCodigoProducto() {
-        return codigoProducto;
-    }
+    public double getPrecioCompra() { return precioCompra; }
+    public void setPrecioCompra(double precioCompra) { this.precioCompra = precioCompra; }
 
-    public void setCodigoProducto(String codigoProducto) {
-        this.codigoProducto = codigoProducto;
-    }
+    public double getPrecioVenta() { return precioVenta; }
+    public void setPrecioVenta(double precioVenta) { this.precioVenta = precioVenta; }
 
-    public String getCodigoProductoProveedor() {
-        return codigoProductoProveedor;
-    }
+    public int getEstado() { return estado; }
+    public void setEstado(int estado) { this.estado = estado; }
 
-    public void setCodigoProductoProveedor(String codigoProductoProveedor) {
-        this.codigoProductoProveedor = codigoProductoProveedor;
-    }
+    public LocalDate getFechaModificacion() { return fechaModificacion; }
+    public void setFechaModificacion(LocalDate fechaModificacion) { this.fechaModificacion = fechaModificacion; }
 
-    public String getDescripcionProducto() {
-        return descripcionProducto;
-    }
+    public LocalTime getHoraModificacion() { return horaModificacion; }
+    public void setHoraModificacion(LocalTime horaModificacion) { this.horaModificacion = horaModificacion; }
 
-    public void setDescripcionProducto(String descripcionProducto) {
-        this.descripcionProducto = descripcionProducto;
-    }
-
-    public int getUnidadDeMedida() {
-        return unidadDeMedida;
-    }
-
-    public void setUnidadDeMedida(int unidadDeMedida) {
-        this.unidadDeMedida = unidadDeMedida;
-    }
-
-    public double getPrecioCompra() {
-        return precioCompra;
-    }
-
-    public void setPrecioCompra(double precioCompra) {
-        this.precioCompra = precioCompra;
-    }
-
-    public double getPrecioVenta() {
-        return precioVenta;
-    }
-
-    public void setPrecioVenta(double precioVenta) {
-        this.precioVenta = precioVenta;
-    }
-
-    public int getEstado() {
-        return estado;
-    }
-
-    public void setEstado(int estado) {
-        this.estado = estado;
-    }
-
-    public LocalDate getFechaModificacion() {
-        return fechaModificacion;
-    }
-
-    public void setFechaModificacion(LocalDate fechaModificacion) {
-        this.fechaModificacion = fechaModificacion;
-    }
-
-    public LocalTime getHoraModificacion() {
-        return horaModificacion;
-    }
-
-    public void setHoraModificacion(LocalTime horaModificacion) {
-        this.horaModificacion = horaModificacion;
-    }
-
-    public int getIdUsuarioModificacion() {
-        return idUsuarioModificacion;
-    }
-
-    public void setIdUsuarioModificacion(int idUsuarioModificacion) {
-        this.idUsuarioModificacion = idUsuarioModificacion;
-    }
-
-
+    public int getIdUsuarioModificacion() { return idUsuarioModificacion; }
+    public void setIdUsuarioModificacion(int idUsuarioModificacion) { this.idUsuarioModificacion = idUsuarioModificacion; }
 }
