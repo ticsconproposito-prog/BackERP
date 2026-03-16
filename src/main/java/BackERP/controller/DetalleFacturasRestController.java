@@ -65,7 +65,7 @@ public class DetalleFacturasRestController {
 
             detalleFacturas.setPorcentajeDeDescuento(PorcDescuento);
         }
-        detalleFacturas.setConsignacionFacturada(0);
+
         detalleFacturas.setFechaModificacion(LocalDate.now());
         detalleFacturas.setHoraModificacion(LocalTime.now());
         detalleFacturas.setEstado(1);
