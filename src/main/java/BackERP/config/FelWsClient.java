@@ -2,11 +2,15 @@
 package BackERP.config;
 
 import BackERP.models.felProperties;
+import io.netty.resolver.DefaultAddressResolverGroup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.netty.http.client.HttpClient;
+
 
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
@@ -19,8 +23,15 @@ public class FelWsClient {
 
     @Autowired
     public FelWsClient(felProperties props) {
-        this.props = props;
-        this.webClient = WebClient.builder().build();
+      this.props = props;
+
+      // Configuramos un HttpClient de Netty que use el resolvedor por defecto del sistema
+      HttpClient httpClient = HttpClient.create()
+        .resolver(DefaultAddressResolverGroup.INSTANCE);
+
+      this.webClient = WebClient.builder()
+        .clientConnector(new ReactorClientHttpConnector(httpClient))
+        .build();
     }
 
     public String generaDocumento(int tipoDoc, String pXml) {
@@ -89,6 +100,8 @@ public class FelWsClient {
                 + "    </guat:anulaDocumento>"
                 + "  </soapenv:Body>"
                 + "</soapenv:Envelope>";
+
+
 
         try {
             return webClient.post()

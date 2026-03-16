@@ -81,7 +81,7 @@ public class EncabezadoFacturasRestController {
 
     @DeleteMapping("anulacionEncabezadoFactura/{idEncabezadoFactura}")
     public String anulacionEncabezadoFactura(@PathVariable long idEncabezadoFactura,@RequestBody erpEncabezadoFacturas EncabezadoFacturas){
-        System.out.println("anulada");
+
         erpEncabezadoFacturas updateEncabezadoFactura = repencfac.findById(idEncabezadoFactura).get();
         updateEncabezadoFactura.setFechaModificacion(LocalDate.now());
         updateEncabezadoFactura.setHoraModificacion(LocalTime.now());
