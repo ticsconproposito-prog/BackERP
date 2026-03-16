@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "ErpDiccionarios", schema = "erpConfig")
+@Table(name = "erpDiccionarios", schema = "erpConfig")
 public class erpDiccionarios {
 
     @Id
