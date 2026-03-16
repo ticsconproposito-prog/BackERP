@@ -69,7 +69,7 @@ public class PerfilesRestController {
 
     @DeleteMapping("eliminarPerfil/{idPerfil}")
     public String eliminarPerfil(@PathVariable long idPerfil, @RequestBody segPerfiles Perfil){
-        System.out.println("eliminar");
+
         segPerfiles updatePerfil = reper.findById(idPerfil).get();
         updatePerfil.setFechaModificacion(LocalDate.now());
         updatePerfil.setHoraModificacion(LocalTime.now());

@@ -31,7 +31,7 @@ public class ProductoRestController {
         @RequestParam(defaultValue = "20") int size,
         @RequestParam(defaultValue = "idProducto,asc") String sort
     ) {
-        System.out.println("idProducto " +idProducto);
+
             String[] sortParts = sort.split(",", 2);
 
             Sort.Direction dir = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.ASC;
@@ -87,7 +87,7 @@ public class ProductoRestController {
 
 @DeleteMapping("eliminarProducto/{idProducto}")
     public String eliminarProducto(@PathVariable long idProducto, @RequestBody erpProductos producto){
-    System.out.println("eliminar");
+
     erpProductos updateProducto = repro.findById(idProducto).get();
     updateProducto.setFechaModificacion(LocalDate.now());
     updateProducto.setHoraModificacion(LocalTime.now());

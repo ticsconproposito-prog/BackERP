@@ -94,7 +94,7 @@ public class ClientesRestController {
 
     @DeleteMapping("eliminarCliente/{idCliente}")
     public String eliminarCliente(@PathVariable long idCliente, @RequestBody erpClientes clientes){
-        System.out.println("eliminar");
+
         erpClientes erpclientes = repcli.findById(idCliente).get();
         erpclientes.setFechaModificacion(LocalDate.now());
         erpclientes.setHoraModificacion(LocalTime.now());

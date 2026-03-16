@@ -48,11 +48,11 @@ public class FelWsClient {
         );
 
         // imprimir XML previo al envio
-        System.out.println("XML a enviar:\n" + soap
+       // System.out.println("XML a enviar:\n" + soap
         //        +"end point"+ props.getEndpoint()
         //        + "usuario "+props.getBasicUser()
         //        +"contrasena "+ props.getBasicPass()
-        );
+       // );
  /* imprimir errores consumo WSDL
         try { String response =    webClient.post()
                 .uri(props.getEndpoint())

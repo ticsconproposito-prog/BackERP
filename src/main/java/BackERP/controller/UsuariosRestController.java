@@ -79,7 +79,7 @@ public class UsuariosRestController {
 
     @DeleteMapping("eliminarUsuario/{idUsuario}")
     public String eliminarUsuario(@PathVariable long idUsuario, @RequestBody segUsuarios Usuario){
-        System.out.println("eliminar");
+
         segUsuarios updateUsuario = reusr.findById(idUsuario).get();
         updateUsuario.setFechaModificacion(LocalDate.now());
         updateUsuario.setHoraModificacion(LocalTime.now());

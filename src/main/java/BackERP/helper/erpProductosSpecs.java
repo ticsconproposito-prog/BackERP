@@ -68,7 +68,7 @@ public class erpProductosSpecs{
     public static Specification<erpProductos> idProductoContains(Long id) {
         return (root, query, cb) ->{
             if (id == null) {
-                System.out.println("entre"+id);
+
                 return null; // <-- al devolver null, no se agrega restricción
 
             }

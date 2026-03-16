@@ -100,7 +100,7 @@ public class DetalleFacturasRestController {
 
     @DeleteMapping("eliminarDetalleFactura/{idDetalleFactura}")
     public String eliminarDetalleFactura(@PathVariable long idDetalleFactura, @RequestBody erpDetalleFacturas  DetalleFacturas){
-        System.out.println("eliminar");
+
         erpDetalleFacturas updateerpDetalleFacturas = repdetfac.findById(idDetalleFactura).get();
         updateerpDetalleFacturas.setFechaModificacion(LocalDate.now());
         updateerpDetalleFacturas.setHoraModificacion(LocalTime.now());

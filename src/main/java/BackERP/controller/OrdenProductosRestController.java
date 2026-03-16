@@ -93,7 +93,7 @@ public class OrdenProductosRestController {
 
     @DeleteMapping("eliminarOrdenProducto/{idOrdenProductos}")
     public String eliminarOrdenProductos(@PathVariable long idOrdenProductos, @RequestBody erpOrdenProductos OrdenProductos){
-        System.out.println("eliminar");
+
         erpOrdenProductos updateOrdenProductos = repordpro.findById(idOrdenProductos).get();
         updateOrdenProductos.setFechaModificacion(LocalDate.now());
         updateOrdenProductos.setHoraModificacion(LocalTime.now());

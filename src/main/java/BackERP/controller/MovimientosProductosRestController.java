@@ -143,7 +143,7 @@ public class MovimientosProductosRestController {
 
     @DeleteMapping("eliminarMovimientosProductos/{idMovimientoProducto}")
     public String eliminarMovimientoProducto(@PathVariable long idMovimientoProducto, @RequestBody erpMovimientosProductos MovimientosProductos){
-        System.out.println("eliminar");
+
         erpMovimientosProductos updateerpMovimientosProductos = removpro.findById(idMovimientoProducto).get();
         updateerpMovimientosProductos.setFechaModificacion(LocalDate.now());
         updateerpMovimientosProductos.setHoraModificacion(LocalTime.now());
@@ -155,7 +155,7 @@ public class MovimientosProductosRestController {
 
     @DeleteMapping("eliminarMovProXIdOrden/{idOrdenProducto}")
     public String eliminarMovProXIdOrden(@PathVariable long idOrdenProducto, @RequestBody erpMovimientosProductos MovimientosProductos){
-        System.out.println("eliminar");
+
         List<erpMovimientosProductos> updateerpMovimientosProductos = removpro.findByIdOrdenProducto(idOrdenProducto);
         if (updateerpMovimientosProductos.isEmpty()) {
             throw new RuntimeException("No se encontraron registros con idOrdenProducto: " + idOrdenProducto);

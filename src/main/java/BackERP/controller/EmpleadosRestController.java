@@ -79,7 +79,7 @@ public class EmpleadosRestController {
 
     @DeleteMapping("eliminarEmpleado/{idEmpleado}")
     public String eliminarEmpleado(@PathVariable long idEmpleado, @RequestBody erpEmpleados empleado){
-        System.out.println("eliminar");
+
         erpEmpleados updateEmpleado = reemp.findById(idEmpleado).get();
         updateEmpleado.setFechaModificacion(LocalDate.now());
         updateEmpleado.setHoraModificacion(LocalTime.now());

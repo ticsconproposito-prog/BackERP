@@ -85,7 +85,7 @@ public class DiccionariosRestController {
 
     @DeleteMapping("eliminarDiccionario/{idDiccionario}")
     public String eliminarDiccionario(@PathVariable long idDiccionario, @RequestBody erpDiccionarios Diccionario){
-        System.out.println("eliminar");
+
         erpDiccionarios updateDiccionario = redic.findById(idDiccionario).get();
         updateDiccionario.setFechaModificacion(LocalDate.now());
         updateDiccionario.setHoraModificacion(LocalTime.now());

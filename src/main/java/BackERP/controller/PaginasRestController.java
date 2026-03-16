@@ -78,7 +78,7 @@ public class PaginasRestController {
 
     @DeleteMapping("eliminarPagina/{idPagina}")
     public String eliminarPagina(@PathVariable long idPagina, @RequestBody segPaginas pagina){
-        System.out.println("eliminar");
+
         segPaginas updatePagina = repag.findById(idPagina).get();
         updatePagina.setFechaModificacion(LocalDate.now());
         updatePagina.setHoraModificacion(LocalTime.now());

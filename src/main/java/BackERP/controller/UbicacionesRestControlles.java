@@ -58,7 +58,7 @@ public class UbicacionesRestControlles {
 
     @DeleteMapping("eliminarUbicacion/{idUbicacion}")
     public String eliminarUbicacion(@PathVariable long idUbicacion, @RequestBody erpUbicaciones Ubicaciones){
-        System.out.println("eliminar");
+
         erpUbicaciones updateerpUbicaciones = remubi.findById(idUbicacion).get();
         updateerpUbicaciones.setFechaModificacion(LocalDate.now());
         updateerpUbicaciones.setHoraModificacion(LocalTime.now());
