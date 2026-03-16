@@ -31,7 +31,7 @@ public class PaginasRestController {
     public Page<segpaginas> getPaginas(@RequestParam(required = false) String nombrePagina,
                                        @RequestParam(required = false) Integer idPagina,
                                        @RequestParam(defaultValue = "0") int page,
-                                       @RequestParam(defaultValue = "20") int size,
+                                       @RequestParam(defaultValue = "100") int size,
                                        @RequestParam(defaultValue = "idPagina,asc") String sort
     ){
         String[] sortParts = sort.split(",", 2);
