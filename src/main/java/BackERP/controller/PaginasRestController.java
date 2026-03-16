@@ -1,7 +1,7 @@
 package BackERP.controller;
 
 import BackERP.helper.segPaginasSpecs;
-import BackERP.models.segpaginas;
+import BackERP.models.segPaginas;
 import BackERP.repository.RepositoryPaginas;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.List;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -28,7 +27,7 @@ public class PaginasRestController {
         return "OK";
     }
     @GetMapping("paginas")
-    public Page<segpaginas> getPaginas(@RequestParam(required = false) String nombrePagina,
+    public Page<segPaginas> getPaginas(@RequestParam(required = false) String nombrePagina,
                                        @RequestParam(required = false) Integer idPagina,
                                        @RequestParam(defaultValue = "0") int page,
                                        @RequestParam(defaultValue = "100") int size,
@@ -43,7 +42,7 @@ public class PaginasRestController {
         Pageable pageable = PageRequest.of(page, size, s);
 
 
-        Specification<segpaginas> spec = Specification
+        Specification<segPaginas> spec = Specification
                 .where(segPaginasSpecs.estadoEquals(1))
                 .and(segPaginasSpecs.idPaginaContains(idPagina))
                 .and(segPaginasSpecs.nombrePaginaContains(nombrePagina));
@@ -53,7 +52,7 @@ public class PaginasRestController {
     }
 
     @PostMapping("grabarPagina")
-    public String grabarPagina(@RequestBody segpaginas pagina){
+    public String grabarPagina(@RequestBody segPaginas pagina){
 
 
         pagina.setFechaModificacion(LocalDate.now());
@@ -64,8 +63,8 @@ public class PaginasRestController {
         return "Grabado";
     }
     @PutMapping("editarPagina/{idPagina}")
-    public String editarPagina(@PathVariable long idPagina, @RequestBody segpaginas pagina){
-        segpaginas updatePagina = repag.findById((long) pagina.getIdPagina()).get();
+    public String editarPagina(@PathVariable long idPagina, @RequestBody segPaginas pagina){
+        segPaginas updatePagina = repag.findById(idPagina).get();
         updatePagina.setNombrePagina(pagina.getNombrePagina());
         updatePagina.setURL(pagina.getURL());
         updatePagina.setFechaModificacion(LocalDate.now());
@@ -78,9 +77,9 @@ public class PaginasRestController {
     }
 
     @DeleteMapping("eliminarPagina/{idPagina}")
-    public String eliminarPagina(@PathVariable long idPagina, @RequestBody segpaginas pagina){
+    public String eliminarPagina(@PathVariable long idPagina, @RequestBody segPaginas pagina){
         System.out.println("eliminar");
-        segpaginas updatePagina = repag.findById(idPagina).get();
+        segPaginas updatePagina = repag.findById(idPagina).get();
         updatePagina.setFechaModificacion(LocalDate.now());
         updatePagina.setHoraModificacion(LocalTime.now());
         updatePagina.setIdUsuarioModificacion(pagina.getIdUsuarioModificacion());

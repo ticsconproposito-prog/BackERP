@@ -1,12 +1,12 @@
 package BackERP.helper;
 
-import BackERP.models.segpaginas;
+import BackERP.models.segPaginas;
 import org.springframework.data.jpa.domain.Specification;
 
 public class segPaginasSpecs {
 
 
-    public static Specification<segpaginas> nombrePaginaContains(String nombre) {
+    public static Specification<segPaginas> nombrePaginaContains(String nombre) {
         return (root, query, cb) -> {
             if (nombre == null || nombre.isEmpty()) {
                 return null; // no aplica filtro si viene null
@@ -16,7 +16,7 @@ public class segPaginasSpecs {
             return cb.like(cb.lower(root.get("nombrePagina")),pattern, '\\');
         };
     }
-    public static Specification<segpaginas> idPaginaContains(Integer id) {
+    public static Specification<segPaginas> idPaginaContains(Integer id) {
         return (root, query, cb) ->{
             if (id == null) {
                 return null; // <-- al devolver null, no se agrega restricción }
@@ -25,7 +25,7 @@ public class segPaginasSpecs {
         };
     }
 
-    public static Specification<segpaginas> estadoEquals(int estado) {
+    public static Specification<segPaginas> estadoEquals(int estado) {
         return (root, query, cb) ->
                 cb.equal(root.get("estado").as(Integer.class), estado);
 

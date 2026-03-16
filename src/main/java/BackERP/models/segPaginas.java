@@ -5,16 +5,19 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "segPerfiles", schema = "erpConfig")
-public class segperfiles {
+@Table(name = "segPaginas", schema = "erpConfig")
+public class segPaginas {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idPerfil")
-    private int idPerfil;
+    @Column(name = "idPagina")
+    private int idPagina;
 
-    @Column(name = "nombrePerfil")
-    private String nombrePerfil;
+    @Column(name = "nombrePagina")
+    private String nombrePagina;
+
+    @Column(name = "URL")
+    private String URL;
 
     @Column(name = "estado")
     private int estado;
@@ -28,14 +31,17 @@ public class segperfiles {
     @Column(name = "idUsuarioModificacion")
     private int idUsuarioModificacion;
 
-    public segperfiles() {}
+    public segPaginas() {}
 
     // Getters y setters
-    public int getIdPerfil() { return idPerfil; }
-    public void setIdPerfil(int idPerfil) { this.idPerfil = idPerfil; }
+    public int getIdPagina() { return idPagina; }
+    public void setIdPagina(int idPagina) { this.idPagina = idPagina; }
 
-    public String getNombrePerfil() { return nombrePerfil; }
-    public void setNombrePerfil(String nombrePerfil) { this.nombrePerfil = nombrePerfil; }
+    public String getNombrePagina() { return nombrePagina; }
+    public void setNombrePagina(String nombrePagina) { this.nombrePagina = nombrePagina; }
+
+    public String getURL() { return URL; }
+    public void setURL(String URL) { this.URL = URL; }
 
     public int getEstado() { return estado; }
     public void setEstado(int estado) { this.estado = estado; }
