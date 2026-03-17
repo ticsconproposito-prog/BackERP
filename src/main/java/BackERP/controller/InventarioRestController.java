@@ -30,33 +30,6 @@ public class InventarioRestController {
             @RequestParam(required = false) String descripcion,
             @RequestParam(required = false) String codigoProductoProveedor,
             @RequestParam(required = false) String codigoProducto,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "idInventario,asc") String sort
-    ) {
-
-        String[] sortParts = sort.split(",", 2);
-
-        Sort.Direction dir = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.ASC;
-
-        Sort s = Sort.by(dir, sortParts[0]);
-
-        Pageable pageable = PageRequest.of(page, size, s);
-
-        Specification<erpInventario> spec = Specification
-                .where(erpInventarioSpecs.estadoEquals(1))
-                .and(erpInventarioSpecs.descripcionProductoContieneFlexible(descripcion))
-                .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
-                .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
-
-        return repinv.findAll(spec, pageable);
-    }
-
-    @GetMapping("inventarioAgrupado")
-    public Page<erpInventarioAgrupadoDTO> getInventarioAgrupado(
-            @RequestParam(required = false) String descripcion,
-            @RequestParam(required = false) String codigoProducto,
-            @RequestParam(required = false) String codigoProductoProveedor,
             @RequestParam(required = false) Integer idUbicacion,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -76,6 +49,33 @@ public class InventarioRestController {
                 .and(erpInventarioSpecs.descripcionProductoContieneFlexible(descripcion))
                 .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
                 .and(erpInventarioSpecs.idUbicacionEquals(idUbicacion))
+                .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
+
+        return repinv.findAll(spec, pageable);
+    }
+
+    @GetMapping("inventarioAgrupado")
+    public Page<erpInventarioAgrupadoDTO> getInventarioAgrupado(
+            @RequestParam(required = false) String descripcion,
+            @RequestParam(required = false) String codigoProducto,
+            @RequestParam(required = false) String codigoProductoProveedor,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size,
+            @RequestParam(defaultValue = "idInventario,asc") String sort
+    ) {
+
+        String[] sortParts = sort.split(",", 2);
+
+        Sort.Direction dir = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.ASC;
+
+        Sort s = Sort.by(dir, sortParts[0]);
+
+        Pageable pageable = PageRequest.of(page, size, s);
+
+        Specification<erpInventario> spec = Specification
+                .where(erpInventarioSpecs.estadoEquals(1))
+                .and(erpInventarioSpecs.descripcionProductoContieneFlexible(descripcion))
+                .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
                 .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
 
         Page<erpInventario> inventariosPage = repinv.findAll(spec, pageable);

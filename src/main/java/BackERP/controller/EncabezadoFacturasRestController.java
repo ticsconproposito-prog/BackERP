@@ -31,7 +31,7 @@ public class EncabezadoFacturasRestController {
             @RequestParam(required = false) String nombreCliente,
             @RequestParam(required = false) String nit,
             @RequestParam(required = false) String referenciaFactura,
-            @RequestParam(required = false) String tipoDocumento,
+            @RequestParam(required = false) Integer tipoDocumento,
             @RequestParam(required = false) String preimpreso,
             @RequestParam(required = false) String facturaProcesada, // 🔎 nuevo parámetro
             @RequestParam(defaultValue = "0") int page,

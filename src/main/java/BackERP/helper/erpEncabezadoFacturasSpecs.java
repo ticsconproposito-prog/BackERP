@@ -51,11 +51,12 @@ public class erpEncabezadoFacturasSpecs {
     };
   }
 
-    public static Specification<erpEncabezadoFacturas> tipoDocumentoContains(String tipoDocumento) {
+    public static Specification<erpEncabezadoFacturas> tipoDocumentoContains(Integer tipoDocumento) {
         return (root, query, cb) -> {
-            String pattern = likeHelper.buildLikePattern(tipoDocumento, likeHelper.MatchMode.ANYWHERE, false);
-            if (pattern == null) return cb.conjunction();
-            return cb.like(cb.lower(root.get("tipoDocumento")), pattern, '\\');
+          if (tipoDocumento == null) {
+            return null; // <-- al devolver null, no se agrega restricción }
+          }
+            return cb.equal(root.get("tipoDocumento"), tipoDocumento);
         };
     }
 
@@ -74,13 +75,13 @@ public class erpEncabezadoFacturasSpecs {
         };
     }
 
-    public static Specification<erpEncabezadoFacturas> numeroPreimpresoContains(String numeroPreimpreso) {
+    public static Specification<erpEncabezadoFacturas> numeroPreimpresoContains(String preimpresoRestAPI) {
         return (root, query, cb) -> {
-            if (numeroPreimpreso == null || numeroPreimpreso.isEmpty()) {
+            if (preimpresoRestAPI == null || preimpresoRestAPI.isEmpty()) {
                 return cb.conjunction(); // no aplica filtro si viene null
             }
-            String pattern = likeHelper.buildLikePattern(numeroPreimpreso, likeHelper.MatchMode.ANYWHERE, false);
-            return cb.like(cb.lower(root.get("preimpreso")), pattern, '\\');
+            String pattern = likeHelper.buildLikePattern(preimpresoRestAPI, likeHelper.MatchMode.ANYWHERE, false);
+            return cb.like(cb.lower(root.get("preimpresoRestAPI")), pattern, '\\');
         };
     }
 
