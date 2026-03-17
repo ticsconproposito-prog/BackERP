@@ -41,7 +41,10 @@ public class FelController {
     @PostMapping("/anularFactura")
     public ResponseEntity<?> anularFactura(@RequestParam String idEncabezadoFactura,
                                            @RequestParam String motivo) {
+      System.out.println("Entre anularFactura ");
+
         FelResult result = felService.anularFactura(idEncabezadoFactura, motivo);
+        System.out.println("respuesta Anular Factura "+result);
         if (result.isOk()) {
             Map<String, Object> body = new HashMap<>();
             body.put("fel", result);

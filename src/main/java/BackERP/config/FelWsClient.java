@@ -102,7 +102,7 @@ public class FelWsClient {
                 + "</soapenv:Envelope>";
 
 
-
+      System.out.println("soap "+soap);
         try {
             return webClient.post()
                     .uri(props.getEndpoint())

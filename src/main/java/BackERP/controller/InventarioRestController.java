@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -81,10 +82,15 @@ public class InventarioRestController {
         Page<erpInventario> inventariosPage = repinv.findAll(spec, pageable);
 
         // Agrupar por producto
-        Map<erpProductos, List<erpInventario>> agrupado = inventariosPage.getContent().stream()
-                .collect(Collectors.groupingBy(erpInventario::getIdProducto));
+         Map<erpProductos, List<erpInventario>> agrupado = inventariosPage.getContent().stream()
+        .collect(Collectors.groupingBy(
+          erpInventario::getIdProducto,
+          LinkedHashMap::new,   // mantiene el orden de inserción
+          Collectors.toList()
+        ));
 
-        List<erpInventarioAgrupadoDTO> resultado = new ArrayList<>();
+
+      List<erpInventarioAgrupadoDTO> resultado = new ArrayList<>();
         for (Map.Entry<erpProductos, List<erpInventario>> entry : agrupado.entrySet()) {
             erpProductos producto = entry.getKey();
             Long totalExistencias = entry.getValue().stream().mapToLong(erpInventario::getCantidadExistencias).sum();
