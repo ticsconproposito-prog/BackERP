@@ -2,43 +2,65 @@ package BackERP.helper;
 
 
 import BackERP.models.erpClientes;
+import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.jpa.domain.Specification;
 
+
+import java.util.Arrays;
+
+
 public class erpClientesSpecs {
-    public static Specification<erpClientes> nombreClienteContains(String nombreCliente) {
-        return (root, query, cb) -> {
-            if (nombreCliente == null || nombreCliente.isEmpty()) {
-                return null; // no aplica filtro si viene null
-            }
-            String pattern = likeHelper.buildLikePattern(nombreCliente, likeHelper.MatchMode.ANYWHERE, true);
 
-            return cb.like(cb.lower(root.get("nombreCliente")),pattern, '\\');
-        };
-    }
+  public static Specification<erpClientes> nombreClienteContains(String nombre) {
+    return (root, query, cb) -> {
+      if (nombre == null || nombre.trim().isEmpty()) {
+        return cb.conjunction();
+      }
 
-    public static Specification<erpClientes> nitClienteContains(String nit) {
-        return (root, query, cb) -> {
-            if (nit == null || nit.isEmpty()) {
-                return null; // no aplica filtro si viene null
-            }
-            String pattern = likeHelper.buildLikePattern(nit, likeHelper.MatchMode.ANYWHERE, true);
+      String[] palabras = nombre.toLowerCase().trim().split("\\s+");
 
-            return cb.like(cb.lower(root.get("nit")),pattern, '\\');
-        };
-    }
+      Predicate[] predicates = Arrays.stream(palabras)
+        .map(p -> cb.like(
+          cb.lower(root.get("nombreCliente")),
+          "%" + likeHelper.escapeForLike(p) + "%",
+          '\\'
+        ))
+        .toArray(Predicate[]::new);
 
-    public static Specification<erpClientes> DPIPasaporteClienteContains(String documentoIdentificacion) {
-        return (root, query, cb) -> {
-            if (documentoIdentificacion == null || documentoIdentificacion.isEmpty()) {
-                return null; // no aplica filtro si viene null
-            }
-            String pattern = likeHelper.buildLikePattern(documentoIdentificacion, likeHelper.MatchMode.ANYWHERE, true);
+      return cb.and(predicates);
+    };
+  }
 
-            return cb.like(cb.lower(root.get("documentoIdentificacion")),pattern, '\\');
-        };
-    }
+  public static Specification<erpClientes> nitClienteContains(String nit) {
+    return (root, query, cb) -> {
+      if (nit == null || nit.trim().isEmpty()) {
+        return cb.conjunction();
+      }
 
-    public static Specification<erpClientes> idCLienteContains(Integer id) {
+      return cb.like(
+        cb.lower(root.get("nitCliente")),  nit.toLowerCase() + "%"
+      );
+    };
+  }
+
+
+
+  public static Specification<erpClientes> DPIPasaporteClienteContains(String documentoIdentificacion) {
+    return (root, query, cb) -> {
+      if (documentoIdentificacion == null || documentoIdentificacion.trim().isEmpty()) {
+        return cb.conjunction(); // no aplica filtro si viene vacío
+      }
+
+      // Autocompletado: coincidencias que empiezan con lo ingresado
+      return cb.like(
+        cb.lower(root.get("documentoIdentificacion")),
+        documentoIdentificacion.toLowerCase() + "%"
+      );
+    };
+  }
+
+
+  public static Specification<erpClientes> idCLienteContains(Integer id) {
         return (root, query, cb) ->{
             if (id == null) {
                 return null; // <-- al devolver null, no se agrega restricción }
