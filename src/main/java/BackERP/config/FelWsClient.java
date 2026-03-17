@@ -86,41 +86,43 @@ public class FelWsClient {
 
     }
 
-    public String anulaDocumento(String uuid, String motivo) {
-        String soap = ""
-                + "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:guat=\"http://dbguatefac/Guatefac.wsdl\">"
-                + "  <soapenv:Header/>"
-                + "  <soapenv:Body>"
-                + "    <guat:anulaDocumento>"
-                + tag("pUsuario", props.getUsuario())
-                + tag("pPassword", props.getPassword())
-                + tag("pNitEmisor", props.getNitEmisor())
-                + tag("pUUID", uuid)
-                + tag("pMotivo", motivo)
-                + "    </guat:anulaDocumento>"
-                + "  </soapenv:Body>"
-                + "</soapenv:Envelope>";
+  public String anulaDocumento(String serie, String preimpreso, String nitComprador,
+                               String fechaAnulacion, String motivo) {
+    String soap = ""
+      + "<soapenv:Envelope xmlns:soapenv=\"http://schemas.xmlsoap.org/soap/envelope/\" xmlns:guat=\"http://dbguatefac/Guatefac.wsdl\">"
+      + "  <soapenv:Header/>"
+      + "  <soapenv:Body>"
+      + "    <guat:anulaDocumento>"
+      + tag("pUsuario", props.getUsuario())
+      + tag("pPassword", props.getPassword())
+      + tag("pNitEmisor", props.getNitEmisor())
+      + tag("pSerie", serie)
+      + tag("pPreimpreso", preimpreso)
+      + tag("pNitComprador", nitComprador)
+      + tag("pFechaAnulacion", fechaAnulacion) // formato YYYYMMDD
+      + tag("pMotivoAnulacion", motivo)
+      + "    </guat:anulaDocumento>"
+      + "  </soapenv:Body>"
+      + "</soapenv:Envelope>";
 
-
-      System.out.println("soap "+soap);
-        try {
-            return webClient.post()
-                    .uri(props.getEndpoint())
-                    .contentType(MediaType.TEXT_XML)
-                    .header(HttpHeaders.AUTHORIZATION, basic(props.getBasicUser(), props.getBasicPass()))
-                    .bodyValue(soap)
-                    .retrieve()
-                    .bodyToMono(String.class)
-                    .block();
-        } catch (Exception e) {
-            // Retornar un XML simulado con el error para que el parser lo capture
-            return "<result><Error>Error de conexión FEL al anular: " + e.getMessage() + "</Error></result>";
-        }
+    try {
+      return webClient.post()
+        .uri(props.getEndpoint())
+        .contentType(MediaType.TEXT_XML)
+        .header(HttpHeaders.AUTHORIZATION, basic(props.getBasicUser(), props.getBasicPass()))
+        .bodyValue(soap)
+        .retrieve()
+        .bodyToMono(String.class)
+        .block();
+    } catch (Exception e) {
+      return "<result><Error>Error de conexión FEL al anular: " + e.getMessage() + "</Error></result>";
     }
+  }
 
 
 
-    private String buildSoapEnvelope(String pUsuario, String pPassword, String pNitEmisor,
+
+  private String buildSoapEnvelope(String pUsuario, String pPassword, String pNitEmisor,
                                      int pEstablecimiento, int pTipoDoc, String pIdMaquina,
                                      String pTipoRespuesta, String pXml) {
 

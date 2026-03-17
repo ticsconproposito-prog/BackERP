@@ -8,6 +8,9 @@ import java.util.Optional;
 
 public interface RepositoryEncabezadoFacturas extends JpaRepository<erpEncabezadoFacturas, Long>, JpaSpecificationExecutor<erpEncabezadoFacturas> {
 
-    // Buscar factura por el número de autorización FEL (UUID)
-    Optional<erpEncabezadoFacturas> findByNumeroAutorizacionResAPI(String numeroAutorizacionResAPI);
+  // Buscar factura por el número de autorización FEL (UUID)
+  Optional<erpEncabezadoFacturas> findByNumeroAutorizacionResAPI(String numeroAutorizacionResAPI);
+
+  // Buscar factura por serie y preimpreso (según respuesta FEL)
+  Optional<erpEncabezadoFacturas> findBySerieResAPIAndPreimpresoResAPI(String serieResAPI, long preimpresoResAPI);
 }

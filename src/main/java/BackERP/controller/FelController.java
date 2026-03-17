@@ -38,21 +38,22 @@ public class FelController {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(result);
     }
 
-    @PostMapping("/anularFactura")
-    public ResponseEntity<?> anularFactura(@RequestParam String idEncabezadoFactura,
-                                           @RequestParam String motivo) {
-      System.out.println("Entre anularFactura ");
-
-        FelResult result = felService.anularFactura(idEncabezadoFactura, motivo);
-        System.out.println("respuesta Anular Factura "+result);
-        if (result.isOk()) {
-            Map<String, Object> body = new HashMap<>();
-            body.put("fel", result);
-            body.put("mensaje", "Factura anulada correctamente");
-            return ResponseEntity.ok(body);
-        }
-        return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(result);
+  @PostMapping("/anularFactura")
+  public ResponseEntity<?> anularFactura(@RequestParam String serie,
+                                         @RequestParam String preimpreso,
+                                         @RequestParam String nitComprador,
+                                         @RequestParam String fechaAnulacion,
+                                         @RequestParam String motivo) {
+    FelResult result = felService.anularFactura(serie, preimpreso, nitComprador, fechaAnulacion, motivo);
+    if (result.isOk()) {
+      Map<String, Object> body = new HashMap<>();
+      body.put("fel", result);
+      body.put("mensaje", "Factura anulada correctamente");
+      return ResponseEntity.ok(body);
     }
+    return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(result);
+  }
+
 
 
 }

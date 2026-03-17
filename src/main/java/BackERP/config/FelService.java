@@ -35,7 +35,7 @@ public class FelService {
     @Autowired
     private RepositoryInventario repInv;
 
-    @Autowired 
+    @Autowired
     private RepositoryEncabezadoFacturas repEncFac;
 
     @Autowired
@@ -177,32 +177,34 @@ public class FelService {
         return result;
     }
 
-    public FelResult anularFactura(String idFacturaEncabezado, String motivo) {
-        String soapResponse = wsClient.anulaDocumento(idFacturaEncabezado, motivo);
-        FelResult result = responseParser.parse(soapResponse);
+  public FelResult anularFactura(String serie, String preimpreso, String nitComprador,
+                                 String fechaAnulacion, String motivo) {
+    String soapResponse = wsClient.anulaDocumento(serie, preimpreso, nitComprador, fechaAnulacion, motivo);
+    FelResult result = responseParser.parse(soapResponse);
 
-        if (result.isOk()) {
-            try {
-                Optional<erpEncabezadoFacturas> optEnc = repEncFac.findByNumeroAutorizacionResAPI(idFacturaEncabezado);
-                if (optEnc.isPresent()) {
-                    erpEncabezadoFacturas enc = optEnc.get();
-                    enc.setFacturaProcesada("A"); // A = Anulada
-                    enc.setRespuestaXML(result.getRawResponse());
-                    repEncFac.save(enc);
-                }
-            } catch (Exception e) {
-                result.setError("Error al actualizar estado de factura: " + e.getMessage());
-                result.setOk(false);
+    if (result.isOk()) {
+      try {
+        Optional<erpEncabezadoFacturas> optEnc = repEncFac.findBySerieResAPIAndPreimpresoResAPI(serie, Long.parseLong(preimpreso));
 
-            }
+        if (optEnc.isPresent()) {
+          erpEncabezadoFacturas enc = optEnc.get();
+          enc.setFacturaProcesada("A"); // A = Anulada
+          enc.setRespuestaXML(result.getRawResponse());
+          repEncFac.save(enc);
         }
-
-        return result;
+      } catch (Exception e) {
+        result.setError("Error al actualizar estado de factura: " + e.getMessage());
+        result.setOk(false);
+      }
     }
 
+    return result;
+  }
 
 
-    private void validar(felDteRequestDto req) {
+
+
+  private void validar(felDteRequestDto req) {
         // Validaciones por línea
         for (felItemDto it : req.getItems()) {
             // IVA = 12% del neto (±0.01)
