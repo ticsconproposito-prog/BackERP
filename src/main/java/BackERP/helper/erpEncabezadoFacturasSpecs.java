@@ -43,6 +43,14 @@ public class erpEncabezadoFacturasSpecs {
         };
     }
 
+  public static Specification<erpEncabezadoFacturas> facturaProcesaContains(String referencia) {
+    return (root, query, cb) -> {
+      String pattern = likeHelper.buildLikePattern(referencia, likeHelper.MatchMode.ANYWHERE, false);
+      if (pattern == null) return cb.conjunction();
+      return cb.like(cb.lower(root.get("facturaProcesada")), pattern, '\\');
+    };
+  }
+
     public static Specification<erpEncabezadoFacturas> tipoDocumentoContains(String tipoDocumento) {
         return (root, query, cb) -> {
             String pattern = likeHelper.buildLikePattern(tipoDocumento, likeHelper.MatchMode.ANYWHERE, false);

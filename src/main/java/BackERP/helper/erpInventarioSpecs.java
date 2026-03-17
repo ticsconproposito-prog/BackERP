@@ -30,6 +30,16 @@ public class erpInventarioSpecs {
         };
     }
 
+  public static Specification<erpInventario> idUbicacionEquals(Integer idUbicacion) {
+    return (root, query, cb) -> {
+
+      if (idUbicacion == null) {
+        return null; // <-- al devolver null, no se agrega restricción }
+      }
+
+      return cb.equal(root.get("idUbicacion").as(Integer.class), idUbicacion);
+    };
+  }
     public static Specification<erpInventario> descripcionProductoContains(String descripcion) {
         return (root, query, cb) -> {
             if (descripcion == null || descripcion.isEmpty()) {

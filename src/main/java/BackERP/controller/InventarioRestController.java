@@ -57,6 +57,7 @@ public class InventarioRestController {
             @RequestParam(required = false) String descripcion,
             @RequestParam(required = false) String codigoProducto,
             @RequestParam(required = false) String codigoProductoProveedor,
+            @RequestParam(required = false) Integer idUbicacion,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
             @RequestParam(defaultValue = "idInventario,asc") String sort
@@ -74,6 +75,7 @@ public class InventarioRestController {
                 .where(erpInventarioSpecs.estadoEquals(1))
                 .and(erpInventarioSpecs.descripcionProductoContieneFlexible(descripcion))
                 .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
+                .and(erpInventarioSpecs.idUbicacionEquals(idUbicacion))
                 .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
 
         Page<erpInventario> inventariosPage = repinv.findAll(spec, pageable);
@@ -111,6 +113,8 @@ public class InventarioRestController {
     public String editarInventario(@PathVariable long idProductoInventario, @RequestBody erpInventario inventario){
 
         erpInventario updateInventario = repinv.findById(idProductoInventario).get();
+        updateInventario.setCantidadExistencias(inventario.getCantidadExistencias());
+        updateInventario.setCantidadDanados(inventario.getCantidadDanados());
         updateInventario.setFechaModificacion(LocalDate.now());
         updateInventario.setHoraModificacion(LocalTime.now());
         updateInventario.setIdUsuarioModificacion(inventario.getIdUsuarioModificacion());
