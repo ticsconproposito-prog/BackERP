@@ -38,10 +38,10 @@ public class FelController {
         return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(result);
     }
 
-    @PostMapping("/anular")
-    public ResponseEntity<?> anularFactura(@RequestParam String uuid,
+    @PostMapping("/anularFactura")
+    public ResponseEntity<?> anularFactura(@RequestParam String idEncabezadoFactura,
                                            @RequestParam String motivo) {
-        FelResult result = felService.anularFactura(uuid, motivo);
+        FelResult result = felService.anularFactura(idEncabezadoFactura, motivo);
         if (result.isOk()) {
             Map<String, Object> body = new HashMap<>();
             body.put("fel", result);
