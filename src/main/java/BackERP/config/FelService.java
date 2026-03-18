@@ -177,25 +177,74 @@ public class FelService {
         return result;
     }
 
-  public FelResult anularFactura(String serie, String preimpreso, String nitComprador,
-                                 String fechaAnulacion, String motivo) {
+  public FelResult anularFactura(Long idEncabezadoFactura,
+                                 String serie,
+                                 String preimpreso,
+                                 String nitComprador,
+                                 String fechaAnulacion,
+                                 String motivo) {
     String soapResponse = wsClient.anulaDocumento(serie, preimpreso, nitComprador, fechaAnulacion, motivo);
     FelResult result = responseParser.parse(soapResponse);
 
     if (result.isOk()) {
       try {
-        Optional<erpEncabezadoFacturas> optEnc = repEncFac.findBySerieResAPIAndPreimpresoResAPI(serie, Long.parseLong(preimpreso));
+        Optional<erpEncabezadoFacturas> optEnc = repEncFac.findById(idEncabezadoFactura);
 
         if (optEnc.isPresent()) {
           erpEncabezadoFacturas enc = optEnc.get();
           enc.setFacturaProcesada("A"); // A = Anulada
           enc.setRespuestaXML(result.getRawResponse());
           repEncFac.save(enc);
+
+          // Recuperar detalles de la factura anulada
+          List<erpDetalleFacturas> detalles = repDetFac.findAll(
+            erpDetalleFacturaSpecs.idEncabezadoFacturaContains(Math.toIntExact(enc.getIdEncabezadoFactura()))
+          );
+
+          for (erpDetalleFacturas det : detalles) {
+            erpInventario inventario = repInv.findByIdProducto_IdProducto(Long.valueOf(det.getIdProducto()));
+
+            if (inventario != null) {
+              inventario.setCantidadExistencias(inventario.getCantidadExistencias() + det.getCantidad());
+              inventario.setFechaModificacion(LocalDate.now());
+              inventario.setHoraModificacion(LocalTime.now());
+              inventario.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
+              repInv.save(inventario);
+            } else {
+              erpInventario nuevo = new erpInventario();
+              erpProductos prod = new erpProductos();
+              prod.setIdProducto((long) det.getIdProducto());
+
+              nuevo.setIdProducto(prod);
+              nuevo.setCantidadExistencias(det.getCantidad());
+              nuevo.setCantidadDanados(0);
+              nuevo.setEstado(1);
+              nuevo.setFechaModificacion(LocalDate.now());
+              nuevo.setHoraModificacion(LocalTime.now());
+              nuevo.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
+              repInv.save(nuevo);
+            }
+          }
+
+          // Marcar movimientos como inactivos
+          List<erpMovimientosProductos> movimientos =
+            repMovPro.findByIdOrdenProducto((long) enc.getIdEncabezadoFactura());
+          for (erpMovimientosProductos mov : movimientos) {
+            mov.setEstado(0);
+            mov.setFechaModificacion(LocalDate.now());
+            mov.setHoraModificacion(LocalTime.now());
+            mov.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
+            repMovPro.save(mov);
+          }
         }
       } catch (Exception e) {
         result.setError("Error al actualizar estado de factura: " + e.getMessage());
         result.setOk(false);
       }
+
+
+
+
     }
 
     return result;
