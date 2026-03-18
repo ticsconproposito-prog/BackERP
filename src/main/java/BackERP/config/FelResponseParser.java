@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 @Component
 public class FelResponseParser {
 
-  public FelResult parse(String soapXml) {
+  public FelResult parseAnular(String soapXml) {
     String payload = extractTag(soapXml, "result");
     if (payload == null) {
       payload = soapXml; // si no viene envuelto en <result>, usar el XML completo
@@ -47,6 +47,45 @@ public class FelResponseParser {
     return res;
   }
 
+  public FelResult parse(String soapXml) {
+    String payload = extractTag(soapXml, "result");
+    if (payload != null) {
+      payload = StringEscapeUtils.unescapeXml(payload);
+    }
+
+
+    String numeroAutorizacion   = findAny(payload, "NumeroAutorizacion", "UUID", "NumeroAutorizacion");
+    String serie  = findAny(payload, "Serie", "SERIE");
+    String preimpreso = findAny(payload, "Preimpreso", "NUMERO", "Numero");
+    String nombre = findAny(payload, "Nombre");
+    String direccion = findAny(payload, "Direccion");
+    String telefono  = findAny(payload, "Telefono");
+    String referencia = findAny(payload, "Referencia");
+    String error  = findAny(payload, "ERROR", "Error", "MensajeError", "DescripcionError");
+    String resultado  =  findAny(payload, "Resultado");
+
+
+    FelResult res = new FelResult();
+    res.setRawResponse(payload);
+    res.setNumeroAutorizacion(numeroAutorizacion);
+    res.setSerie(serie);
+    res.setPreimpreso(preimpreso);
+    if (numeroAutorizacion == null || error != null) {
+      res.setError(error != null ? error : resultado);
+      res.setOk(false);
+    } else {
+      res.setOk(true);
+    }
+
+
+// si quieres extender FelResult con más campos:
+    res.setNombre(nombre);
+    res.setDireccion(direccion);
+    res.setTelefono(telefono);
+    res.setReferencia(referencia);
+
+    return res;
+  }
 
   private String extractTag(String xml, String tag) {
         Pattern p = Pattern.compile("<" + tag + "[^>]*>(.*?)</" + tag + ">", Pattern.DOTALL);

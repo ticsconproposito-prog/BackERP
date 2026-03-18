@@ -184,7 +184,7 @@ public class FelService {
                                  String fechaAnulacion,
                                  String motivo) {
     String soapResponse = wsClient.anulaDocumento(serie, preimpreso, nitComprador, fechaAnulacion, motivo);
-    FelResult result = responseParser.parse(soapResponse);
+    FelResult result = responseParser.parseAnular(soapResponse);
 
     if (result.isOk()) {
       try {
