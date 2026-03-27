@@ -44,7 +44,8 @@ public class EncabezadoFacturasRestController {
         Pageable pageable = PageRequest.of(page, size, s);
 
         Specification<erpEncabezadoFacturas> spec = Specification
-                .where(erpEncabezadoFacturasSpecs.referenciaFacturaContains(referenciaFactura))
+                .where(erpEncabezadoFacturasSpecs.estadoEquals(1))
+                .and(erpEncabezadoFacturasSpecs.referenciaFacturaContains(referenciaFactura))
                 .and(erpEncabezadoFacturasSpecs.tipoDocumentoContains(tipoDocumento))
                 .and(erpEncabezadoFacturasSpecs.nombreClienteContains(nombreCliente))
                 .and(erpEncabezadoFacturasSpecs.nitClienteContains(nit))

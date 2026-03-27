@@ -85,4 +85,11 @@ public class erpEncabezadoFacturasSpecs {
         };
     }
 
+
+  public static Specification<erpEncabezadoFacturas> estadoEquals(int estado) {
+    return (root, query, cb) ->
+      cb.equal(root.get("estado").as(Integer.class), estado);
+
+  }
+
 }
