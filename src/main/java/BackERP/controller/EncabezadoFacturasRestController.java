@@ -36,7 +36,7 @@ public class EncabezadoFacturasRestController {
             @RequestParam(required = false) String facturaProcesada, // 🔎 nuevo parámetro
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "idEncabezadoFactura,asc") String sort
+            @RequestParam(defaultValue = "idEncabezadoFactura,desc") String sort
     ) {
         String[] sortParts = sort.split(",", 2);
         Sort.Direction dir = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.ASC;

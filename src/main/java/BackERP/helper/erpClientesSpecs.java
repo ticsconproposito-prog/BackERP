@@ -38,7 +38,7 @@ public class erpClientesSpecs {
       }
 
       return cb.like(
-        cb.lower(root.get("nitCliente")),  nit.toLowerCase() + "%"
+        cb.lower(root.get("nit")),  nit.toLowerCase() + "%"
       );
     };
   }
