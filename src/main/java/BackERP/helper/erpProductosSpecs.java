@@ -66,6 +66,7 @@ public class erpProductosSpecs{
     };
   }
 
+
     public static Specification<erpProductos> descripcionContiene(String descripcion) {
         return (root, query, cb) -> {
             String pattern = likeHelper.buildLikePattern(descripcion, likeHelper.MatchMode.ANYWHERE, true);
