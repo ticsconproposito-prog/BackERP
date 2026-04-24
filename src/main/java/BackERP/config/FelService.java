@@ -1,4 +1,3 @@
-
 package BackERP.config;
 
 import BackERP.helper.erpDetalleFacturaSpecs;
@@ -10,6 +9,7 @@ import BackERP.repository.RepositoryInventario;
 import BackERP.repository.RepositoryMovimientosProductos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -21,162 +21,155 @@ import java.util.Optional;
 @Service
 public class FelService {
 
-    private static final BigDecimal IVA_RATE = new BigDecimal("0.12");
-    private static final BigDecimal TOL = new BigDecimal("0.01");
+  private static final BigDecimal IVA_RATE = new BigDecimal("0.12");
+  private static final BigDecimal TOL = new BigDecimal("0.01");
 
-    private final felProperties props;
-    private final FelXmlBuilder xmlBuilder;
-    private final FelWsClient wsClient;
-    private final FelResponseParser responseParser;
+  private final felProperties props;
+  private final FelXmlBuilder xmlBuilder;
+  private final FelWsClient wsClient;
+  private final FelResponseParser responseParser;
 
-    @Autowired
-    private RepositoryDetalleFacturas repDetFac;
+  @Autowired
+  private RepositoryDetalleFacturas repDetFac;
 
-    @Autowired
-    private RepositoryInventario repInv;
+  @Autowired
+  private RepositoryInventario repInv;
 
-    @Autowired
-    private RepositoryEncabezadoFacturas repEncFac;
+  @Autowired
+  private RepositoryEncabezadoFacturas repEncFac;
 
-    @Autowired
-    private RepositoryMovimientosProductos repMovPro;
-    @Autowired
-    public FelService(felProperties props,
-                      FelXmlBuilder xmlBuilder,
-                      FelWsClient wsClient,
-                      FelResponseParser responseParser) {
-        this.props = props;
-        this.xmlBuilder = xmlBuilder;
-        this.wsClient = wsClient;
-        this.responseParser = responseParser;
-    }
-    public FelResult generarDte(felDteRequestDto req) {
+  @Autowired
+  private RepositoryMovimientosProductos repMovPro;
 
-        validar(req);
+  @Autowired
+  public FelService(felProperties props,
+                    FelXmlBuilder xmlBuilder,
+                    FelWsClient wsClient,
+                    FelResponseParser responseParser) {
+    this.props = props;
+    this.xmlBuilder = xmlBuilder;
+    this.wsClient = wsClient;
+    this.responseParser = responseParser;
+  }
 
-        String pXml = xmlBuilder.buildDocElectronicoXml(req);
-        String soapResponse = wsClient.generaDocumento(req.getTipoDoc(), pXml);
-        FelResult result = responseParser.parse(soapResponse);
+  @Transactional(readOnly = true)
+  public FelResult generarDte(felDteRequestDto req) {
 
-        if (result.isOk()) {
-            try {
-                String SID = req.getReferencia().substring(4);
-                long ID = Long.parseLong(SID);
+    validar(req);
 
-                Optional<erpEncabezadoFacturas> optEnc = repEncFac.findById(ID);
-                if (optEnc.isPresent()) {
-                    erpEncabezadoFacturas enc = optEnc.get();
-                    enc.setSerieResAPI(result.getSerie());
-                    enc.setPreimpresoResAPI(Long.parseLong(result.getPreimpreso()));
-                    enc.setNumeroAutorizacionResAPI(result.getNumeroAutorizacion());
-                    enc.setRespuestaXML(result.getRawResponse());
-                    enc.setReferencia(req.getReferencia());
-                    enc.setFacturaProcesada("S");
-                    enc.setNombreResAPI(result.getNombre());
-                    enc.setDireccionResAPI(result.getDireccion());
-                    enc.setTelefonoResAPI(result.getTelefono());
-                    enc.setReferenciaResAPI(result.getReferencia());
+    String pXml = xmlBuilder.buildDocElectronicoXml(req);
+    String soapResponse = wsClient.generaDocumento(req.getTipoDoc(), pXml);
+    FelResult result = responseParser.parse(soapResponse);
 
-                    repEncFac.save(enc);
-                } else {
-                    // Registrar el error en el campo error del resultado
-                    result.setError("No se encontró encabezado de factura con ID " + ID);
-                    result.setOk(false);
+    if (result.isOk()) {
+      try {
+        String SID = req.getReferencia().substring(4);
+        long ID = Long.parseLong(SID);
 
-                }
-            } catch (Exception e) {
-                // Captura cualquier otro error inesperado
-                result.setError("Error al procesar encabezado de factura: " + e.getMessage());
-                result.setOk(false);
-            }
-        }else {
+        Optional<erpEncabezadoFacturas> optEnc = repEncFac.findById(ID);
+        if (optEnc.isPresent()) {
+          erpEncabezadoFacturas enc = optEnc.get();
+          enc.setSerieResAPI(result.getSerie());
+          enc.setPreimpresoResAPI(Long.parseLong(result.getPreimpreso()));
+          enc.setNumeroAutorizacionResAPI(result.getNumeroAutorizacion());
+          enc.setRespuestaXML(result.getRawResponse());
+          enc.setReferencia(req.getReferencia());
+          enc.setFacturaProcesada("S");
+          enc.setNombreResAPI(result.getNombre());
+          enc.setDireccionResAPI(result.getDireccion());
+          enc.setTelefonoResAPI(result.getTelefono());
+          enc.setReferenciaResAPI(result.getReferencia());
 
-            try {
-
-
-                String SID = req.getReferencia().substring(4);
-                long ID = Long.parseLong(SID);
-
-                Optional<erpEncabezadoFacturas> optEnc = repEncFac.findById(ID);
-                if (optEnc.isPresent()) {
-
-                    erpEncabezadoFacturas enc = optEnc.get();
-                    if ("2-NO EXISTE EL NIT/CUI DEL CONTRIBUYENTE".equals(result.getError()) ||
-                            "186-NUMERO DE DOCUMENTO DE IDENTIFICACION INVALIDO".equals(result.getError())) {
-                        enc.setEstado(0);
-
-                        // Consultar los detalles de la factura
-                        List<erpDetalleFacturas> detalles = repDetFac.findAll(
-                                erpDetalleFacturaSpecs.idEncabezadoFacturaContains(Math.toIntExact(enc.getIdEncabezadoFactura()))
-                        );
-
-                        for (erpDetalleFacturas det : detalles) {
-                            // Buscar inventario solo por producto
-                            erpInventario inventario = repInv.findByIdProducto_IdProducto(Long.valueOf(det.getIdProducto()));
-
-                            if (inventario != null) {
-                                // Sumar de regreso la cantidad
-                                inventario.setCantidadExistencias(
-                                        inventario.getCantidadExistencias() + det.getCantidad()
-                                );
-                                inventario.setFechaModificacion(LocalDate.now());
-                                inventario.setHoraModificacion(LocalTime.now());
-                                inventario.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
-                                repInv.save(inventario);
-                            } else {
-                                // Crear inventario nuevo si no existía
-                                erpInventario nuevo = new erpInventario();
-                                erpProductos prod = new erpProductos();
-                                prod.setIdProducto((long) det.getIdProducto());
-
-                                nuevo.setIdProducto(prod);
-                                nuevo.setCantidadExistencias(det.getCantidad());
-                                nuevo.setCantidadDanados(0);
-                                nuevo.setEstado(1);
-                                nuevo.setFechaModificacion(LocalDate.now());
-                                nuevo.setHoraModificacion(LocalTime.now());
-                                nuevo.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
-                                repInv.save(nuevo);
-                            }
-                        }
-
-                        // 🔎 Marcar movimientos como inactivos
-                        List<erpMovimientosProductos> movimientos = repMovPro.findByIdOrdenProducto((long) enc.getIdEncabezadoFactura());
-                        for (erpMovimientosProductos mov : movimientos) {
-                            mov.setEstado(0);
-                            mov.setFechaModificacion(LocalDate.now());
-                            mov.setHoraModificacion(LocalTime.now());
-                            mov.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
-                            repMovPro.save(mov);
-                        }
-                    }
-
-
-
-                    enc.setRespuestaXML(result.getRawResponse());
-                    enc.setReferencia(req.getReferencia());
-                    enc.setFacturaProcesada("N");
-                    repEncFac.save(enc);
-
-
-
-
-                } else {
-                    // Registrar el error en el campo error del resultado
-                    result.setError("No se encontró encabezado de factura con ID " + ID);
-                    result.setOk(false);
-                }
-            } catch (Exception e) {
-                // Captura cualquier otro error inesperado
-                result.setError("Error al procesar encabezado de factura: " + e.getMessage());
-                result.setOk(false);
-            }
-
+          repEncFac.save(enc);
+        } else {
+          result.setError("No se encontró encabezado de factura con ID " + ID);
+          result.setOk(false);
         }
+      } catch (Exception e) {
+        result.setError("Error al procesar encabezado de factura: " + e.getMessage());
+        result.setOk(false);
+      }
+    } else {
+      try {
+        String SID = req.getReferencia().substring(4);
+        long ID = Long.parseLong(SID);
 
-        return result;
+        Optional<erpEncabezadoFacturas> optEnc = repEncFac.findById(ID);
+        if (optEnc.isPresent()) {
+          erpEncabezadoFacturas enc = optEnc.get();
+          if ("2-NO EXISTE EL NIT/CUI DEL CONTRIBUYENTE".equals(result.getError()) ||
+            "186-NUMERO DE DOCUMENTO DE IDENTIFICACION INVALIDO".equals(result.getError())) {
+            enc.setEstado(0);
+
+            // Consultar los detalles de la factura
+            List<erpDetalleFacturas> detalles = repDetFac.findAll(
+              erpDetalleFacturaSpecs.idEncabezadoFacturaContains(Math.toIntExact(enc.getIdEncabezadoFactura()))
+            );
+
+            // 🔥 Opción 1: Usar el primer inventario disponible
+            for (erpDetalleFacturas det : detalles) {
+              // Buscar todos los inventarios del producto
+              List<erpInventario> inventarios = repInv.findByIdProducto_IdProducto(Long.valueOf(det.getIdProducto()));
+
+              if (inventarios != null && !inventarios.isEmpty()) {
+                // Usar el primer inventario encontrado
+                erpInventario inventario = inventarios.get(0);
+
+                // Sumar de regreso la cantidad
+                inventario.setCantidadExistencias(
+                  inventario.getCantidadExistencias() + det.getCantidad()
+                );
+                inventario.setFechaModificacion(LocalDate.now());
+                inventario.setHoraModificacion(LocalTime.now());
+                inventario.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
+                repInv.save(inventario);
+              } else {
+                // Crear inventario nuevo si no existía
+                erpInventario nuevo = new erpInventario();
+                erpProductos prod = new erpProductos();
+                prod.setIdProducto((long) det.getIdProducto());
+
+                nuevo.setIdProducto(prod);
+                nuevo.setCantidadExistencias(det.getCantidad());
+                nuevo.setCantidadDanados(0);
+                nuevo.setIdUbicacion(1); // Ubicación por defecto
+                nuevo.setEstado(1);
+                nuevo.setFechaModificacion(LocalDate.now());
+                nuevo.setHoraModificacion(LocalTime.now());
+                nuevo.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
+                repInv.save(nuevo);
+              }
+            }
+
+            // Marcar movimientos como inactivos
+            List<erpMovimientosProductos> movimientos = repMovPro.findByIdOrdenProducto((long) enc.getIdEncabezadoFactura());
+            for (erpMovimientosProductos mov : movimientos) {
+              mov.setEstado(0);
+              mov.setFechaModificacion(LocalDate.now());
+              mov.setHoraModificacion(LocalTime.now());
+              mov.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
+              repMovPro.save(mov);
+            }
+          }
+
+          enc.setRespuestaXML(result.getRawResponse());
+          enc.setReferencia(req.getReferencia());
+          enc.setFacturaProcesada("N");
+          repEncFac.save(enc);
+        } else {
+          result.setError("No se encontró encabezado de factura con ID " + ID);
+          result.setOk(false);
+        }
+      } catch (Exception e) {
+        result.setError("Error al procesar encabezado de factura: " + e.getMessage());
+        result.setOk(false);
+      }
     }
 
+    return result;
+  }
+
+  @Transactional
   public FelResult anularFactura(Long idEncabezadoFactura,
                                  String serie,
                                  String preimpreso,
@@ -201,16 +194,25 @@ public class FelService {
             erpDetalleFacturaSpecs.idEncabezadoFacturaContains(Math.toIntExact(enc.getIdEncabezadoFactura()))
           );
 
+          // 🔥 Opción 1: Usar el primer inventario disponible
           for (erpDetalleFacturas det : detalles) {
-            erpInventario inventario = repInv.findByIdProducto_IdProducto(Long.valueOf(det.getIdProducto()));
+            // Buscar todos los inventarios del producto
+            List<erpInventario> inventarios = repInv.findByIdProducto_IdProducto(Long.valueOf(det.getIdProducto()));
 
-            if (inventario != null) {
-              inventario.setCantidadExistencias(inventario.getCantidadExistencias() + det.getCantidad());
+            if (inventarios != null && !inventarios.isEmpty()) {
+              // Usar el primer inventario encontrado
+              erpInventario inventario = inventarios.get(0);
+
+              // Sumar de regreso la cantidad
+              inventario.setCantidadExistencias(
+                inventario.getCantidadExistencias() + det.getCantidad()
+              );
               inventario.setFechaModificacion(LocalDate.now());
               inventario.setHoraModificacion(LocalTime.now());
               inventario.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
               repInv.save(inventario);
             } else {
+              // Crear inventario nuevo si no existía
               erpInventario nuevo = new erpInventario();
               erpProductos prod = new erpProductos();
               prod.setIdProducto((long) det.getIdProducto());
@@ -218,6 +220,7 @@ public class FelService {
               nuevo.setIdProducto(prod);
               nuevo.setCantidadExistencias(det.getCantidad());
               nuevo.setCantidadDanados(0);
+              nuevo.setIdUbicacion(1); // Ubicación por defecto
               nuevo.setEstado(1);
               nuevo.setFechaModificacion(LocalDate.now());
               nuevo.setHoraModificacion(LocalTime.now());
@@ -241,52 +244,41 @@ public class FelService {
         result.setError("Error al actualizar estado de factura: " + e.getMessage());
         result.setOk(false);
       }
-
-
-
-
     }
 
     return result;
   }
 
-
-
-
   private void validar(felDteRequestDto req) {
-        // Validaciones por línea
-        for (felItemDto it : req.getItems()) {
-            // IVA = 12% del neto (±0.01)
-            BigDecimal ivaCalc = it.getImpNeto().multiply(IVA_RATE).setScale(2, RoundingMode.HALF_UP);
-            if (it.getImpIva().subtract(ivaCalc).abs().compareTo(TOL) > 0) {
-                throw new IllegalArgumentException("IVA de la línea no respeta 12% ±0.01");
-            }
-            // ImpBruto = Cantidad * Precio (±0.01)
-            BigDecimal brutoCalc = it.getCantidad().multiply(it.getPrecio()).setScale(2, RoundingMode.HALF_UP);
-            if (it.getImpBruto().subtract(brutoCalc).abs().compareTo(TOL) > 0) {
-                throw new IllegalArgumentException("ImpBruto ≠ Cantidad*Precio (±0.01)");
-            }
-        }
-
-        // Totales vs sumatoria de líneas (±0.01 por campo)
-        assertClose("Bruto",     req.getTotales().getBruto(),     req.getItems().stream().map(felItemDto::getImpBruto).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Descuento", req.getTotales().getDescuento(), req.getItems().stream().map(felItemDto::getImpDescuento).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Exento",    req.getTotales().getExento(),    req.getItems().stream().map(felItemDto::getImpExento).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Otros",     req.getTotales().getOtros(),     req.getItems().stream().map(felItemDto::getImpOtros).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Neto",      req.getTotales().getNeto(),      req.getItems().stream().map(felItemDto::getImpNeto).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Iva",       req.getTotales().getIva(),       req.getItems().stream().map(felItemDto::getImpIva).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Isr",       req.getTotales().getIsr(),       req.getItems().stream().map(felItemDto::getImpIsr).reduce(BigDecimal.ZERO, BigDecimal::add));
-        assertClose("Total",     req.getTotales().getTotal(),     req.getItems().stream().map(felItemDto::getImpTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
-
-        // Moneda/Tasa
-        if (req.getMoneda() == 1 && req.getTasa().compareTo(BigDecimal.ONE) != 0) {
-            throw new IllegalArgumentException("Para Moneda=1 (GTQ) la Tasa debe ser 1.000000");
-        }
+    // Validaciones por línea
+    for (felItemDto it : req.getItems()) {
+      BigDecimal ivaCalc = it.getImpNeto().multiply(IVA_RATE).setScale(2, RoundingMode.HALF_UP);
+      if (it.getImpIva().subtract(ivaCalc).abs().compareTo(TOL) > 0) {
+        throw new IllegalArgumentException("IVA de la línea no respeta 12% ±0.01");
+      }
+      BigDecimal brutoCalc = it.getCantidad().multiply(it.getPrecio()).setScale(2, RoundingMode.HALF_UP);
+      if (it.getImpBruto().subtract(brutoCalc).abs().compareTo(TOL) > 0) {
+        throw new IllegalArgumentException("ImpBruto ≠ Cantidad*Precio (±0.01)");
+      }
     }
 
-    private void assertClose(String name, BigDecimal expected, BigDecimal actual) {
-        if (expected.subtract(actual).abs().compareTo(TOL) > 0) {
-            throw new IllegalArgumentException("Total " + name + " no cuadra (±0.01).");
-        }
+    assertClose("Bruto",     req.getTotales().getBruto(),     req.getItems().stream().map(felItemDto::getImpBruto).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Descuento", req.getTotales().getDescuento(), req.getItems().stream().map(felItemDto::getImpDescuento).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Exento",    req.getTotales().getExento(),    req.getItems().stream().map(felItemDto::getImpExento).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Otros",     req.getTotales().getOtros(),     req.getItems().stream().map(felItemDto::getImpOtros).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Neto",      req.getTotales().getNeto(),      req.getItems().stream().map(felItemDto::getImpNeto).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Iva",       req.getTotales().getIva(),       req.getItems().stream().map(felItemDto::getImpIva).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Isr",       req.getTotales().getIsr(),       req.getItems().stream().map(felItemDto::getImpIsr).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Total",     req.getTotales().getTotal(),     req.getItems().stream().map(felItemDto::getImpTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
+
+    if (req.getMoneda() == 1 && req.getTasa().compareTo(BigDecimal.ONE) != 0) {
+      throw new IllegalArgumentException("Para Moneda=1 (GTQ) la Tasa debe ser 1.000000");
     }
+  }
+
+  private void assertClose(String name, BigDecimal expected, BigDecimal actual) {
+    if (expected.subtract(actual).abs().compareTo(TOL) > 0) {
+      throw new IllegalArgumentException("Total " + name + " no cuadra (±0.01).");
+    }
+  }
 }
