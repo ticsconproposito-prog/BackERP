@@ -26,18 +26,7 @@ public class InventarioRestController {
     @Autowired
     private RepositoryInventario repinv;
 
-  @GetMapping({"inventario","inventarioAgrupado"})
-  public List<erpInventario> getInventarioFullText( @RequestParam(required = false) String descripcion,
-                                                    @RequestParam(required = false) String codigoProducto,
-                                                    @RequestParam(required = false) String codigoProductoProveedor,
-                                                    @RequestParam(defaultValue = "0") int page,
-                                                    @RequestParam(defaultValue = "20") int size,
-                                                    @RequestParam(defaultValue = "idInventario,asc") String sort) {
-    return repinv.buscarPorDescripcionFullText(descripcion);
-  }
-
-
-  @GetMapping("inventarioFullText")
+    @GetMapping("inventario")
     public Page<erpInventario> getInventario(
             @RequestParam(required = false) String descripcion,
             @RequestParam(required = false) String codigoProductoProveedor,
@@ -58,7 +47,7 @@ public class InventarioRestController {
 
         Specification<erpInventario> spec = Specification
                 .where(erpInventarioSpecs.estadoEquals(1))
-             //   .and(erpInventarioSpecs.descripcionProductoFullText(descripcion))
+                .and(erpInventarioSpecs.descripcionProductoFullText(descripcion))
                 .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
                 .and(erpInventarioSpecs.idUbicacionEquals(idUbicacion))
                 .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
@@ -66,7 +55,7 @@ public class InventarioRestController {
         return repinv.findAll(spec, pageable);
     }
 
-    @GetMapping("inventarioAgrupadot")
+    @GetMapping("inventarioAgrupado")
     public Page<erpInventarioAgrupadoDTO> getInventarioAgrupado(
             @RequestParam(required = false) String descripcion,
             @RequestParam(required = false) String codigoProducto,
@@ -86,7 +75,7 @@ public class InventarioRestController {
 
         Specification<erpInventario> spec = Specification
                 .where(erpInventarioSpecs.estadoEquals(1))
-             //   .and(erpInventarioSpecs.descripcionProductoFullText(descripcion))
+                .and(erpInventarioSpecs.descripcionProductoFullText(descripcion))
                 .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
                 .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
 
