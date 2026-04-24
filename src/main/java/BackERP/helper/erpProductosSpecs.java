@@ -54,13 +54,18 @@ public class erpProductosSpecs{
       if (descripcion == null || descripcion.trim().isEmpty()) {
         return cb.conjunction();
       }
-      return (Predicate) cb.function(
-        "MATCH", Boolean.class,
-        root.get("descripcionProducto"),
-        cb.literal(descripcion)
+      // MATCH ... AGAINST devuelve un score de relevancia
+      return cb.greaterThan(
+        cb.function(
+          "MATCH", Double.class,
+          root.get("descripcionProducto"),
+          cb.literal(descripcion)
+        ),
+        0.0
       );
     };
   }
+
 
     public static Specification<erpProductos> descripcionContiene(String descripcion) {
         return (root, query, cb) -> {

@@ -35,14 +35,17 @@ public class erpInventarioSpecs {
       if (descripcion == null || descripcion.trim().isEmpty()) {
         return cb.conjunction();
       }
-      // MATCH ... AGAINST aplicado sobre la columna descripcionProducto
-      return (Predicate) cb.function(
-        "MATCH", Boolean.class,
-        root.get("idProducto").get("descripcionProducto"),
-        cb.literal(descripcion)
+      // MATCH ... AGAINST devuelve un número de relevancia
+      return cb.greaterThan(
+        cb.function("MATCH", Double.class,
+          root.get("idProducto").get("descripcionProducto"),
+          cb.literal(descripcion)
+        ),
+        0.0
       );
     };
   }
+
 
   public static Specification<erpInventario> idUbicacionEquals(Integer idUbicacion) {
     return (root, query, cb) -> {
