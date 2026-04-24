@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class InventarioRestController {
 
@@ -47,7 +47,7 @@ public class InventarioRestController {
 
         Specification<erpInventario> spec = Specification
                 .where(erpInventarioSpecs.estadoEquals(1))
-                .and(erpInventarioSpecs.descripcionProductoFullText(descripcion))
+                .and(erpInventarioSpecs.descripcionProductoContieneFlexible(descripcion))
                 .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
                 .and(erpInventarioSpecs.idUbicacionEquals(idUbicacion))
                 .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
@@ -75,7 +75,7 @@ public class InventarioRestController {
 
         Specification<erpInventario> spec = Specification
                 .where(erpInventarioSpecs.estadoEquals(1))
-                .and(erpInventarioSpecs.descripcionProductoFullText(descripcion))
+                .and(erpInventarioSpecs.descripcionProductoContieneFlexible(descripcion))
                 .and(erpInventarioSpecs.codigoProductoContains(codigoProducto))
                 .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
 

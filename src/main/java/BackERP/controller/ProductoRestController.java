@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
-//@CrossOrigin(origins = "http://localhost:3000")
-
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class ProductoRestController {
 
@@ -44,7 +43,7 @@ public class ProductoRestController {
             Specification<erpProductos> spec = Specification
                     .where(erpProductosSpecs.estadoEquals(1))
                     .and(erpProductosSpecs.codigoProductoProveedorContains(codigoProductoProveedor))
-                    .and(erpProductosSpecs.descripcionFullText(descripcionProducto))
+                    .and(erpProductosSpecs.descripcionContieneFlexible(descripcionProducto))
                     .and(erpProductosSpecs.idProductoContains(idProducto))
                     .and(erpProductosSpecs.codigoProductoContains(codigoProducto));
 
