@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 //@CrossOrigin(origins = "http://localhost:3000")
 
@@ -22,7 +23,7 @@ public class ProductoRestController {
     @Autowired
     private RepositoryProductos repro;
 
-    @GetMapping("productos")
+    @GetMapping("productosFullText")
     public Page<erpProductos> getProductos(
         @RequestParam(required = false) String codigoProducto,
         @RequestParam(required = false) String codigoProductoProveedor,
@@ -44,12 +45,22 @@ public class ProductoRestController {
             Specification<erpProductos> spec = Specification
                     .where(erpProductosSpecs.estadoEquals(1))
                     .and(erpProductosSpecs.codigoProductoProveedorContains(codigoProductoProveedor))
-                    .and(erpProductosSpecs.descripcionFullText(descripcionProducto))
+                   // .and(erpProductosSpecs.descripcionFullText(descripcionProducto))
                     .and(erpProductosSpecs.idProductoContains(idProducto))
                     .and(erpProductosSpecs.codigoProductoContains(codigoProducto));
 
             return repro.findAll(spec, pageable);
     }
+  @GetMapping("productos")
+  public List<erpProductos> getProductosFullText(@RequestParam(required = false) String codigoProducto,
+                                                 @RequestParam(required = false) String codigoProductoProveedor,
+                                                 @RequestParam(required = false) String descripcionProducto,
+                                                 @RequestParam(required = false) Long idProducto,
+                                                 @RequestParam(defaultValue = "0") int page,
+                                                 @RequestParam(defaultValue = "20") int size,
+                                                 @RequestParam(defaultValue = "idProducto,asc") String sort) {
+    return repro.buscarPorDescripcionFullText(descripcionProducto);
+  }
 
     @PostMapping("grabarProducto")
     public String grabarProducto(@RequestBody erpProductos producto){
