@@ -49,7 +49,18 @@ public class erpProductosSpecs{
             return cb.and(predicates);
         };
     }
-
+  public static Specification<erpProductos> descripcionFullText(String descripcion) {
+    return (root, query, cb) -> {
+      if (descripcion == null || descripcion.trim().isEmpty()) {
+        return cb.conjunction();
+      }
+      return (Predicate) cb.function(
+        "MATCH", Boolean.class,
+        root.get("descripcionProducto"),
+        cb.literal(descripcion)
+      );
+    };
+  }
 
     public static Specification<erpProductos> descripcionContiene(String descripcion) {
         return (root, query, cb) -> {

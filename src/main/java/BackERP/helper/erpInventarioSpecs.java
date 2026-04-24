@@ -30,6 +30,20 @@ public class erpInventarioSpecs {
         };
     }
 
+  public static Specification<erpInventario> descripcionProductoFullText(String descripcion) {
+    return (root, query, cb) -> {
+      if (descripcion == null || descripcion.trim().isEmpty()) {
+        return cb.conjunction();
+      }
+      // MATCH ... AGAINST aplicado sobre la columna descripcionProducto
+      return (Predicate) cb.function(
+        "MATCH", Boolean.class,
+        root.get("idProducto").get("descripcionProducto"),
+        cb.literal(descripcion)
+      );
+    };
+  }
+
   public static Specification<erpInventario> idUbicacionEquals(Integer idUbicacion) {
     return (root, query, cb) -> {
 
