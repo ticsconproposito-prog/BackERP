@@ -52,7 +52,7 @@ public class FelService {
     this.responseParser = responseParser;
   }
 
-  @Transactional(readOnly = true)
+  @Transactional
   public FelResult generarDte(felDteRequestDto req) {
 
     validar(req);
