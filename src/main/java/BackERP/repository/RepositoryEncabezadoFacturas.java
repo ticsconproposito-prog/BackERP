@@ -3,14 +3,18 @@ package BackERP.repository;
 import BackERP.models.erpEncabezadoFacturas;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 public interface RepositoryEncabezadoFacturas extends JpaRepository<erpEncabezadoFacturas, Long>, JpaSpecificationExecutor<erpEncabezadoFacturas> {
 
-  // Buscar factura por el número de autorización FEL (UUID)
   Optional<erpEncabezadoFacturas> findByNumeroAutorizacionResAPI(String numeroAutorizacionResAPI);
-
-  // Buscar factura por serie y preimpreso (según respuesta FEL)
   Optional<erpEncabezadoFacturas> findBySerieResAPIAndPreimpresoResAPI(String serieResAPI, long preimpresoResAPI);
+
+  // Buscar encabezado activo
+  Optional<erpEncabezadoFacturas> findByIdEncabezadoFacturaAndEstado(Long idEncabezadoFactura, int estado);
 }

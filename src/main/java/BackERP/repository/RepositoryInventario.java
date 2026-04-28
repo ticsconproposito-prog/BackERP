@@ -8,7 +8,10 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -53,4 +56,16 @@ public interface RepositoryInventario extends JpaRepository<erpInventario, Long>
   // 🔥 8. Método adicional: buscar por ubicación
   @EntityGraph(attributePaths = {"idProducto"})
   List<erpInventario> findByIdUbicacion(int idUbicacion);
+
+
+
+  // Restaurar inventario (incrementar existencias)
+  @Modifying
+  @Transactional
+  @Query("UPDATE erpInventario i SET i.cantidadExistencias = i.cantidadExistencias + :cantidad, " +
+    "i.fechaModificacion = CURRENT_DATE, i.horaModificacion = CURRENT_TIME, " +
+    "i.idUsuarioModificacion = :idUsuario WHERE i.idInventario = :idInventario")
+  void restaurarExistencia(@Param("idInventario") Long idInventario,
+                           @Param("cantidad") int cantidad,
+                           @Param("idUsuario") int idUsuarioModificacion);
 }
