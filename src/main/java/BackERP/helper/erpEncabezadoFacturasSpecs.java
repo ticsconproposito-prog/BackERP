@@ -81,7 +81,7 @@ public class erpEncabezadoFacturasSpecs {
                 return cb.conjunction(); // no aplica filtro si viene null
             }
             String pattern = likeHelper.buildLikePattern(preimpresoRestAPI, likeHelper.MatchMode.ANYWHERE, false);
-            return cb.like(cb.lower(root.get("preimpresoRestAPI")), pattern, '\\');
+            return cb.like(cb.lower(root.get("preimpresoResAPI")), pattern, '\\');
         };
     }
 

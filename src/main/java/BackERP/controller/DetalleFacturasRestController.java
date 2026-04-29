@@ -9,6 +9,7 @@ import BackERP.repository.RepositoryDetalleFacturas;
 import BackERP.repository.RepositoryInventario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -37,19 +38,10 @@ public class DetalleFacturasRestController {
     }
 
     @GetMapping("resumenDiario")
-    public felResumenDiarioDTO getResumenDiario(@RequestParam LocalDate fecha) {
-        List<erpDetalleFacturas> facturas = repdetfac.findAll(
-                (root, query, cb) -> cb.equal(root.get("fechaModificacion"), fecha)
-        );
-
-        double totalVentas = facturas.stream()
-                .mapToDouble(erpDetalleFacturas::getImpTotal)
-                .sum();
-
-        int totalProductos = facturas.stream()
-                .mapToInt(erpDetalleFacturas::getCantidad)
-                .sum();
-
+    public felResumenDiarioDTO getResumenDiario(@RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+        Object[] row = repdetfac.getResumenDiario(fecha);
+        double totalVentas  = row[0] != null ? ((Number) row[0]).doubleValue() : 0.0;
+        int totalProductos  = row[1] != null ? ((Number) row[1]).intValue()    : 0;
         return new felResumenDiarioDTO(fecha, totalVentas, totalProductos);
     }
 
@@ -72,10 +64,8 @@ public class DetalleFacturasRestController {
         repdetfac.save(detalleFacturas);
 
         // 🔹 Descontar inventario
-
-        erpInventario inventario = repinv.findAll(
-                (root, query, cb) -> cb.equal(root.get("idProducto").get("idProducto"), detalleFacturas.getIdProducto())
-        ).stream().findFirst().orElse(null);
+        List<erpInventario> inventarios = repinv.findByIdProducto_IdProducto((long) detalleFacturas.getIdProducto());
+        erpInventario inventario = inventarios.isEmpty() ? null : inventarios.get(0);
 
      /*   if (inventario.getCantidadExistencias() < detalleFacturas.getCantidad()) {
             return "Error: stock insuficiente";

@@ -36,7 +36,7 @@ public class OrdenProductosRestController {
             @RequestParam(required = false) Integer  id,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
-            @RequestParam(defaultValue = "idOrdenProducto,asc") String sort
+            @RequestParam(defaultValue = "idOrdenProducto,desc") String sort
         ) {
 
 

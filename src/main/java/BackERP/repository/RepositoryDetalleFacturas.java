@@ -8,12 +8,17 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface RepositoryDetalleFacturas extends JpaRepository<erpDetalleFacturas, Long>, JpaSpecificationExecutor<erpDetalleFacturas> {
 
   // Buscar detalles activos por ID de encabezado
   List<erpDetalleFacturas> findByIdEncabezadoFacturaAndEstado(int idEncabezadoFactura, int estado);
+
+  // Resumen diario: total de ventas y cantidad de productos en una fecha
+  @Query("SELECT SUM(d.ImpTotal), SUM(d.cantidad) FROM erpDetalleFacturas d WHERE d.fechaModificacion = :fecha")
+  Object[] getResumenDiario(@Param("fecha") LocalDate fecha);
 
   // Actualización lógica masiva de detalles
   @Modifying

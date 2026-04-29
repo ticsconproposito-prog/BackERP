@@ -21,7 +21,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-//@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 public class EncabezadoFacturasRestController {
 
@@ -69,13 +69,20 @@ public class EncabezadoFacturasRestController {
     }
 
     @GetMapping("facturasPorFecha")
-    public List<erpEncabezadoFacturas> getFacturasPorFecha(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha) {
+    public Page<erpEncabezadoFacturas> getFacturasPorFecha(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "50") int size,
+            @RequestParam(defaultValue = "idEncabezadoFactura,desc") String sort) {
+
+        String[] sortParts = sort.split(",", 2);
+        Sort.Direction dir = (sortParts.length > 1) ? Sort.Direction.fromString(sortParts[1]) : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(dir, sortParts[0]));
 
         Specification<erpEncabezadoFacturas> spec = (root, query, cb) ->
                 cb.equal(root.get("FechaFactura"), fecha);
 
-        return repencfac.findAll(spec);
+        return repencfac.findAll(spec, pageable);
     }
 
 

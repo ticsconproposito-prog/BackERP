@@ -1,22 +1,11 @@
 package BackERP.config;
 
-import BackERP.helper.erpDetalleFacturaSpecs;
 import BackERP.models.*;
-
-import BackERP.repository.RepositoryDetalleFacturas;
-import BackERP.repository.RepositoryEncabezadoFacturas;
-import BackERP.repository.RepositoryInventario;
-import BackERP.repository.RepositoryMovimientosProductos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class FelService {
@@ -30,16 +19,7 @@ public class FelService {
   private final FelResponseParser responseParser;
 
   @Autowired
-  private RepositoryDetalleFacturas repDetFac;
-
-  @Autowired
-  private RepositoryInventario repInv;
-
-  @Autowired
-  private RepositoryEncabezadoFacturas repEncFac;
-
-  @Autowired
-  private RepositoryMovimientosProductos repMovPro;
+  private FelPersistenceService felPersistenceService;
 
   @Autowired
   public FelService(felProperties props,
@@ -52,198 +32,44 @@ public class FelService {
     this.responseParser = responseParser;
   }
 
-  @Transactional
+  // Sin @Transactional: la llamada SOAP ocurre sin ningún lock de BD abierto.
+  // La persistencia del resultado se delega a FelPersistenceService en una transacción corta.
   public FelResult generarDte(felDteRequestDto req) {
-
     validar(req);
 
+    // Fase 1: llamada al WS externo (fuera de cualquier transacción JPA)
     String pXml = xmlBuilder.buildDocElectronicoXml(req);
     String soapResponse = wsClient.generaDocumento(req.getTipoDoc(), pXml);
     FelResult result = responseParser.parse(soapResponse);
 
-    if (result.isOk()) {
-      try {
-        String SID = req.getReferencia().substring(4);
-        long ID = Long.parseLong(SID);
-
-        Optional<erpEncabezadoFacturas> optEnc = repEncFac.findById(ID);
-        if (optEnc.isPresent()) {
-          erpEncabezadoFacturas enc = optEnc.get();
-          enc.setSerieResAPI(result.getSerie());
-          enc.setPreimpresoResAPI(Long.parseLong(result.getPreimpreso()));
-          enc.setNumeroAutorizacionResAPI(result.getNumeroAutorizacion());
-          enc.setRespuestaXML(result.getRawResponse());
-          enc.setReferencia(req.getReferencia());
-          enc.setFacturaProcesada("S");
-          enc.setNombreResAPI(result.getNombre());
-          enc.setDireccionResAPI(result.getDireccion());
-          enc.setTelefonoResAPI(result.getTelefono());
-          enc.setReferenciaResAPI(result.getReferencia());
-
-          repEncFac.save(enc);
-        } else {
-          result.setError("No se encontró encabezado de factura con ID " + ID);
-          result.setOk(false);
-        }
-      } catch (Exception e) {
-        result.setError("Error al procesar encabezado de factura: " + e.getMessage());
-        result.setOk(false);
-      }
-    } else {
-      try {
-        String SID = req.getReferencia().substring(4);
-        long ID = Long.parseLong(SID);
-
-        Optional<erpEncabezadoFacturas> optEnc = repEncFac.findById(ID);
-        if (optEnc.isPresent()) {
-          erpEncabezadoFacturas enc = optEnc.get();
-          if ("2-NO EXISTE EL NIT/CUI DEL CONTRIBUYENTE".equals(result.getError()) ||
-            "186-NUMERO DE DOCUMENTO DE IDENTIFICACION INVALIDO".equals(result.getError())) {
-            enc.setEstado(0);
-
-            // Consultar los detalles de la factura
-            List<erpDetalleFacturas> detalles = repDetFac.findAll(
-              erpDetalleFacturaSpecs.idEncabezadoFacturaContains(Math.toIntExact(enc.getIdEncabezadoFactura()))
-            );
-
-            // 🔥 Opción 1: Usar el primer inventario disponible
-            for (erpDetalleFacturas det : detalles) {
-              // Buscar todos los inventarios del producto
-              List<erpInventario> inventarios = repInv.findByIdProducto_IdProducto(Long.valueOf(det.getIdProducto()));
-
-              if (inventarios != null && !inventarios.isEmpty()) {
-                // Usar el primer inventario encontrado
-                erpInventario inventario = inventarios.get(0);
-
-                // Sumar de regreso la cantidad
-                inventario.setCantidadExistencias(
-                  inventario.getCantidadExistencias() + det.getCantidad()
-                );
-                inventario.setFechaModificacion(LocalDate.now());
-                inventario.setHoraModificacion(LocalTime.now());
-                inventario.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
-                repInv.save(inventario);
-              } else {
-                // Crear inventario nuevo si no existía
-                erpInventario nuevo = new erpInventario();
-                erpProductos prod = new erpProductos();
-                prod.setIdProducto((long) det.getIdProducto());
-
-                nuevo.setIdProducto(prod);
-                nuevo.setCantidadExistencias(det.getCantidad());
-                nuevo.setCantidadDanados(0);
-                nuevo.setIdUbicacion(1); // Ubicación por defecto
-                nuevo.setEstado(1);
-                nuevo.setFechaModificacion(LocalDate.now());
-                nuevo.setHoraModificacion(LocalTime.now());
-                nuevo.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
-                repInv.save(nuevo);
-              }
-            }
-
-            // Marcar movimientos como inactivos
-            List<erpMovimientosProductos> movimientos = repMovPro.findByIdOrdenProducto((long) enc.getIdEncabezadoFactura());
-            for (erpMovimientosProductos mov : movimientos) {
-              mov.setEstado(0);
-              mov.setFechaModificacion(LocalDate.now());
-              mov.setHoraModificacion(LocalTime.now());
-              mov.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
-              repMovPro.save(mov);
-            }
-          }
-
-          enc.setRespuestaXML(result.getRawResponse());
-          enc.setReferencia(req.getReferencia());
-          enc.setFacturaProcesada("N");
-          repEncFac.save(enc);
-        } else {
-          result.setError("No se encontró encabezado de factura con ID " + ID);
-          result.setOk(false);
-        }
-      } catch (Exception e) {
-        result.setError("Error al procesar encabezado de factura: " + e.getMessage());
-        result.setOk(false);
-      }
+    // Fase 2: persistir resultado en una transacción corta independiente
+    try {
+      felPersistenceService.persistirResultadoDte(result, req);
+    } catch (Exception e) {
+      result.setError("Error al persistir resultado DTE: " + e.getMessage());
+      result.setOk(false);
     }
 
     return result;
   }
 
-  @Transactional
+  // Sin @Transactional: la llamada SOAP ocurre sin ningún lock de BD abierto.
   public FelResult anularFactura(Long idEncabezadoFactura,
                                  String serie,
                                  String preimpreso,
                                  String nitComprador,
                                  String fechaAnulacion,
                                  String motivo) {
+    // Fase 1: llamada al WS externo (fuera de cualquier transacción JPA)
     String soapResponse = wsClient.anulaDocumento(serie, preimpreso, nitComprador, fechaAnulacion, motivo);
     FelResult result = responseParser.parseAnular(soapResponse);
 
-    if (result.isOk()) {
-      try {
-        Optional<erpEncabezadoFacturas> optEnc = repEncFac.findById(idEncabezadoFactura);
-
-        if (optEnc.isPresent()) {
-          erpEncabezadoFacturas enc = optEnc.get();
-          enc.setFacturaProcesada("A"); // A = Anulada
-          enc.setRespuestaXML(result.getRawResponse());
-          repEncFac.save(enc);
-
-          // Recuperar detalles de la factura anulada
-          List<erpDetalleFacturas> detalles = repDetFac.findAll(
-            erpDetalleFacturaSpecs.idEncabezadoFacturaContains(Math.toIntExact(enc.getIdEncabezadoFactura()))
-          );
-
-          // 🔥 Opción 1: Usar el primer inventario disponible
-          for (erpDetalleFacturas det : detalles) {
-            // Buscar todos los inventarios del producto
-            List<erpInventario> inventarios = repInv.findByIdProducto_IdProducto(Long.valueOf(det.getIdProducto()));
-
-            if (inventarios != null && !inventarios.isEmpty()) {
-              // Usar el primer inventario encontrado
-              erpInventario inventario = inventarios.get(0);
-
-              // Sumar de regreso la cantidad
-              inventario.setCantidadExistencias(
-                inventario.getCantidadExistencias() + det.getCantidad()
-              );
-              inventario.setFechaModificacion(LocalDate.now());
-              inventario.setHoraModificacion(LocalTime.now());
-              inventario.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
-              repInv.save(inventario);
-            } else {
-              // Crear inventario nuevo si no existía
-              erpInventario nuevo = new erpInventario();
-              erpProductos prod = new erpProductos();
-              prod.setIdProducto((long) det.getIdProducto());
-
-              nuevo.setIdProducto(prod);
-              nuevo.setCantidadExistencias(det.getCantidad());
-              nuevo.setCantidadDanados(0);
-              nuevo.setIdUbicacion(1); // Ubicación por defecto
-              nuevo.setEstado(1);
-              nuevo.setFechaModificacion(LocalDate.now());
-              nuevo.setHoraModificacion(LocalTime.now());
-              nuevo.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
-              repInv.save(nuevo);
-            }
-          }
-
-          // Marcar movimientos como inactivos
-          List<erpMovimientosProductos> movimientos =
-            repMovPro.findByIdOrdenProducto((long) enc.getIdEncabezadoFactura());
-          for (erpMovimientosProductos mov : movimientos) {
-            mov.setEstado(0);
-            mov.setFechaModificacion(LocalDate.now());
-            mov.setHoraModificacion(LocalTime.now());
-            mov.setIdUsuarioModificacion(enc.getIdUsuarioModificacion());
-            repMovPro.save(mov);
-          }
-        }
-      } catch (Exception e) {
-        result.setError("Error al actualizar estado de factura: " + e.getMessage());
-        result.setOk(false);
-      }
+    // Fase 2: persistir resultado en una transacción corta independiente
+    try {
+      felPersistenceService.persistirResultadoAnulacion(result, idEncabezadoFactura);
+    } catch (Exception e) {
+      result.setError("Error al actualizar estado de factura: " + e.getMessage());
+      result.setOk(false);
     }
 
     return result;
