@@ -22,8 +22,6 @@
   <properties>
     <java.version>17</java.version>
     <jakarta-servlet.version>6.0.0</jakarta-servlet.version>
-    <!-- Opciones extra del JVM solo en JDK 24+ (perfil jdk-24-warnings); vacío si no aplica -->
-    <modern.jdk.jvm.args />
   </properties>
 
   <dependencies>
@@ -135,16 +133,6 @@
       <plugin>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-maven-plugin</artifactId>
-        <configuration>
-          <jvmArguments>${modern.jdk.jvm.args}</jvmArguments>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <argLine>${modern.jdk.jvm.args}</argLine>
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -164,17 +152,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <!-- JDK 24+: silencia avisos de Unsafe (Netty/JEP 498), JNI (Tomcat) y agentes dinámicos (Byte Buddy/Mockito) -->
-  <profiles>
-    <profile>
-      <id>jdk-24-warnings</id>
-      <activation>
-        <jdk>[24,)</jdk>
-      </activation>
-      <properties>
-        <modern.jdk.jvm.args>--sun-misc-unsafe-memory-access=allow --enable-native-access=ALL-UNNAMED -XX:+EnableDynamicAgentLoading -Xshare:off</modern.jdk.jvm.args>
-      </properties>
-    </profile>
-  </profiles>
 </project>
