@@ -17,7 +17,7 @@ public class erpDetalleFacturas {
     private int idEncabezadoFactura;
 
     @Column(name = "idProducto")
-    private int idProducto;
+    private Long idProducto;
 
     @Column(name = "idUnidadDeMedida")
     private int idUnidadDeMedida;
@@ -90,11 +90,11 @@ public class erpDetalleFacturas {
         this.idEncabezadoFactura = idEncabezadoFactura;
     }
 
-    public int getIdProducto() {
+    public Long getIdProducto() {
         return idProducto;
     }
 
-    public void setIdProducto(int idProducto) {
+    public void setIdProducto(Long idProducto) {
         this.idProducto = idProducto;
     }
 
