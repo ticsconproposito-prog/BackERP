@@ -172,8 +172,8 @@ public class erpEncabezadoFacturas {
         return FechaFactura;
     }
 
-    public void setFechaFactura(LocalDate fechaFactura) {
-        FechaFactura = fechaFactura;
+    public void setFechaFactura(LocalDate FechaFactura) {
+        this.FechaFactura = FechaFactura;
     }
 
     public int getMoneda() {
