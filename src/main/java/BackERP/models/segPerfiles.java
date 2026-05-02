@@ -11,7 +11,7 @@ public class segPerfiles {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idPerfil")
-    private int idPerfil;
+    private Long idPerfil;
 
     @Column(name = "nombrePerfil")
     private String nombrePerfil;
@@ -31,8 +31,8 @@ public class segPerfiles {
     public segPerfiles() {}
 
     // Getters y setters
-    public int getIdPerfil() { return idPerfil; }
-    public void setIdPerfil(int idPerfil) { this.idPerfil = idPerfil; }
+    public Long getIdPerfil() { return idPerfil; }
+    public void setIdPerfil(Long idPerfil) { this.idPerfil = idPerfil; }
 
     public String getNombrePerfil() { return nombrePerfil; }
     public void setNombrePerfil(String nombrePerfil) { this.nombrePerfil = nombrePerfil; }

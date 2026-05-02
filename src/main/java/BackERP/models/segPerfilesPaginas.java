@@ -14,10 +14,10 @@ public class segPerfilesPaginas {
     private int idPerfilPagina;
 
     @Column(name = "idPerfil")
-    private int idPerfil;
+    private Long idPerfil;
 
     @Column(name = "idPagina")
-    private int idPagina;
+    private Long idPagina;
 
     @Column(name = "permiso")
     private int permiso;
@@ -40,11 +40,11 @@ public class segPerfilesPaginas {
     public int getIdPerfilPagina() { return idPerfilPagina; }
     public void setIdPerfilPagina(int idPerfilPagina) { this.idPerfilPagina = idPerfilPagina; }
 
-    public int getIdPerfil() { return idPerfil; }
-    public void setIdPerfil(int idPerfil) { this.idPerfil = idPerfil; }
+    public Long getIdPerfil() { return idPerfil; }
+    public void setIdPerfil(Long idPerfil) { this.idPerfil = idPerfil; }
 
-    public int getIdPagina() { return idPagina; }
-    public void setIdPagina(int idPagina) { this.idPagina = idPagina; }
+    public Long getIdPagina() { return idPagina; }
+    public void setIdPagina(Long idPagina) { this.idPagina = idPagina; }
 
     public int getPermiso() { return permiso; }
     public void setPermiso(int permiso) { this.permiso = permiso; }

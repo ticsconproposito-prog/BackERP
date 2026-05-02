@@ -11,7 +11,7 @@ public class segPaginas {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idPagina")
-    private int idPagina;
+    private Long idPagina;
 
     @Column(name = "nombrePagina")
     private String nombrePagina;
@@ -34,8 +34,8 @@ public class segPaginas {
     public segPaginas() {}
 
     // Getters y setters
-    public int getIdPagina() { return idPagina; }
-    public void setIdPagina(int idPagina) { this.idPagina = idPagina; }
+    public Long getIdPagina() { return idPagina; }
+    public void setIdPagina(Long idPagina) { this.idPagina = idPagina; }
 
     public String getNombrePagina() { return nombrePagina; }
     public void setNombrePagina(String nombrePagina) { this.nombrePagina = nombrePagina; }

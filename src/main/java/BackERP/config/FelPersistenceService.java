@@ -65,6 +65,7 @@ public class FelPersistenceService {
             enc.setReferenciaResAPI(result.getReferencia());
             repEncFac.save(enc);
         } else {
+          System.out.println(result.getError());
             if ("2-NO EXISTE EL NIT/CUI DEL CONTRIBUYENTE".equals(result.getError()) ||
                     "186-NUMERO DE DOCUMENTO DE IDENTIFICACION INVALIDO".equals(result.getError())) {
                 enc.setEstado(0);
