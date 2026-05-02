@@ -90,7 +90,7 @@ public class EncabezadoFacturasRestController {
     public ResponseEntity<Long> grabarEncabezadoFacturas(@RequestBody erpEncabezadoFacturas EncabezadoFacturas){
 
         // valor por defecto
-
+System.out.println("Fecha "+ EncabezadoFacturas.getFechaFactura());
         EncabezadoFacturas.setFechaModificacion(LocalDate.now());
         EncabezadoFacturas.setHoraModificacion(LocalTime.now());
         EncabezadoFacturas.setReversion("N");
