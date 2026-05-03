@@ -1,5 +1,6 @@
 package BackERP.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -27,6 +28,7 @@ public class erpEncabezadoFacturas {
     private int destinoVenta;
 
     @Column(name = "FechaFactura")
+    @JsonProperty("FechaFactura")
     private LocalDate FechaFactura;
 
     @Column(name = "moneda")
