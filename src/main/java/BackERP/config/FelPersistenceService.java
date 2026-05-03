@@ -67,7 +67,9 @@ public class FelPersistenceService {
         } else {
           System.out.println(result.getError());
             if ("2-NO EXISTE EL NIT/CUI DEL CONTRIBUYENTE".equals(result.getError()) ||
-                    "186-NUMERO DE DOCUMENTO DE IDENTIFICACION INVALIDO".equals(result.getError())) {
+                    "186-NUMERO DE DOCUMENTO DE IDENTIFICACION INVALIDO".equals(result.getError()) ||
+            "<Resultado><ERROR-1569>[ID del Receptor:CF]El monto total en Q del documento excede del limite permitido para receptor CF.</ERROR-1569>".equals(result.getError())
+            ) {
                 enc.setEstado(0);
                 restaurarInventarioYMovimientos(enc);
             }
