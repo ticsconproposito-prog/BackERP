@@ -18,55 +18,105 @@ public class ProductoBusquedaService {
   @Autowired
   private RepositoryProductos repoProductos;
 
-  public Page<erpProductos> buscarPorPalabrasEnDescripcion(
-    String descripcion,
+  /**
+   * Búsqueda OPTIMIZADA con OR entre campos
+   */
+  public Page<erpProductos> buscarProductos(
+
     String codigoProducto,
     String codigoProductoProveedor,
+    String descripcionProducto,
     Long idProducto,
     Pageable pageable) {
 
-    if (descripcion == null || descripcion.trim().isEmpty()) {
+    Set<Long> idsTotales = new HashSet<>();
+
+    // Búsqueda por código de producto
+    if (codigoProducto != null && !codigoProducto.trim().isEmpty()) {
       Specification<erpProductos> spec = Specification
         .where(erpProductosSpecs.estadoEquals(1))
-        .and(erpProductosSpecs.codigoProductoContains(codigoProducto))
-        .and(erpProductosSpecs.codigoProductoProveedorContains(codigoProductoProveedor))
-        .and(erpProductosSpecs.idProductoContains(idProducto));
-      return repoProductos.findAll(spec, pageable);
+        .and(erpProductosSpecs.codigoProductoContains(codigoProducto));
+
+      Set<Long> ids = repoProductos.findAll(spec).stream()
+        .map(erpProductos::getIdProducto)
+        .collect(Collectors.toSet());
+      idsTotales.addAll(ids);
     }
 
+    // Búsqueda por código de proveedor
+    if (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) {
+      Specification<erpProductos> spec = Specification
+        .where(erpProductosSpecs.estadoEquals(1))
+        .and(erpProductosSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
+
+      Set<Long> ids = repoProductos.findAll(spec).stream()
+        .map(erpProductos::getIdProducto)
+        .collect(Collectors.toSet());
+      idsTotales.addAll(ids);
+    }
+
+    // Búsqueda por descripción (con optimización de palabras)
+    if (descripcionProducto != null && !descripcionProducto.trim().isEmpty()) {
+      Set<Long> idsDescripcion = buscarPorDescripcionProducto(descripcionProducto);
+      idsTotales.addAll(idsDescripcion);
+    }
+
+    // Búsqueda por ID exacto
+    if (idProducto != null) {
+      Optional<erpProductos> producto = repoProductos.findById(idProducto);
+      producto.ifPresent(p -> idsTotales.add(p.getIdProducto()));
+    }
+
+    if (idsTotales.isEmpty()) {
+      return Page.empty(pageable);
+    }
+
+    return paginarResultadosProductos(idsTotales, pageable);
+  }
+
+  /**
+   * Búsqueda optimizada por descripción con CRUCE de IDs
+   */
+  private Set<Long> buscarPorDescripcionProducto(String descripcion) {
     String[] palabras = descripcion.toLowerCase().trim().split("\\s+");
     List<Set<Long>> resultadosPorPalabra = new ArrayList<>();
 
     for (String palabra : palabras) {
-      Specification<erpProductos> specPalabra = Specification
+      Specification<erpProductos> spec = Specification
         .where(erpProductosSpecs.estadoEquals(1))
-        .and(erpProductosSpecs.buscarPalabraEnDescripcion(palabra))
-        .and(erpProductosSpecs.codigoProductoContains(codigoProducto))
-        .and(erpProductosSpecs.codigoProductoProveedorContains(codigoProductoProveedor))
-        .and(erpProductosSpecs.idProductoContains(idProducto));
+        .and(erpProductosSpecs.buscarPalabraEnDescripcion(palabra));
 
-      List<erpProductos> resultados = repoProductos.findAll(specPalabra);
-      Set<Long> ids = resultados.stream()
+
+
+
+
+      Set<Long> ids = repoProductos.findAll(spec).stream()
         .map(erpProductos::getIdProducto)
         .collect(Collectors.toSet());
 
       resultadosPorPalabra.add(ids);
 
       if (ids.isEmpty()) {
-        return Page.empty(pageable);
+        return new HashSet<>();
       }
     }
 
+    // CRUCE de IDs
     Set<Long> idsFinales = new HashSet<>(resultadosPorPalabra.get(0));
     for (int i = 1; i < resultadosPorPalabra.size(); i++) {
       idsFinales.retainAll(resultadosPorPalabra.get(i));
       if (idsFinales.isEmpty()) {
-        return Page.empty(pageable);
+        break;
       }
     }
 
-    // Paginación y obtención de resultados
-    List<Long> idsList = new ArrayList<>(idsFinales);
+    return idsFinales;
+  }
+
+  private Page<erpProductos> paginarResultadosProductos(Set<Long> idsTotales, Pageable pageable) {
+    List<Long> idsList = new ArrayList<>(idsTotales);
+    idsList.sort(Long::compareTo);
+
     int start = (int) pageable.getOffset();
     int end = Math.min((start + pageable.getPageSize()), idsList.size());
 
@@ -85,6 +135,6 @@ public class ProductoBusquedaService {
       .filter(Objects::nonNull)
       .collect(Collectors.toList());
 
-    return new PageImpl<>(resultadosOrdenados, pageable, idsFinales.size());
+    return new PageImpl<>(resultadosOrdenados, pageable, idsTotales.size());
   }
 }
