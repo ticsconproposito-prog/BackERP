@@ -20,14 +20,27 @@ public class ProductoBusquedaService {
 
   /**
    * Búsqueda OPTIMIZADA con OR entre campos
+   * Si no viene NINGÚN parámetro, devuelve TODOS los productos activos
    */
   public Page<erpProductos> buscarProductos(
-
     String codigoProducto,
     String codigoProductoProveedor,
     String descripcionProducto,
     Long idProducto,
     Pageable pageable) {
+
+    // 🔥 NUEVO: Verificar si NO hay NINGÚN filtro
+    boolean hayFiltros = (codigoProducto != null && !codigoProducto.trim().isEmpty()) ||
+      (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) ||
+      (descripcionProducto != null && !descripcionProducto.trim().isEmpty()) ||
+      (idProducto != null);
+
+    // Si no hay filtros, devolver TODOS los productos activos
+    if (!hayFiltros) {
+      Specification<erpProductos> spec = Specification
+        .where(erpProductosSpecs.estadoEquals(1));
+      return repoProductos.findAll(spec, pageable);
+    }
 
     Set<Long> idsTotales = new HashSet<>();
 
@@ -85,10 +98,6 @@ public class ProductoBusquedaService {
       Specification<erpProductos> spec = Specification
         .where(erpProductosSpecs.estadoEquals(1))
         .and(erpProductosSpecs.buscarPalabraEnDescripcion(palabra));
-
-
-
-
 
       Set<Long> ids = repoProductos.findAll(spec).stream()
         .map(erpProductos::getIdProducto)
