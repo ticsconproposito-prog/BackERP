@@ -70,9 +70,11 @@ public class FelPersistenceService {
                     "186-NUMERO DE DOCUMENTO DE IDENTIFICACION INVALIDO".equals(result.getError()) ||
             "<Resultado><ERROR-1569>[ID del Receptor:CF]El monto total en Q del documento excede del limite permitido para receptor CF.</ERROR-1569>".equals(result.getError())
             ) {
+              System.out.println("elimina factura limpia inventario");
                 enc.setEstado(0);
                 restaurarInventarioYMovimientos(enc);
             }
+          System.out.println("No elimina factura limpia inventario");
             enc.setRespuestaXML(result.getRawResponse());
             enc.setReferencia(req.getReferencia());
             enc.setFacturaProcesada("N");
