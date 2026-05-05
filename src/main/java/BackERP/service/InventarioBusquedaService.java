@@ -50,7 +50,6 @@ public class InventarioBusquedaService {
     // 🔥 1. BÚSQUEDA POR DESCRIPCIÓN (múltiples palabras con AND)
     if (descripcion != null && !descripcion.trim().isEmpty()) {
       Set<Long> idsDescripcion = buscarPorDescripcionMultiplePalabras(descripcion);
-      System.out.println("IDs encontrados por descripción '" + descripcion + "': " + idsDescripcion.size());
       idsTotales.addAll(idsDescripcion);
     }
 
@@ -64,7 +63,6 @@ public class InventarioBusquedaService {
         .map(erpInventario::getIdInventario)
         .collect(Collectors.toSet());
 
-      System.out.println("IDs encontrados por código producto '" + codigoProducto + "': " + idsCodigo.size());
       idsTotales.addAll(idsCodigo);
     }
 
@@ -78,21 +76,21 @@ public class InventarioBusquedaService {
         .map(erpInventario::getIdInventario)
         .collect(Collectors.toSet());
 
-      System.out.println("IDs encontrados por código proveedor '" + codigoProductoProveedor + "': " + idsProveedor.size());
+
       idsTotales.addAll(idsProveedor);
     }
 
-    System.out.println("Total IDs únicos sin filtro de ubicación: " + idsTotales.size());
+
 
     // Si no se encontraron resultados con ningún filtro
     if (idsTotales.isEmpty()) {
-      System.out.println("NO se encontraron resultados con ningún filtro");
+
       return Page.empty(pageable);
     }
 
     // 🔥 4. APLICAR FILTRO DE UBICACIÓN (si viene)
     if (idUbicacion != null) {
-      System.out.println("Aplicando filtro de ubicación: " + idUbicacion);
+
 
       // Obtener los IDs que cumplen con la ubicación
       Specification<erpInventario> specUbicacion = Specification
@@ -103,15 +101,15 @@ public class InventarioBusquedaService {
         .map(erpInventario::getIdInventario)
         .collect(Collectors.toSet());
 
-      System.out.println("IDs válidos por ubicación: " + idsUbicacionValidos.size());
+
 
       // Intersectar: solo los que cumplen con la ubicación
       idsTotales.retainAll(idsUbicacionValidos);
-      System.out.println("IDs después de filtro de ubicación: " + idsTotales.size());
+
     }
 
     if (idsTotales.isEmpty()) {
-      System.out.println("NO hay resultados después de aplicar filtro de ubicación");
+
       return Page.empty(pageable);
     }
 
