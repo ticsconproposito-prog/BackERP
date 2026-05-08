@@ -75,15 +75,24 @@ public class erpEncabezadoFacturasSpecs {
         };
     }
 
-    public static Specification<erpEncabezadoFacturas> numeroPreimpresoContains(String preimpresoRestAPI) {
-        return (root, query, cb) -> {
-            if (preimpresoRestAPI == null || preimpresoRestAPI.isEmpty()) {
-                return cb.conjunction(); // no aplica filtro si viene null
-            }
-            String pattern = likeHelper.buildLikePattern(preimpresoRestAPI, likeHelper.MatchMode.ANYWHERE, false);
-            return cb.like(cb.lower(root.get("preimpresoResAPI")), pattern, '\\');
-        };
-    }
+  // erpEncabezadoFacturasSpecs.java - Versión corregida
+
+  public static Specification<erpEncabezadoFacturas> numeroPreimpresoContains(String preimpresoRestAPI) {
+    return (root, query, cb) -> {
+      if (preimpresoRestAPI == null || preimpresoRestAPI.trim().isEmpty()) {
+        return cb.conjunction();
+      }
+
+      try {
+        // Convertir a Long para búsqueda exacta
+        Long preimpresoLong = Long.parseLong(preimpresoRestAPI.trim());
+        return cb.equal(root.get("preimpresoResAPI"), preimpresoLong);
+      } catch (NumberFormatException e) {
+        // Si no es número, convertir a 0 o manejar como sin resultados
+        return cb.disjunction(); // Devuelve ningún resultado
+      }
+    };
+  }
 
 
   public static Specification<erpEncabezadoFacturas> estadoEquals(int estado) {
