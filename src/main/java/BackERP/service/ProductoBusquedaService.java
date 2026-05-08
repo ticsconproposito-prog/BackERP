@@ -1,6 +1,5 @@
 package BackERP.service;
 
-import BackERP.helper.erpProductosSpecs;
 import BackERP.models.erpProductos;
 import BackERP.repository.RepositoryProductos;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +18,10 @@ public class ProductoBusquedaService {
   private RepositoryProductos repoProductos;
 
   /**
-   * Búsqueda OPTIMIZADA con OR entre campos - PAGINACIÓN DIRECTA EN BD
-   * UNA SOLA consulta SQL con paginación, sin cargar toda la tabla en memoria
-   *
-   * @param codigoProducto Código del producto
-   * @param codigoProductoProveedor Código del producto del proveedor
-   * @param descripcionProducto Descripción del producto
-   * @param idProducto ID exacto del producto (opcional)
-   * @param pageable Paginación y ordenamiento
-   * @return Página de resultados paginados directamente desde la BD
+   * Búsqueda OPTIMIZADA - CADA filtro es independiente
+   * - Si buscas por código, SOLO busca en código
+   * - Si buscas por descripción, TODAS las palabras deben estar en la descripción
+   * - Si buscas por código de proveedor, SOLO busca ahí
    */
   public Page<erpProductos> buscarProductos(
     String codigoProducto,
@@ -38,19 +32,17 @@ public class ProductoBusquedaService {
 
     Specification<erpProductos> spec = (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
-
-      // Estado activo SIEMPRE
       predicates.add(cb.equal(root.get("estado"), 1));
 
-      // Filtro por ID exacto (si viene, es prioritario)
+      // Filtro por ID exacto (prioritario)
       if (idProducto != null) {
         predicates.add(cb.equal(root.get("idProducto"), idProducto));
       }
 
-      // Grupo de filtros OR (por lo menos uno debe cumplirse)
+      // Grupo OR para filtros de texto
       List<Predicate> orPredicates = new ArrayList<>();
 
-      // Búsqueda por código de producto
+      // 🔥 1. Código de producto - búsqueda por texto completo
       if (codigoProducto != null && !codigoProducto.trim().isEmpty()) {
         String pattern = "%" + escapeLike(codigoProducto.toLowerCase().trim()) + "%";
         orPredicates.add(cb.like(
@@ -59,7 +51,7 @@ public class ProductoBusquedaService {
         ));
       }
 
-      // Búsqueda por código de proveedor
+      // 🔥 2. Código de proveedor - búsqueda por texto completo
       if (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) {
         String pattern = "%" + escapeLike(codigoProductoProveedor.toLowerCase().trim()) + "%";
         orPredicates.add(cb.like(
@@ -68,32 +60,37 @@ public class ProductoBusquedaService {
         ));
       }
 
-      // Búsqueda por descripción (TODAS las palabras deben estar presentes - AND)
+      // 🔥 3. Descripción - TODAS las palabras deben estar en la descripción
       if (descripcionProducto != null && !descripcionProducto.trim().isEmpty()) {
         String[] palabras = descripcionProducto.toLowerCase().trim().split("\\s+");
+
+        List<Predicate> descripcionPredicates = new ArrayList<>();
         for (String palabra : palabras) {
           if (!palabra.isEmpty()) {
             String pattern = "%" + escapeLike(palabra) + "%";
-            orPredicates.add(cb.like(
+            descripcionPredicates.add(cb.like(
               cb.lower(root.get("descripcionProducto")),
               pattern, '\\'
             ));
           }
         }
+
+        if (!descripcionPredicates.isEmpty()) {
+          // AND entre todas las palabras - SOLO en descripción
+          orPredicates.add(cb.and(descripcionPredicates.toArray(new Predicate[0])));
+        }
       }
 
-      // Si hay filtros OR, agregamos la condición de que al menos uno se cumpla
+      // Aplicar OR solo si hay filtros
       if (!orPredicates.isEmpty()) {
         predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
       } else if (idProducto == null) {
-        // Si NO hay NINGÚN filtro (excepto posible ID), devolvemos TODOS los activos
-        // No agregamos condiciones adicionales
+        // Verificar si se enviaron filtros vacíos
         boolean hayFiltros = (codigoProducto != null && !codigoProducto.trim().isEmpty()) ||
           (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) ||
           (descripcionProducto != null && !descripcionProducto.trim().isEmpty());
 
         if (hayFiltros) {
-          // Si hay filtros pero todos vacíos, devolver nada
           predicates.add(cb.disjunction());
         }
       }
@@ -105,41 +102,71 @@ public class ProductoBusquedaService {
   }
 
   /**
-   * Búsqueda SOLO por texto (para autocompletado o búsquedas rápidas)
-   * Versión simplificada que busca en todos los campos de texto a la vez
-   *
-   * @param textoBusqueda Texto a buscar en código, código proveedor y descripción
-   * @param pageable Paginación y ordenamiento
-   * @return Página de resultados
+   * Búsqueda por frase EXACTA (sin dividir palabras)
+   * Busca la misma frase en cualquier campo
    */
-  public Page<erpProductos> buscarPorTextoLibre(String textoBusqueda, Pageable pageable) {
+  public Page<erpProductos> buscarPorFraseExacta(String textoBusqueda, Pageable pageable) {
     if (textoBusqueda == null || textoBusqueda.trim().isEmpty()) {
-      // Sin búsqueda, devolver todos los activos
       return repoProductos.findAll(
         (root, query, cb) -> cb.equal(root.get("estado"), 1),
         pageable
       );
     }
 
-    Specification<erpProductos> spec = (root, query, cb) -> {
-      String pattern = "%" + escapeLike(textoBusqueda.toLowerCase().trim()) + "%";
+    String pattern = "%" + escapeLike(textoBusqueda.toLowerCase().trim()) + "%";
 
-      return cb.and(
-        cb.equal(root.get("estado"), 1),
-        cb.or(
-          cb.like(cb.lower(root.get("codigoProducto")), pattern, '\\'),
-          cb.like(cb.lower(root.get("codigoProductoProveedor")), pattern, '\\'),
-          cb.like(cb.lower(root.get("descripcionProducto")), pattern, '\\')
-        )
-      );
-    };
+    Specification<erpProductos> spec = (root, query, cb) -> cb.and(
+      cb.equal(root.get("estado"), 1),
+      cb.or(
+        cb.like(cb.lower(root.get("codigoProducto")), pattern, '\\'),
+        cb.like(cb.lower(root.get("codigoProductoProveedor")), pattern, '\\'),
+        cb.like(cb.lower(root.get("descripcionProducto")), pattern, '\\')
+      )
+    );
 
     return repoProductos.findAll(spec, pageable);
   }
 
   /**
-   * Escapa caracteres especiales de LIKE para evitar SQL injection y errores
+   * Búsqueda COMBINADA pero con AND entre campos (más restrictiva)
+   * Útil cuando quieres que TODOS los campos coincidan
    */
+  public Page<erpProductos> buscarConAndEntreCampos(
+    String codigoProducto,
+    String codigoProductoProveedor,
+    String descripcionProducto,
+    Pageable pageable) {
+
+    Specification<erpProductos> spec = (root, query, cb) -> {
+      List<Predicate> predicates = new ArrayList<>();
+      predicates.add(cb.equal(root.get("estado"), 1));
+
+      if (codigoProducto != null && !codigoProducto.trim().isEmpty()) {
+        String pattern = "%" + escapeLike(codigoProducto.toLowerCase().trim()) + "%";
+        predicates.add(cb.like(cb.lower(root.get("codigoProducto")), pattern, '\\'));
+      }
+
+      if (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) {
+        String pattern = "%" + escapeLike(codigoProductoProveedor.toLowerCase().trim()) + "%";
+        predicates.add(cb.like(cb.lower(root.get("codigoProductoProveedor")), pattern, '\\'));
+      }
+
+      if (descripcionProducto != null && !descripcionProducto.trim().isEmpty()) {
+        String[] palabras = descripcionProducto.toLowerCase().trim().split("\\s+");
+        for (String palabra : palabras) {
+          if (!palabra.isEmpty()) {
+            String pattern = "%" + escapeLike(palabra) + "%";
+            predicates.add(cb.like(cb.lower(root.get("descripcionProducto")), pattern, '\\'));
+          }
+        }
+      }
+
+      return cb.and(predicates.toArray(new Predicate[0]));
+    };
+
+    return repoProductos.findAll(spec, pageable);
+  }
+
   private String escapeLike(String value) {
     return value.replace("\\", "\\\\")
       .replace("%", "\\%")
