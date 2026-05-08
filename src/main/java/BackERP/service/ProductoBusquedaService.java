@@ -5,12 +5,12 @@ import BackERP.models.erpProductos;
 import BackERP.repository.RepositoryProductos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import java.util.*;
-import java.util.stream.Collectors;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ProductoBusquedaService {
@@ -19,8 +19,15 @@ public class ProductoBusquedaService {
   private RepositoryProductos repoProductos;
 
   /**
-   * Búsqueda OPTIMIZADA con OR entre campos
-   * Si no viene NINGÚN parámetro, devuelve TODOS los productos activos
+   * Búsqueda OPTIMIZADA con OR entre campos - PAGINACIÓN DIRECTA EN BD
+   * UNA SOLA consulta SQL con paginación, sin cargar toda la tabla en memoria
+   *
+   * @param codigoProducto Código del producto
+   * @param codigoProductoProveedor Código del producto del proveedor
+   * @param descripcionProducto Descripción del producto
+   * @param idProducto ID exacto del producto (opcional)
+   * @param pageable Paginación y ordenamiento
+   * @return Página de resultados paginados directamente desde la BD
    */
   public Page<erpProductos> buscarProductos(
     String codigoProducto,
@@ -29,121 +36,113 @@ public class ProductoBusquedaService {
     Long idProducto,
     Pageable pageable) {
 
-    // 🔥 NUEVO: Verificar si NO hay NINGÚN filtro
-    boolean hayFiltros = (codigoProducto != null && !codigoProducto.trim().isEmpty()) ||
-      (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) ||
-      (descripcionProducto != null && !descripcionProducto.trim().isEmpty()) ||
-      (idProducto != null);
+    Specification<erpProductos> spec = (root, query, cb) -> {
+      List<Predicate> predicates = new ArrayList<>();
 
-    // Si no hay filtros, devolver TODOS los productos activos
-    if (!hayFiltros) {
-      Specification<erpProductos> spec = Specification
-        .where(erpProductosSpecs.estadoEquals(1));
-      return repoProductos.findAll(spec, pageable);
-    }
+      // Estado activo SIEMPRE
+      predicates.add(cb.equal(root.get("estado"), 1));
 
-    Set<Long> idsTotales = new HashSet<>();
+      // Filtro por ID exacto (si viene, es prioritario)
+      if (idProducto != null) {
+        predicates.add(cb.equal(root.get("idProducto"), idProducto));
+      }
 
-    // Búsqueda por código de producto
-    if (codigoProducto != null && !codigoProducto.trim().isEmpty()) {
-      Specification<erpProductos> spec = Specification
-        .where(erpProductosSpecs.estadoEquals(1))
-        .and(erpProductosSpecs.codigoProductoContains(codigoProducto));
+      // Grupo de filtros OR (por lo menos uno debe cumplirse)
+      List<Predicate> orPredicates = new ArrayList<>();
 
-      Set<Long> ids = repoProductos.findAll(spec).stream()
-        .map(erpProductos::getIdProducto)
-        .collect(Collectors.toSet());
-      idsTotales.addAll(ids);
-    }
+      // Búsqueda por código de producto
+      if (codigoProducto != null && !codigoProducto.trim().isEmpty()) {
+        String pattern = "%" + escapeLike(codigoProducto.toLowerCase().trim()) + "%";
+        orPredicates.add(cb.like(
+          cb.lower(root.get("codigoProducto")),
+          pattern, '\\'
+        ));
+      }
 
-    // Búsqueda por código de proveedor
-    if (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) {
-      Specification<erpProductos> spec = Specification
-        .where(erpProductosSpecs.estadoEquals(1))
-        .and(erpProductosSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
+      // Búsqueda por código de proveedor
+      if (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) {
+        String pattern = "%" + escapeLike(codigoProductoProveedor.toLowerCase().trim()) + "%";
+        orPredicates.add(cb.like(
+          cb.lower(root.get("codigoProductoProveedor")),
+          pattern, '\\'
+        ));
+      }
 
-      Set<Long> ids = repoProductos.findAll(spec).stream()
-        .map(erpProductos::getIdProducto)
-        .collect(Collectors.toSet());
-      idsTotales.addAll(ids);
-    }
+      // Búsqueda por descripción (TODAS las palabras deben estar presentes - AND)
+      if (descripcionProducto != null && !descripcionProducto.trim().isEmpty()) {
+        String[] palabras = descripcionProducto.toLowerCase().trim().split("\\s+");
+        for (String palabra : palabras) {
+          if (!palabra.isEmpty()) {
+            String pattern = "%" + escapeLike(palabra) + "%";
+            orPredicates.add(cb.like(
+              cb.lower(root.get("descripcionProducto")),
+              pattern, '\\'
+            ));
+          }
+        }
+      }
 
-    // Búsqueda por descripción (con optimización de palabras)
-    if (descripcionProducto != null && !descripcionProducto.trim().isEmpty()) {
-      Set<Long> idsDescripcion = buscarPorDescripcionProducto(descripcionProducto);
-      idsTotales.addAll(idsDescripcion);
-    }
+      // Si hay filtros OR, agregamos la condición de que al menos uno se cumpla
+      if (!orPredicates.isEmpty()) {
+        predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
+      } else if (idProducto == null) {
+        // Si NO hay NINGÚN filtro (excepto posible ID), devolvemos TODOS los activos
+        // No agregamos condiciones adicionales
+        boolean hayFiltros = (codigoProducto != null && !codigoProducto.trim().isEmpty()) ||
+          (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) ||
+          (descripcionProducto != null && !descripcionProducto.trim().isEmpty());
 
-    // Búsqueda por ID exacto
-    if (idProducto != null) {
-      Optional<erpProductos> producto = repoProductos.findById(idProducto);
-      producto.ifPresent(p -> idsTotales.add(p.getIdProducto()));
-    }
+        if (hayFiltros) {
+          // Si hay filtros pero todos vacíos, devolver nada
+          predicates.add(cb.disjunction());
+        }
+      }
 
-    if (idsTotales.isEmpty()) {
-      return Page.empty(pageable);
-    }
+      return cb.and(predicates.toArray(new Predicate[0]));
+    };
 
-    return paginarResultadosProductos(idsTotales, pageable);
+    return repoProductos.findAll(spec, pageable);
   }
 
   /**
-   * Búsqueda optimizada por descripción con CRUCE de IDs
+   * Búsqueda SOLO por texto (para autocompletado o búsquedas rápidas)
+   * Versión simplificada que busca en todos los campos de texto a la vez
+   *
+   * @param textoBusqueda Texto a buscar en código, código proveedor y descripción
+   * @param pageable Paginación y ordenamiento
+   * @return Página de resultados
    */
-  private Set<Long> buscarPorDescripcionProducto(String descripcion) {
-    String[] palabras = descripcion.toLowerCase().trim().split("\\s+");
-    List<Set<Long>> resultadosPorPalabra = new ArrayList<>();
-
-    for (String palabra : palabras) {
-      Specification<erpProductos> spec = Specification
-        .where(erpProductosSpecs.estadoEquals(1))
-        .and(erpProductosSpecs.buscarPalabraEnDescripcion(palabra));
-
-      Set<Long> ids = repoProductos.findAll(spec).stream()
-        .map(erpProductos::getIdProducto)
-        .collect(Collectors.toSet());
-
-      resultadosPorPalabra.add(ids);
-
-      if (ids.isEmpty()) {
-        return new HashSet<>();
-      }
+  public Page<erpProductos> buscarPorTextoLibre(String textoBusqueda, Pageable pageable) {
+    if (textoBusqueda == null || textoBusqueda.trim().isEmpty()) {
+      // Sin búsqueda, devolver todos los activos
+      return repoProductos.findAll(
+        (root, query, cb) -> cb.equal(root.get("estado"), 1),
+        pageable
+      );
     }
 
-    // CRUCE de IDs
-    Set<Long> idsFinales = new HashSet<>(resultadosPorPalabra.get(0));
-    for (int i = 1; i < resultadosPorPalabra.size(); i++) {
-      idsFinales.retainAll(resultadosPorPalabra.get(i));
-      if (idsFinales.isEmpty()) {
-        break;
-      }
-    }
+    Specification<erpProductos> spec = (root, query, cb) -> {
+      String pattern = "%" + escapeLike(textoBusqueda.toLowerCase().trim()) + "%";
 
-    return idsFinales;
+      return cb.and(
+        cb.equal(root.get("estado"), 1),
+        cb.or(
+          cb.like(cb.lower(root.get("codigoProducto")), pattern, '\\'),
+          cb.like(cb.lower(root.get("codigoProductoProveedor")), pattern, '\\'),
+          cb.like(cb.lower(root.get("descripcionProducto")), pattern, '\\')
+        )
+      );
+    };
+
+    return repoProductos.findAll(spec, pageable);
   }
 
-  private Page<erpProductos> paginarResultadosProductos(Set<Long> idsTotales, Pageable pageable) {
-    List<Long> idsList = new ArrayList<>(idsTotales);
-    idsList.sort(Long::compareTo);
-
-    int start = (int) pageable.getOffset();
-    int end = Math.min((start + pageable.getPageSize()), idsList.size());
-
-    if (start >= idsList.size()) {
-      return Page.empty(pageable);
-    }
-
-    List<Long> idsPaginados = idsList.subList(start, end);
-    List<erpProductos> resultadosFinales = repoProductos.findAllById(idsPaginados);
-
-    Map<Long, erpProductos> mapaResultados = resultadosFinales.stream()
-      .collect(Collectors.toMap(erpProductos::getIdProducto, r -> r));
-
-    List<erpProductos> resultadosOrdenados = idsPaginados.stream()
-      .map(mapaResultados::get)
-      .filter(Objects::nonNull)
-      .collect(Collectors.toList());
-
-    return new PageImpl<>(resultadosOrdenados, pageable, idsTotales.size());
+  /**
+   * Escapa caracteres especiales de LIKE para evitar SQL injection y errores
+   */
+  private String escapeLike(String value) {
+    return value.replace("\\", "\\\\")
+      .replace("%", "\\%")
+      .replace("_", "\\_");
   }
 }

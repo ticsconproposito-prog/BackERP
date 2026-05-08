@@ -5,12 +5,12 @@ import BackERP.models.erpInventario;
 import BackERP.repository.RepositoryInventario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import java.util.*;
-import java.util.stream.Collectors;
+import jakarta.persistence.criteria.Predicate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class InventarioBusquedaService {
@@ -19,9 +19,15 @@ public class InventarioBusquedaService {
   private RepositoryInventario repinv;
 
   /**
-   * Búsqueda que combina todos los filtros con OR
-   * - Si vienen múltiples filtros, hace OR entre ellos
-   * - La ubicación es filtro adicional (AND) si viene
+   * Búsqueda OPTIMIZADA con OR entre campos - PAGINACIÓN DIRECTA EN BD
+   * UNA SOLA consulta SQL sin cargar toda la tabla en memoria
+   *
+   * @param descripcion Texto a buscar en la descripción del producto
+   * @param codigoProducto Código del producto
+   * @param codigoProductoProveedor Código del producto del proveedor
+   * @param idUbicacion Filtro por ubicación (opcional)
+   * @param pageable Paginación y ordenamiento
+   * @return Página de resultados paginados directamente desde la BD
    */
   public Page<erpInventario> buscarPorPalabrasEnDescripcion(
     String descripcion,
@@ -30,138 +36,80 @@ public class InventarioBusquedaService {
     Integer idUbicacion,
     Pageable pageable) {
 
-    // Verificar si NO hay NINGÚN filtro
-    boolean hayFiltrosTexto = (descripcion != null && !descripcion.trim().isEmpty()) ||
-      (codigoProducto != null && !codigoProducto.trim().isEmpty()) ||
-      (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty());
+    Specification<erpInventario> spec = (root, query, cb) -> {
+      List<Predicate> predicates = new ArrayList<>();
 
-    // Si no hay filtros de texto, devolver todos (con posible filtro de ubicación)
-    if (!hayFiltrosTexto) {
-      Specification<erpInventario> spec = Specification.where(erpInventarioSpecs.estadoEquals(1));
+      // Estado activo SIEMPRE
+      predicates.add(cb.equal(root.get("estado"), 1));
+
+      // Filtro de ubicación (AND obligatorio si viene)
       if (idUbicacion != null) {
-        spec = spec.and(erpInventarioSpecs.idUbicacionEquals(idUbicacion));
+        predicates.add(cb.equal(root.get("idUbicacion"), idUbicacion));
       }
-      return repinv.findAll(spec, pageable);
-    }
 
-    // Colección para acumular todos los IDs encontrados por cualquier filtro
-    Set<Long> idsTotales = new HashSet<>();
+      // Grupo de filtros OR (por lo menos uno debe cumplirse)
+      List<Predicate> orPredicates = new ArrayList<>();
 
-    // 🔥 1. BÚSQUEDA POR DESCRIPCIÓN (múltiples palabras con AND)
-    if (descripcion != null && !descripcion.trim().isEmpty()) {
-      Set<Long> idsDescripcion = buscarPorDescripcionMultiplePalabras(descripcion);
-      idsTotales.addAll(idsDescripcion);
-    }
+      // Búsqueda por código de producto
+      if (codigoProducto != null && !codigoProducto.trim().isEmpty()) {
+        String pattern = "%" + escapeLike(codigoProducto.toLowerCase().trim()) + "%";
+        orPredicates.add(cb.like(
+          cb.lower(root.get("idProducto").get("codigoProducto")),
+          pattern, '\\'
+        ));
+      }
 
-    // 🔥 2. BÚSQUEDA POR CÓDIGO PRODUCTO
-    if (codigoProducto != null && !codigoProducto.trim().isEmpty()) {
-      Specification<erpInventario> specCodigo = Specification
-        .where(erpInventarioSpecs.estadoEquals(1))
-        .and(erpInventarioSpecs.codigoProductoContains(codigoProducto));
+      // Búsqueda por código de proveedor
+      if (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) {
+        String pattern = "%" + escapeLike(codigoProductoProveedor.toLowerCase().trim()) + "%";
+        orPredicates.add(cb.like(
+          cb.lower(root.get("idProducto").get("codigoProductoProveedor")),
+          pattern, '\\'
+        ));
+      }
 
-      Set<Long> idsCodigo = repinv.findAll(specCodigo).stream()
-        .map(erpInventario::getIdInventario)
-        .collect(Collectors.toSet());
+      // Búsqueda por descripción (TODAS las palabras deben estar presentes - AND)
+      if (descripcion != null && !descripcion.trim().isEmpty()) {
+        String[] palabras = descripcion.toLowerCase().trim().split("\\s+");
+        for (String palabra : palabras) {
+          if (!palabra.isEmpty()) {
+            String pattern = "%" + escapeLike(palabra) + "%";
+            orPredicates.add(cb.like(
+              cb.lower(root.get("idProducto").get("descripcionProducto")),
+              pattern, '\\'
+            ));
+          }
+        }
+      }
 
-      idsTotales.addAll(idsCodigo);
-    }
+      // Si hay filtros OR, agregamos la condición de que al menos uno se cumpla
+      if (!orPredicates.isEmpty()) {
+        predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
+      } else {
+        // Si NO hay NINGÚN filtro de texto, verificamos si es un caso válido
+        boolean hayFiltrosTexto = (descripcion != null && !descripcion.trim().isEmpty()) ||
+          (codigoProducto != null && !codigoProducto.trim().isEmpty()) ||
+          (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty());
 
-    // 🔥 3. BÚSQUEDA POR CÓDIGO PROVEEDOR
-    if (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) {
-      Specification<erpInventario> specProveedor = Specification
-        .where(erpInventarioSpecs.estadoEquals(1))
-        .and(erpInventarioSpecs.codigoProductoProveedorContains(codigoProductoProveedor));
+        if (hayFiltrosTexto) {
+          // Si hay filtros pero todos dieron vacío, devolver nada
+          predicates.add(cb.disjunction());
+        }
+        // Si no hay filtros, devolvemos solo los activos (sin condiciones adicionales)
+      }
 
-      Set<Long> idsProveedor = repinv.findAll(specProveedor).stream()
-        .map(erpInventario::getIdInventario)
-        .collect(Collectors.toSet());
+      return cb.and(predicates.toArray(new Predicate[0]));
+    };
 
-
-      idsTotales.addAll(idsProveedor);
-    }
-
-
-
-    // Si no se encontraron resultados con ningún filtro
-    if (idsTotales.isEmpty()) {
-
-      return Page.empty(pageable);
-    }
-
-    // 🔥 4. APLICAR FILTRO DE UBICACIÓN (si viene)
-    if (idUbicacion != null) {
-
-
-      // Obtener los IDs que cumplen con la ubicación
-      Specification<erpInventario> specUbicacion = Specification
-        .where(erpInventarioSpecs.estadoEquals(1))
-        .and(erpInventarioSpecs.idUbicacionEquals(idUbicacion));
-
-      Set<Long> idsUbicacionValidos = repinv.findAll(specUbicacion).stream()
-        .map(erpInventario::getIdInventario)
-        .collect(Collectors.toSet());
-
-
-
-      // Intersectar: solo los que cumplen con la ubicación
-      idsTotales.retainAll(idsUbicacionValidos);
-
-    }
-
-    if (idsTotales.isEmpty()) {
-
-      return Page.empty(pageable);
-    }
-
-    return paginarResultados(idsTotales, pageable);
+    return repinv.findAll(spec, pageable);
   }
 
   /**
-   * Busca por descripción con AND entre múltiples palabras
+   * Escapa caracteres especiales de LIKE para evitar SQL injection y errores
    */
-  private Set<Long> buscarPorDescripcionMultiplePalabras(String descripcion) {
-    String[] palabras = descripcion.toLowerCase().trim().split("\\s+");
-
-    // Construir Specification con AND entre todas las palabras
-    Specification<erpInventario> specCompleta = Specification
-      .where(erpInventarioSpecs.estadoEquals(1));
-
-    // Cada palabra como condición AND
-    for (String palabra : palabras) {
-      specCompleta = specCompleta.and(erpInventarioSpecs.buscarPalabraEnDescripcion(palabra));
-    }
-
-    return repinv.findAll(specCompleta).stream()
-      .map(erpInventario::getIdInventario)
-      .collect(Collectors.toSet());
-  }
-
-  /**
-   * Paginación de resultados
-   */
-  private Page<erpInventario> paginarResultados(Set<Long> idsTotales, Pageable pageable) {
-    List<Long> idsList = new ArrayList<>(idsTotales);
-    idsList.sort(Long::compareTo);
-
-    int start = (int) pageable.getOffset();
-    int end = Math.min((start + pageable.getPageSize()), idsList.size());
-
-    if (start >= idsList.size()) {
-      return Page.empty(pageable);
-    }
-
-    List<Long> idsPaginados = idsList.subList(start, end);
-    List<erpInventario> resultadosFinales = repinv.findAllById(idsPaginados);
-
-    // Mantener el orden original
-    Map<Long, erpInventario> mapaResultados = resultadosFinales.stream()
-      .collect(Collectors.toMap(erpInventario::getIdInventario, r -> r));
-
-    List<erpInventario> resultadosOrdenados = idsPaginados.stream()
-      .map(mapaResultados::get)
-      .filter(Objects::nonNull)
-      .collect(Collectors.toList());
-
-    return new PageImpl<>(resultadosOrdenados, pageable, idsTotales.size());
+  private String escapeLike(String value) {
+    return value.replace("\\", "\\\\")
+      .replace("%", "\\%")
+      .replace("_", "\\_");
   }
 }
