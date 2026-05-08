@@ -52,7 +52,7 @@ public class DetalleFacturasRestController {
 
     // 🔥 VALIDACIÓN: Evita división por cero y valores nulos
 
-    System.out.println("descuento "+detalleFacturas.getCantidadDeDescuento() + "ImpBruto "+detalleFacturas.getImpBruto());
+
     double cantidadDeDescuento = detalleFacturas.getCantidadDeDescuento() != 0
       ? detalleFacturas.getCantidadDeDescuento()
       : 0.0;
