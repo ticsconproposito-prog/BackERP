@@ -2,10 +2,12 @@ package BackERP.config;
 
 import BackERP.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class FelService {
@@ -30,6 +32,27 @@ public class FelService {
     this.xmlBuilder = xmlBuilder;
     this.wsClient = wsClient;
     this.responseParser = responseParser;
+  }
+
+  // ============ NUEVO MÉTODO ASYNC ============
+  @Async
+  public CompletableFuture<FelResult> generarDteAsync(felDteRequestDto req) {
+    // Este método NO BLOQUEA el hilo principal
+    FelResult result = generarDte(req);  // Llama a tu método original
+    return CompletableFuture.completedFuture(result);
+  }
+
+  // ============ NUEVO MÉTODO ASYNC PARA ANULACIÓN ============
+  @Async
+  public CompletableFuture<FelResult> anularFacturaAsync(Long idEncabezadoFactura,
+                                                         String serie,
+                                                         String preimpreso,
+                                                         String nitComprador,
+                                                         String fechaAnulacion,
+                                                         String motivo) {
+    FelResult result = anularFactura(idEncabezadoFactura, serie, preimpreso,
+      nitComprador, fechaAnulacion, motivo);
+    return CompletableFuture.completedFuture(result);
   }
 
   // Sin @Transactional: la llamada SOAP ocurre sin ningún lock de BD abierto.
@@ -101,6 +124,8 @@ public class FelService {
       throw new IllegalArgumentException("Para Moneda=1 (GTQ) la Tasa debe ser 1.000000");
     }
   }
+
+
 
   private void assertClose(String name, BigDecimal expected, BigDecimal actual) {
     if (expected.subtract(actual).abs().compareTo(TOL) > 0) {

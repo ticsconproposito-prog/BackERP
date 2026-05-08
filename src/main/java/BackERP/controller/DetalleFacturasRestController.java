@@ -9,6 +9,7 @@ import BackERP.repository.RepositoryInventario;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -46,6 +47,7 @@ public class DetalleFacturasRestController {
   }
 
   @PostMapping("grabarDetalleFactura")
+  @Transactional
   public String grabarDetalleFacturas(@RequestBody erpDetalleFacturas detalleFacturas){
 
     // 🔥 VALIDACIÓN: Evita división por cero y valores nulos

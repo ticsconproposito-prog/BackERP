@@ -15,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -87,6 +88,7 @@ public class EncabezadoFacturasRestController {
 
 
     @PostMapping("grabarEncabezadoFacturas")
+    @Transactional
     public ResponseEntity<Long> grabarEncabezadoFacturas(@RequestBody erpEncabezadoFacturas EncabezadoFacturas){
 
         // valor por defecto
