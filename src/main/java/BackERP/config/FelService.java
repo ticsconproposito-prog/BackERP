@@ -34,16 +34,14 @@ public class FelService {
     this.responseParser = responseParser;
   }
 
-  // ============ NUEVO MÉTODO ASYNC ============
-  @Async
+  // Usa el Executor específico para evitar fuga de hilos
+  @Async("felTaskExecutor")
   public CompletableFuture<FelResult> generarDteAsync(felDteRequestDto req) {
-    // Este método NO BLOQUEA el hilo principal
-    FelResult result = generarDte(req);  // Llama a tu método original
+    FelResult result = generarDte(req);
     return CompletableFuture.completedFuture(result);
   }
 
-  // ============ NUEVO MÉTODO ASYNC PARA ANULACIÓN ============
-  @Async
+  @Async("felTaskExecutor")
   public CompletableFuture<FelResult> anularFacturaAsync(Long idEncabezadoFactura,
                                                          String serie,
                                                          String preimpreso,
@@ -55,17 +53,13 @@ public class FelService {
     return CompletableFuture.completedFuture(result);
   }
 
-  // Sin @Transactional: la llamada SOAP ocurre sin ningún lock de BD abierto.
-  // La persistencia del resultado se delega a FelPersistenceService en una transacción corta.
   public FelResult generarDte(felDteRequestDto req) {
     validar(req);
 
-    // Fase 1: llamada al WS externo (fuera de cualquier transacción JPA)
     String pXml = xmlBuilder.buildDocElectronicoXml(req);
     String soapResponse = wsClient.generaDocumento(req.getTipoDoc(), pXml);
     FelResult result = responseParser.parse(soapResponse);
 
-    // Fase 2: persistir resultado en una transacción corta independiente
     try {
       felPersistenceService.persistirResultadoDte(result, req);
     } catch (Exception e) {
@@ -76,18 +70,15 @@ public class FelService {
     return result;
   }
 
-  // Sin @Transactional: la llamada SOAP ocurre sin ningún lock de BD abierto.
   public FelResult anularFactura(Long idEncabezadoFactura,
                                  String serie,
                                  String preimpreso,
                                  String nitComprador,
                                  String fechaAnulacion,
                                  String motivo) {
-    // Fase 1: llamada al WS externo (fuera de cualquier transacción JPA)
     String soapResponse = wsClient.anulaDocumento(serie, preimpreso, nitComprador, fechaAnulacion, motivo);
     FelResult result = responseParser.parseAnular(soapResponse);
 
-    // Fase 2: persistir resultado en una transacción corta independiente
     try {
       felPersistenceService.persistirResultadoAnulacion(result, idEncabezadoFactura);
     } catch (Exception e) {
@@ -99,7 +90,6 @@ public class FelService {
   }
 
   private void validar(felDteRequestDto req) {
-    // Validaciones por línea
     for (felItemDto it : req.getItems()) {
       BigDecimal ivaCalc = it.getImpNeto().multiply(IVA_RATE).setScale(2, RoundingMode.HALF_UP);
       if (it.getImpIva().subtract(ivaCalc).abs().compareTo(TOL) > 0) {
@@ -111,21 +101,19 @@ public class FelService {
       }
     }
 
-    assertClose("Bruto",     req.getTotales().getBruto(),     req.getItems().stream().map(felItemDto::getImpBruto).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Bruto", req.getTotales().getBruto(), req.getItems().stream().map(felItemDto::getImpBruto).reduce(BigDecimal.ZERO, BigDecimal::add));
     assertClose("Descuento", req.getTotales().getDescuento(), req.getItems().stream().map(felItemDto::getImpDescuento).reduce(BigDecimal.ZERO, BigDecimal::add));
-    assertClose("Exento",    req.getTotales().getExento(),    req.getItems().stream().map(felItemDto::getImpExento).reduce(BigDecimal.ZERO, BigDecimal::add));
-    assertClose("Otros",     req.getTotales().getOtros(),     req.getItems().stream().map(felItemDto::getImpOtros).reduce(BigDecimal.ZERO, BigDecimal::add));
-    assertClose("Neto",      req.getTotales().getNeto(),      req.getItems().stream().map(felItemDto::getImpNeto).reduce(BigDecimal.ZERO, BigDecimal::add));
-    assertClose("Iva",       req.getTotales().getIva(),       req.getItems().stream().map(felItemDto::getImpIva).reduce(BigDecimal.ZERO, BigDecimal::add));
-    assertClose("Isr",       req.getTotales().getIsr(),       req.getItems().stream().map(felItemDto::getImpIsr).reduce(BigDecimal.ZERO, BigDecimal::add));
-    assertClose("Total",     req.getTotales().getTotal(),     req.getItems().stream().map(felItemDto::getImpTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Exento", req.getTotales().getExento(), req.getItems().stream().map(felItemDto::getImpExento).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Otros", req.getTotales().getOtros(), req.getItems().stream().map(felItemDto::getImpOtros).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Neto", req.getTotales().getNeto(), req.getItems().stream().map(felItemDto::getImpNeto).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Iva", req.getTotales().getIva(), req.getItems().stream().map(felItemDto::getImpIva).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Isr", req.getTotales().getIsr(), req.getItems().stream().map(felItemDto::getImpIsr).reduce(BigDecimal.ZERO, BigDecimal::add));
+    assertClose("Total", req.getTotales().getTotal(), req.getItems().stream().map(felItemDto::getImpTotal).reduce(BigDecimal.ZERO, BigDecimal::add));
 
     if (req.getMoneda() == 1 && req.getTasa().compareTo(BigDecimal.ONE) != 0) {
       throw new IllegalArgumentException("Para Moneda=1 (GTQ) la Tasa debe ser 1.000000");
     }
   }
-
-
 
   private void assertClose(String name, BigDecimal expected, BigDecimal actual) {
     if (expected.subtract(actual).abs().compareTo(TOL) > 0) {

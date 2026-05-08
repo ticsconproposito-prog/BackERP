@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;  // ← AGREGAR
-import java.util.concurrent.TimeUnit;           // ← AGREGAR
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @RequestMapping("fel")
@@ -27,10 +27,9 @@ public class FelController {
     this.felService = felService;
   }
 
-  // ============ ENDPOINT ORIGINAL (se mantiene como respaldo) ============
+  // Endpoint original síncrono (se mantiene como respaldo)
   @PostMapping("/dtes/sync")
   public ResponseEntity<?> generarSync(@Valid @RequestBody felDteRequestDto req) {
-    // Versión síncrona original (bloqueante)
     FelResult result = felService.generarDte(req);
     if (result.isOk()) {
       Map<String, Object> body = new HashMap<>();
@@ -41,16 +40,14 @@ public class FelController {
     return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(result);
   }
 
-  // ============ NUEVO ENDPOINT ASYNC (RECOMENDADO) ============
+  // Endpoint async recomendado
   @PostMapping("/dtes")
   public ResponseEntity<?> generarAsync(@Valid @RequestBody felDteRequestDto req) {
 
-    // Llamada ASÍNCRONA - NO BLOQUEA
     CompletableFuture<FelResult> futureResult = felService.generarDteAsync(req);
 
     try {
-      // Esperar máximo 30 segundos (ajusta según tu necesidad)
-      FelResult result = futureResult.get(30, TimeUnit.SECONDS);
+      FelResult result = futureResult.get(25, TimeUnit.SECONDS);
 
       if (result.isOk()) {
         Map<String, Object> body = new HashMap<>();
@@ -61,9 +58,18 @@ public class FelController {
       return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(result);
 
     } catch (java.util.concurrent.TimeoutException e) {
+      futureResult.cancel(true);
+
       Map<String, Object> errorBody = new HashMap<>();
       errorBody.put("ok", false);
-      errorBody.put("error", "El servicio FEL está tardando más de 30 segundos");
+      errorBody.put("error", "El servicio FEL está tardando más de 25 segundos");
+      errorBody.put("cancelled", true);
+      return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(errorBody);
+
+    } catch (java.util.concurrent.CancellationException e) {
+      Map<String, Object> errorBody = new HashMap<>();
+      errorBody.put("ok", false);
+      errorBody.put("error", "La operación fue cancelada por timeout");
       return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(errorBody);
 
     } catch (Exception e) {
@@ -74,7 +80,7 @@ public class FelController {
     }
   }
 
-  // ============ ENDPOINT ASYNC PARA ANULACIÓN ============
+  // Endpoint async para anulación
   @PostMapping("/anularFactura")
   public ResponseEntity<?> anularFacturaAsync(@RequestParam Long idEncabezadoFactura,
                                               @RequestParam String serie,
@@ -88,7 +94,8 @@ public class FelController {
     );
 
     try {
-      FelResult result = futureResult.get(30, TimeUnit.SECONDS);
+      FelResult result = futureResult.get(25, TimeUnit.SECONDS);
+
       if (result.isOk()) {
         Map<String, Object> body = new HashMap<>();
         body.put("fel", result);
@@ -98,9 +105,18 @@ public class FelController {
       return ResponseEntity.status(HttpStatus.UNPROCESSABLE_ENTITY).body(result);
 
     } catch (java.util.concurrent.TimeoutException e) {
+      futureResult.cancel(true);
+
       Map<String, Object> errorBody = new HashMap<>();
       errorBody.put("ok", false);
-      errorBody.put("error", "La anulación está tardando más de 30 segundos");
+      errorBody.put("error", "La anulación está tardando más de 25 segundos");
+      errorBody.put("cancelled", true);
+      return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(errorBody);
+
+    } catch (java.util.concurrent.CancellationException e) {
+      Map<String, Object> errorBody = new HashMap<>();
+      errorBody.put("ok", false);
+      errorBody.put("error", "La operación de anulación fue cancelada por timeout");
       return ResponseEntity.status(HttpStatus.GATEWAY_TIMEOUT).body(errorBody);
 
     } catch (Exception e) {
