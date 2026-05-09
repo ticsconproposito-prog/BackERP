@@ -77,15 +77,15 @@ public class erpEncabezadoFacturasSpecs {
 
   // erpEncabezadoFacturasSpecs.java - Versión corregida
 
-  public static Specification<erpEncabezadoFacturas> numeroPreimpresoContains(String preimpresoRestAPI) {
+  public static Specification<erpEncabezadoFacturas> numeroPreimpresoContains(String preimpresoResAPI) {
     return (root, query, cb) -> {
-      if (preimpresoRestAPI == null || preimpresoRestAPI.trim().isEmpty()) {
+      if (preimpresoResAPI == null || preimpresoResAPI.trim().isEmpty()) {
         return cb.conjunction();
       }
 
       try {
         // Convertir a Long para búsqueda exacta
-        Long preimpresoLong = Long.parseLong(preimpresoRestAPI.trim());
+        Long preimpresoLong = Long.parseLong(preimpresoResAPI.trim());
         return cb.equal(root.get("preimpresoResAPI"), preimpresoLong);
       } catch (NumberFormatException e) {
         // Si no es número, convertir a 0 o manejar como sin resultados
