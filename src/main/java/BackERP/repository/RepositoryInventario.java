@@ -18,6 +18,10 @@ import java.util.Optional;
 
 public interface RepositoryInventario extends JpaRepository<erpInventario, Long>, JpaSpecificationExecutor<erpInventario> {
 
+  // ============================================
+  // MÉTODOS EXISTENTES (optimizados con EntityGraph)
+  // ============================================
+
   // 🔥 1. MÉTODO CRÍTICO: El que usa paginación con Specifications
   @Override
   @EntityGraph(attributePaths = {"idProducto"})
@@ -57,7 +61,9 @@ public interface RepositoryInventario extends JpaRepository<erpInventario, Long>
   @EntityGraph(attributePaths = {"idProducto"})
   List<erpInventario> findByIdUbicacion(int idUbicacion);
 
-
+  // ============================================
+  // MÉTODOS DE ACTUALIZACIÓN EXISTENTES
+  // ============================================
 
   // Restaurar inventario (incrementar existencias)
   @Modifying
@@ -68,4 +74,80 @@ public interface RepositoryInventario extends JpaRepository<erpInventario, Long>
   void restaurarExistencia(@Param("idInventario") Long idInventario,
                            @Param("cantidad") int cantidad,
                            @Param("idUsuario") int idUsuarioModificacion);
+
+  // ============================================
+  // NUEVOS MÉTODOS PARA REORDENAMIENTO
+  // ============================================
+
+  /**
+   * Obtener todos los inventarios activos ordenados por ordenInventario
+   * Útil para reordenar la lista completa
+   */
+  @Query("SELECT i FROM erpInventario i WHERE i.estado = 1 ORDER BY i.ordenInventario ASC")
+  @EntityGraph(attributePaths = {"idProducto"})
+  List<erpInventario> findAllActivosOrderByOrden();
+
+  /**
+   * Obtener el máximo ordenInventario actual
+   * Útil para saber el último número de orden
+   */
+  @Query("SELECT MAX(i.ordenInventario) FROM erpInventario i WHERE i.estado = 1")
+  Integer getMaxOrdenInventario();
+
+  /**
+   * Obtener el mínimo ordenInventario actual
+   * Útil para saber el primer número de orden
+   */
+  @Query("SELECT MIN(i.ordenInventario) FROM erpInventario i WHERE i.estado = 1")
+  Integer getMinOrdenInventario();
+
+  /**
+   * Obtener un inventario por su ordenInventario
+   * Útil para encontrar qué registro está en una posición específica
+   */
+  @EntityGraph(attributePaths = {"idProducto"})
+  Optional<erpInventario> findByOrdenInventarioAndEstado(int ordenInventario, int estado);
+
+  /**
+   * Obtener todos los inventarios con ordenInventario mayor o igual a un valor
+   * Útil para desplazar órdenes hacia arriba o abajo
+   */
+  @Query("SELECT i FROM erpInventario i WHERE i.estado = 1 AND i.ordenInventario >= :ordenInicial ORDER BY i.ordenInventario ASC")
+  @EntityGraph(attributePaths = {"idProducto"})
+  List<erpInventario> findAllByOrdenInventarioGreaterThanEqual(@Param("ordenInicial") int ordenInicial);
+
+  /**
+   * Actualizar el ordenInventario de un inventario específico
+   * Útil para actualizaciones individuales
+   */
+  @Modifying
+  @Transactional
+  @Query("UPDATE erpInventario i SET i.ordenInventario = :nuevoOrden, " +
+    "i.fechaModificacion = CURRENT_DATE, i.horaModificacion = CURRENT_TIME, " +
+    "i.idUsuarioModificacion = :idUsuario WHERE i.idInventario = :idInventario")
+  void actualizarOrdenInventario(@Param("idInventario") Long idInventario,
+                                 @Param("nuevoOrden") int nuevoOrden,
+                                 @Param("idUsuario") int idUsuario);
+
+  /**
+   * Desplazar órdenes en un rango específico
+   * Útil para hacer espacio o cerrar huecos
+   */
+  @Modifying
+  @Transactional
+  @Query("UPDATE erpInventario i SET i.ordenInventario = i.ordenInventario + :incremento " +
+    "WHERE i.estado = 1 AND i.ordenInventario >= :desde AND i.ordenInventario <= :hasta")
+  void desplazarOrdenes(@Param("desde") int desde,
+                        @Param("hasta") int hasta,
+                        @Param("incremento") int incremento);
+
+  /**
+   * Verificar si existe un ordenInventario específico
+   */
+  boolean existsByOrdenInventarioAndEstado(int ordenInventario, int estado);
+
+  /**
+   * Contar el número total de inventarios activos
+   */
+  long countByEstado(int estado);
 }

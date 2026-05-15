@@ -16,6 +16,9 @@ public class erpInventario {
     @JoinColumn(name = "idProducto", referencedColumnName = "idProducto")
     private erpProductos idProducto;
     @Column
+    private int ordenInventario;
+
+    @Column
     private int cantidadExistencias;
     @Column
     private int cantidadDanados;
@@ -50,7 +53,15 @@ public class erpInventario {
         this.idProducto = idProducto;
     }
 
-    public int getCantidadExistencias() {
+  public int getOrdenInventario() {
+    return ordenInventario;
+  }
+
+  public void setOrdenInventario(int ordenInventario) {
+    this.ordenInventario = ordenInventario;
+  }
+
+  public int getCantidadExistencias() {
         return cantidadExistencias;
     }
 

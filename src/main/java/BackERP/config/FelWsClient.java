@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 public class FelWsClient {
 
   private static final int CONNECTION_TIMEOUT = 10000;  // 10 segundos
-  private static final int READ_TIMEOUT = 30000;       // 30 segundos
+  private static final int READ_TIMEOUT = 20000;       // 20 segundos
   private static final int WRITE_TIMEOUT = 15000;      // 15 segundos
 
   private final felProperties props;

@@ -18,9 +18,9 @@ public class AsyncConfig {
 
     // Configuración crítica para evitar fuga de hilos
     executor.setCorePoolSize(5);           // Hilos mínimos siempre disponibles
-    executor.setMaxPoolSize(20);            // Máximo de hilos simultáneos
-    executor.setQueueCapacity(100);         // Cola de espera
-    executor.setKeepAliveSeconds(60);       // Hilos extras mueren después de 60s inactivos
+    executor.setMaxPoolSize(10);            // Máximo de hilos simultáneos
+    executor.setQueueCapacity(30);         // Cola de espera
+    executor.setKeepAliveSeconds(30);       // Hilos extras mueren después de 60s inactivos
 
     // POLÍTICA CRÍTICA: Rechazar nuevas tareas cuando no hay capacidad
     // Esto evita que se acumulen hilos infinitos
