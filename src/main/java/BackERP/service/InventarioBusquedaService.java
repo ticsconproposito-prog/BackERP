@@ -19,20 +19,31 @@ public class InventarioBusquedaService {
 
   /**
    * Búsqueda OPTIMIZADA - TODAS las palabras deben coincidir en ALGÚN campo
-   * No se permite que una palabra esté en un campo y otra en otro campo diferente
+   *
+   * @param descripcion Texto para buscar en descripción (todas las palabras deben coincidir)
+   * @param codigoProducto Código del producto
+   * @param codigoProductoProveedor Código del proveedor
+   * @param idUbicacion ID de ubicación
+   * @param estadoExcluir Estado que se quiere EXCLUIR (si viene, trae todos los que NO sean este estado)
+   * @param pageable Paginación y ordenamiento
    */
   public Page<erpInventario> buscarPorPalabrasEnDescripcion(
     String descripcion,
     String codigoProducto,
     String codigoProductoProveedor,
     Integer idUbicacion,
+    Integer estadoExcluir,  // ← ESTADO A EXCLUIR
     Pageable pageable) {
 
     Specification<erpInventario> spec = (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
 
-      // Estado activo SIEMPRE
-      predicates.add(cb.equal(root.get("estado"), 1));
+      // 🔥 FILTRO DE ESTADO MODIFICADO
+      if (estadoExcluir != null) {
+        // Si viene estado, excluir ese estado (trae todos los diferentes)
+        predicates.add(cb.notEqual(root.get("estado"), estadoExcluir));
+      }
+      // Si NO viene estado, NO se agrega filtro de estado (trae todos)
 
       // Filtro de ubicación (AND obligatorio si viene)
       if (idUbicacion != null) {
@@ -105,14 +116,20 @@ public class InventarioBusquedaService {
   /**
    * Búsqueda EXACTA por frase completa (sin dividir palabras)
    * Útil cuando quieres buscar la frase exacta en cualquier campo
+   *
+   * @param textoBusqueda Texto a buscar exactamente
+   * @param idUbicacion ID de ubicación
+   * @param estadoExcluir Estado que se quiere EXCLUIR (si viene, trae todos los que NO sean este estado)
+   * @param pageable Paginación y ordenamiento
    */
   public Page<erpInventario> buscarPorFraseExacta(
     String textoBusqueda,
     Integer idUbicacion,
+    Integer estadoExcluir,  // ← ESTADO A EXCLUIR
     Pageable pageable) {
 
     if (textoBusqueda == null || textoBusqueda.trim().isEmpty()) {
-      return buscarPorPalabrasEnDescripcion(null, null, null, idUbicacion, pageable);
+      return buscarPorPalabrasEnDescripcion(null, null, null, idUbicacion, estadoExcluir, pageable);
     }
 
     String textoBusquedaLower = escapeLike(textoBusqueda.toLowerCase().trim());
@@ -120,7 +137,13 @@ public class InventarioBusquedaService {
 
     Specification<erpInventario> spec = (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
-      predicates.add(cb.equal(root.get("estado"), 1));
+
+      // 🔥 FILTRO DE ESTADO MODIFICADO
+      if (estadoExcluir != null) {
+        // Si viene estado, excluir ese estado (trae todos los diferentes)
+        predicates.add(cb.notEqual(root.get("estado"), estadoExcluir));
+      }
+      // Si NO viene estado, NO se agrega filtro de estado (trae todos)
 
       if (idUbicacion != null) {
         predicates.add(cb.equal(root.get("idUbicacion"), idUbicacion));

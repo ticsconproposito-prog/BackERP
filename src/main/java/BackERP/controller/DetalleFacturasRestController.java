@@ -7,6 +7,7 @@ import BackERP.models.erpInventario;
 import BackERP.repository.RepositoryDetalleFacturas;
 import BackERP.repository.RepositoryInventario;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,13 +30,25 @@ public class DetalleFacturasRestController {
   public List<erpDetalleFacturas> getDetalleFacturas(
     @RequestParam(required = false) Integer idEncabezadoFactura,
     @RequestParam(required = false) LocalDate fechaInicio,
-    @RequestParam(required = false) LocalDate fechaFin) {
+    @RequestParam(required = false) LocalDate fechaFin,
+    @RequestParam(defaultValue = "idEncabezadoFactura,asc") String sort) {
 
     Specification<erpDetalleFacturas> spec = Specification
       .where(erpDetalleFacturaSpecs.idEncabezadoFacturaContains(idEncabezadoFactura))
       .and(erpDetalleFacturaSpecs.fechaBetween(fechaInicio, fechaFin));
 
-    return repdetfac.findAll(spec);
+    // Procesar el parámetro sort y aplicarlo
+    return repdetfac.findAll(spec, parseSort(sort));
+  }
+
+  // Método auxiliar para parsear el parámetro sort
+  private Sort parseSort(String sort) {
+    String[] sortParams = sort.split(",");
+    String sortField = sortParams[0];
+    Sort.Direction sortDirection = sortParams.length > 1 && sortParams[1].equalsIgnoreCase("desc")
+      ? Sort.Direction.DESC
+      : Sort.Direction.ASC;
+    return Sort.by(sortDirection, sortField);
   }
 
   @GetMapping("resumenDiario")

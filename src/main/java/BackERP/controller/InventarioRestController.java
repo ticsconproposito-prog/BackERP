@@ -29,6 +29,7 @@ public class InventarioRestController {
     @RequestParam(required = false) String codigoProductoProveedor,
     @RequestParam(required = false) String codigoProducto,
     @RequestParam(required = false) Integer idUbicacion,
+    @RequestParam(defaultValue = "0") Integer estadoExcluido,  // ← NUEVO PARÁMETRO OPCIONAL
     @RequestParam(defaultValue = "0") int page,
     @RequestParam(defaultValue = "20") int size,
     @RequestParam(defaultValue = "idInventario,asc") String sort
@@ -39,12 +40,13 @@ public class InventarioRestController {
     Sort s = Sort.by(dir, sortParts[0]);
     Pageable pageable = PageRequest.of(page, size, s);
 
-    // 🔥 USAR EL NUEVO SERVICIO que cruza resultados
+    // 🔥 LLAMAR AL SERVICIO CON EL PARÁMETRO ESTADO
     return busquedaService.buscarPorPalabrasEnDescripcion(
       descripcion,
       codigoProducto,
       codigoProductoProveedor,
       idUbicacion,
+      estadoExcluido,  // ← AGREGAR ESTE PARÁMETRO
       pageable
     );
   }
@@ -54,6 +56,7 @@ public class InventarioRestController {
     @RequestParam(required = false) String descripcion,
     @RequestParam(required = false) String codigoProducto,
     @RequestParam(required = false) String codigoProductoProveedor,
+    @RequestParam(defaultValue = "0") Integer estadoExcluido,
     @RequestParam(defaultValue = "0") int page,
     @RequestParam(defaultValue = "20") int size,
     @RequestParam(defaultValue = "idInventario,asc") String sort
@@ -70,6 +73,7 @@ public class InventarioRestController {
       codigoProducto,
       codigoProductoProveedor,
       null,  // Sin filtro de ubicación para el agrupado
+      estadoExcluido,  // ← AGREGAR ESTE PARÁMETRO
       pageable
     );
 
