@@ -9,428 +9,440 @@ import java.time.LocalTime;
 @Table(name = "erpEncabezadoFacturas", schema = "erpConfig")
 public class erpEncabezadoFacturas {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idEncabezadoFactura")
-    private Long idEncabezadoFactura;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @Column(name = "idEncabezadoFactura")
+  private Long idEncabezadoFactura;
 
-    @Column(name = "tipoDocumento")
-    private int tipoDocumento;
+  @Column(name = "tipoDocumento")
+  private int tipoDocumento;
 
-    @ManyToOne
-    @JoinColumn(name = "idCliente", referencedColumnName = "idCliente")
-    private erpClientes idCliente;
+  @ManyToOne
+  @JoinColumn(name = "idCliente", referencedColumnName = "idCliente")
+  private erpClientes idCliente;
 
-    @Column(name = "tipoVenta", length = 10)
-    private String tipoVenta;
+  @Column(name = "nombreFactura", length = 200)
+  private String nombreFactura;
 
-    @Column(name = "destinoVenta")
-    private int destinoVenta;
 
-    @Column(name = "FechaFactura")
-    @JsonProperty("FechaFactura")
-    private LocalDate FechaFactura;
+  @Column(name = "tipoVenta", length = 10)
+  private String tipoVenta;
 
-    @Column(name = "moneda")
-    private int moneda;
+  @Column(name = "destinoVenta")
+  private int destinoVenta;
 
-    @Column(name = "tasaDeCambio")
-    private double tasaDeCambio;
+  @Column(name = "FechaFactura")
+  @JsonProperty("FechaFactura")
+  private LocalDate FechaFactura;
 
-    @Column(name = "referencia", length = 40)
-    private String referencia;
+  @Column(name = "moneda")
+  private int moneda;
 
-    @Column(name = "numeroAcceso")
-    private int numeroAcceso;
+  @Column(name = "tasaDeCambio")
+  private double tasaDeCambio;
 
-    @Column(name = "serieAdmin", length = 20)
-    private String serieAdmin;
+  @Column(name = "referencia", length = 40)
+  private String referencia;
 
-    @Column(name = "numeroAdmin")
-    private int numeroAdmin;
+  @Column(name = "numeroAcceso")
+  private int numeroAcceso;
 
-    @Column(name = "reversion", length = 1)
-    private String reversion;
+  @Column(name = "serieAdmin", length = 20)
+  private String serieAdmin;
 
-    @Column(name = "totalBruto")
-    private double totalBruto;
+  @Column(name = "numeroAdmin")
+  private int numeroAdmin;
 
-    @Column(name = "porcentajeDeDescuento")
-    private double porcentajeDeDescuento;
+  @Column(name = "reversion", length = 1)
+  private String reversion;
 
-    @Column(name = "cantidadDeDescuento")
-    private double cantidadDeDescuento;
+  @Column(name = "totalBruto")
+  private double totalBruto;
 
-    @Column(name = "exento")
-    private double exento;
+  @Column(name = "porcentajeDeDescuento")
+  private double porcentajeDeDescuento;
 
-    @Column(name = "otro")
-    private double otro;
+  @Column(name = "cantidadDeDescuento")
+  private double cantidadDeDescuento;
 
-    @Column(name = "totalNeto")
-    private double totalNeto;
+  @Column(name = "exento")
+  private double exento;
 
-    @Column(name = "isr")
-    private double isr;
+  @Column(name = "otro")
+  private double otro;
 
-    @Column(name = "iva")
-    private double iva;
+  @Column(name = "totalNeto")
+  private double totalNeto;
 
-    @Column(name = "total")
-    private double total;
+  @Column(name = "isr")
+  private double isr;
 
-    @Column(name = "facturaProcesada", length = 2)
-    private String facturaProcesada;
+  @Column(name = "iva")
+  private double iva;
 
-    @Column(name = "direccionEntrega", length = 2000)
-    private String direccionEntrega;
+  @Column(name = "total")
+  private double total;
 
-    @Column(name = "tipoReceptor")
-    private int tipoReceptor;
+  @Column(name = "facturaProcesada", length = 2)
+  private String facturaProcesada;
 
-    @Column(name = "enviarCorreo", length = 1)
-    private String enviarCorreo;
+  @Column(name = "direccionEntrega", length = 2000)
+  private String direccionEntrega;
 
-    @Column(name = "serieResAPI", length = 50)
-    private String serieResAPI;
+  @Column(name = "tipoReceptor")
+  private int tipoReceptor;
 
-    @Column(name = "preimpresoResAPI")
-    private long preimpresoResAPI;
+  @Column(name = "enviarCorreo", length = 1)
+  private String enviarCorreo;
 
-    @Column(name = "nombreResAPI", length = 200)
-    private String nombreResAPI;
+  @Column(name = "serieResAPI", length = 50)
+  private String serieResAPI;
 
-    @Column(name = "direccionResAPI", length = 500)
-    private String direccionResAPI;
+  @Column(name = "preimpresoResAPI")
+  private long preimpresoResAPI;
 
-    @Column(name = "telefonoResAPI", length = 20)
-    private String telefonoResAPI;
+  @Column(name = "nombreResAPI", length = 200)
+  private String nombreResAPI;
 
-    @Column(name = "numeroAutorizacionResAPI", length = 50)
-    private String numeroAutorizacionResAPI;
+  @Column(name = "direccionResAPI", length = 500)
+  private String direccionResAPI;
 
-    @Column(name = "referenciaResAPI", length = 40)
-    private String referenciaResAPI;
+  @Column(name = "telefonoResAPI", length = 20)
+  private String telefonoResAPI;
 
-    @Column(name = "respuestaXML", length = 4000)
-    private String respuestaXML;
+  @Column(name = "numeroAutorizacionResAPI", length = 50)
+  private String numeroAutorizacionResAPI;
 
-    @Column(name = "estado")
-    private int estado;
+  @Column(name = "referenciaResAPI", length = 40)
+  private String referenciaResAPI;
 
-    @Column(name = "fechaModificacion")
-    private LocalDate fechaModificacion;
+  @Column(name = "respuestaXML", length = 4000)
+  private String respuestaXML;
 
-    @Column(name = "horaModificacion")
-    private LocalTime horaModificacion;
+  @Column(name = "estado")
+  private int estado;
 
-    @Column(name = "idUsuarioModificacion")
-    private int idUsuarioModificacion;
+  @Column(name = "fechaModificacion")
+  private LocalDate fechaModificacion;
 
-    public erpEncabezadoFacturas() {}
-    // getters y setters...
+  @Column(name = "horaModificacion")
+  private LocalTime horaModificacion;
 
-    public Long getIdEncabezadoFactura() {
-        return idEncabezadoFactura;
-    }
+  @Column(name = "idUsuarioModificacion")
+  private int idUsuarioModificacion;
 
-    public void setIdEncabezadoFactura(Long idEncabezadoFactura) {
-        this.idEncabezadoFactura = idEncabezadoFactura;
-    }
+  public erpEncabezadoFacturas() {}
+  // getters y setters...
 
-    public int getTipoDocumento() {
-        return tipoDocumento;
-    }
+  public Long getIdEncabezadoFactura() {
+    return idEncabezadoFactura;
+  }
 
-    public void setTipoDocumento(int tipoDocumento) {
-        this.tipoDocumento = tipoDocumento;
-    }
+  public void setIdEncabezadoFactura(Long idEncabezadoFactura) {
+    this.idEncabezadoFactura = idEncabezadoFactura;
+  }
 
-    public erpClientes getIdCliente() {
-        return idCliente;
-    }
+  public int getTipoDocumento() {
+    return tipoDocumento;
+  }
 
-    public void setIdCliente(erpClientes idCliente) {
-        this.idCliente = idCliente;
-    }
+  public void setTipoDocumento(int tipoDocumento) {
+    this.tipoDocumento = tipoDocumento;
+  }
 
-    public String getTipoVenta() {
-        return tipoVenta;
-    }
+  public erpClientes getIdCliente() {
+    return idCliente;
+  }
 
-    public void setTipoVenta(String tipoVenta) {
-        this.tipoVenta = tipoVenta;
-    }
+  public void setIdCliente(erpClientes idCliente) {
+    this.idCliente = idCliente;
+  }
 
-    public int getDestinoVenta() {
-        return destinoVenta;
-    }
+  public String getNombreFactura() {
+    return nombreFactura;
+  }
 
-    public void setDestinoVenta(int destinoVenta) {
-        this.destinoVenta = destinoVenta;
-    }
+  public void setNombreFactura(String nombreFactura) {
+    this.nombreFactura = nombreFactura;
+  }
 
-    public LocalDate getFechaFactura() {
-        return FechaFactura;
-    }
+  public String getTipoVenta() {
+    return tipoVenta;
+  }
 
-    public void setFechaFactura(LocalDate FechaFactura) {
-        this.FechaFactura = FechaFactura;
-    }
+  public void setTipoVenta(String tipoVenta) {
+    this.tipoVenta = tipoVenta;
+  }
 
-    public int getMoneda() {
-        return moneda;
-    }
+  public int getDestinoVenta() {
+    return destinoVenta;
+  }
 
-    public void setMoneda(int moneda) {
-        this.moneda = moneda;
-    }
+  public void setDestinoVenta(int destinoVenta) {
+    this.destinoVenta = destinoVenta;
+  }
 
-    public double getTasaDeCambio() {
-        return tasaDeCambio;
-    }
+  public LocalDate getFechaFactura() {
+    return FechaFactura;
+  }
 
-    public void setTasaDeCambio(double tasaDeCambio) {
-        this.tasaDeCambio = tasaDeCambio;
-    }
+  public void setFechaFactura(LocalDate FechaFactura) {
+    this.FechaFactura = FechaFactura;
+  }
 
-    public String getReferencia() {
-        return referencia;
-    }
+  public int getMoneda() {
+    return moneda;
+  }
 
-    public void setReferencia(String referencia) {
-        this.referencia = referencia;
-    }
+  public void setMoneda(int moneda) {
+    this.moneda = moneda;
+  }
 
-    public int getNumeroAcceso() {
-        return numeroAcceso;
-    }
+  public double getTasaDeCambio() {
+    return tasaDeCambio;
+  }
 
-    public void setNumeroAcceso(int numeroAcceso) {
-        this.numeroAcceso = numeroAcceso;
-    }
+  public void setTasaDeCambio(double tasaDeCambio) {
+    this.tasaDeCambio = tasaDeCambio;
+  }
 
-    public String getSerieAdmin() {
-        return serieAdmin;
-    }
+  public String getReferencia() {
+    return referencia;
+  }
 
-    public void setSerieAdmin(String serieAdmin) {
-        this.serieAdmin = serieAdmin;
-    }
+  public void setReferencia(String referencia) {
+    this.referencia = referencia;
+  }
 
-    public int getNumeroAdmin() {
-        return numeroAdmin;
-    }
+  public int getNumeroAcceso() {
+    return numeroAcceso;
+  }
 
-    public void setNumeroAdmin(int numeroAdmin) {
-        this.numeroAdmin = numeroAdmin;
-    }
+  public void setNumeroAcceso(int numeroAcceso) {
+    this.numeroAcceso = numeroAcceso;
+  }
 
-    public String getReversion() {
-        return reversion;
-    }
+  public String getSerieAdmin() {
+    return serieAdmin;
+  }
 
-    public void setReversion(String reversion) {
-        this.reversion = reversion;
-    }
+  public void setSerieAdmin(String serieAdmin) {
+    this.serieAdmin = serieAdmin;
+  }
 
-    public double getTotalBruto() {
-        return totalBruto;
-    }
+  public int getNumeroAdmin() {
+    return numeroAdmin;
+  }
 
-    public void setTotalBruto(double totalBruto) {
-        this.totalBruto = totalBruto;
-    }
+  public void setNumeroAdmin(int numeroAdmin) {
+    this.numeroAdmin = numeroAdmin;
+  }
 
-    public double getPorcentajeDeDescuento() {
-        return porcentajeDeDescuento;
-    }
+  public String getReversion() {
+    return reversion;
+  }
 
-    public void setPorcentajeDeDescuento(double porcentajeDeDescuento) {
-        this.porcentajeDeDescuento = porcentajeDeDescuento;
-    }
+  public void setReversion(String reversion) {
+    this.reversion = reversion;
+  }
 
-    public double getCantidadDeDescuento() {
-        return cantidadDeDescuento;
-    }
+  public double getTotalBruto() {
+    return totalBruto;
+  }
 
-    public void setCantidadDeDescuento(double cantidadDeDescuento) {
-        this.cantidadDeDescuento = cantidadDeDescuento;
-    }
+  public void setTotalBruto(double totalBruto) {
+    this.totalBruto = totalBruto;
+  }
 
-    public double getExento() {
-        return exento;
-    }
+  public double getPorcentajeDeDescuento() {
+    return porcentajeDeDescuento;
+  }
 
-    public void setExento(double exento) {
-        this.exento = exento;
-    }
+  public void setPorcentajeDeDescuento(double porcentajeDeDescuento) {
+    this.porcentajeDeDescuento = porcentajeDeDescuento;
+  }
 
-    public double getOtro() {
-        return otro;
-    }
+  public double getCantidadDeDescuento() {
+    return cantidadDeDescuento;
+  }
 
-    public void setOtro(double otro) {
-        this.otro = otro;
-    }
+  public void setCantidadDeDescuento(double cantidadDeDescuento) {
+    this.cantidadDeDescuento = cantidadDeDescuento;
+  }
 
-    public double getTotalNeto() {
-        return totalNeto;
-    }
+  public double getExento() {
+    return exento;
+  }
 
-    public void setTotalNeto(double totalNeto) {
-        this.totalNeto = totalNeto;
-    }
+  public void setExento(double exento) {
+    this.exento = exento;
+  }
 
-    public double getIsr() {
-        return isr;
-    }
+  public double getOtro() {
+    return otro;
+  }
 
-    public void setIsr(double isr) {
-        this.isr = isr;
-    }
+  public void setOtro(double otro) {
+    this.otro = otro;
+  }
 
-    public double getIva() {
-        return iva;
-    }
+  public double getTotalNeto() {
+    return totalNeto;
+  }
 
-    public void setIva(double iva) {
-        this.iva = iva;
-    }
+  public void setTotalNeto(double totalNeto) {
+    this.totalNeto = totalNeto;
+  }
 
-    public double getTotal() {
-        return total;
-    }
+  public double getIsr() {
+    return isr;
+  }
 
-    public void setTotal(double total) {
-        this.total = total;
-    }
+  public void setIsr(double isr) {
+    this.isr = isr;
+  }
 
-    public String getFacturaProcesada() {
-        return facturaProcesada;
-    }
+  public double getIva() {
+    return iva;
+  }
 
-    public void setFacturaProcesada(String facturaProcesada) {
-        this.facturaProcesada = facturaProcesada;
-    }
+  public void setIva(double iva) {
+    this.iva = iva;
+  }
 
-    public String getDireccionEntrega() {
-        return direccionEntrega;
-    }
+  public double getTotal() {
+    return total;
+  }
 
-    public void setDireccionEntrega(String direccionEntrega) {
-        this.direccionEntrega = direccionEntrega;
-    }
+  public void setTotal(double total) {
+    this.total = total;
+  }
 
-    public int getTipoReceptor() {
-        return tipoReceptor;
-    }
+  public String getFacturaProcesada() {
+    return facturaProcesada;
+  }
 
-    public void setTipoReceptor(int tipoReceptor) {
-        this.tipoReceptor = tipoReceptor;
-    }
+  public void setFacturaProcesada(String facturaProcesada) {
+    this.facturaProcesada = facturaProcesada;
+  }
 
-    public String getEnviarCorreo() {
-        return enviarCorreo;
-    }
+  public String getDireccionEntrega() {
+    return direccionEntrega;
+  }
 
-    public void setEnviarCorreo(String enviarCorreo) {
-        this.enviarCorreo = enviarCorreo;
-    }
+  public void setDireccionEntrega(String direccionEntrega) {
+    this.direccionEntrega = direccionEntrega;
+  }
 
-    public String getSerieResAPI() {
-        return serieResAPI;
-    }
+  public int getTipoReceptor() {
+    return tipoReceptor;
+  }
 
-    public void setSerieResAPI(String serieResAPI) {
-        this.serieResAPI = serieResAPI;
-    }
+  public void setTipoReceptor(int tipoReceptor) {
+    this.tipoReceptor = tipoReceptor;
+  }
 
-    public long  getPreimpresoResAPI() {
-        return preimpresoResAPI;
-    }
+  public String getEnviarCorreo() {
+    return enviarCorreo;
+  }
 
-    public void setPreimpresoResAPI(long preimpresoResAPI) {
-        this.preimpresoResAPI = preimpresoResAPI;
-    }
+  public void setEnviarCorreo(String enviarCorreo) {
+    this.enviarCorreo = enviarCorreo;
+  }
 
-    public String getNombreResAPI() {
-        return nombreResAPI;
-    }
+  public String getSerieResAPI() {
+    return serieResAPI;
+  }
 
-    public void setNombreResAPI(String nombreResAPI) {
-        this.nombreResAPI = nombreResAPI;
-    }
+  public void setSerieResAPI(String serieResAPI) {
+    this.serieResAPI = serieResAPI;
+  }
 
-    public String getDireccionResAPI() {
-        return direccionResAPI;
-    }
+  public long  getPreimpresoResAPI() {
+    return preimpresoResAPI;
+  }
 
-    public void setDireccionResAPI(String direccionResAPI) {
-        this.direccionResAPI = direccionResAPI;
-    }
+  public void setPreimpresoResAPI(long preimpresoResAPI) {
+    this.preimpresoResAPI = preimpresoResAPI;
+  }
 
-    public String getTelefonoResAPI() {
-        return telefonoResAPI;
-    }
+  public String getNombreResAPI() {
+    return nombreResAPI;
+  }
 
-    public void setTelefonoResAPI(String telefonoResAPI) {
-        this.telefonoResAPI = telefonoResAPI;
-    }
+  public void setNombreResAPI(String nombreResAPI) {
+    this.nombreResAPI = nombreResAPI;
+  }
 
-    public String getNumeroAutorizacionResAPI() {
-        return numeroAutorizacionResAPI;
-    }
+  public String getDireccionResAPI() {
+    return direccionResAPI;
+  }
 
-    public void setNumeroAutorizacionResAPI(String numeroAutorizacionResAPI) {
-        this.numeroAutorizacionResAPI = numeroAutorizacionResAPI;
-    }
+  public void setDireccionResAPI(String direccionResAPI) {
+    this.direccionResAPI = direccionResAPI;
+  }
 
-    public String getReferenciaResAPI() {
-        return referenciaResAPI;
-    }
+  public String getTelefonoResAPI() {
+    return telefonoResAPI;
+  }
 
-    public void setReferenciaResAPI(String referenciaResAPI) {
-        this.referenciaResAPI = referenciaResAPI;
-    }
+  public void setTelefonoResAPI(String telefonoResAPI) {
+    this.telefonoResAPI = telefonoResAPI;
+  }
 
-    public String getRespuestaXML() {
-        return respuestaXML;
-    }
+  public String getNumeroAutorizacionResAPI() {
+    return numeroAutorizacionResAPI;
+  }
 
-    public void setRespuestaXML(String respuestaXML) {
-        this.respuestaXML = respuestaXML;
-    }
+  public void setNumeroAutorizacionResAPI(String numeroAutorizacionResAPI) {
+    this.numeroAutorizacionResAPI = numeroAutorizacionResAPI;
+  }
 
-    public int getEstado() {
-        return estado;
-    }
+  public String getReferenciaResAPI() {
+    return referenciaResAPI;
+  }
 
-    public void setEstado(int estado) {
-        this.estado = estado;
-    }
+  public void setReferenciaResAPI(String referenciaResAPI) {
+    this.referenciaResAPI = referenciaResAPI;
+  }
 
-    public LocalDate getFechaModificacion() {
-        return fechaModificacion;
-    }
+  public String getRespuestaXML() {
+    return respuestaXML;
+  }
 
-    public void setFechaModificacion(LocalDate fechaModificacion) {
-        this.fechaModificacion = fechaModificacion;
-    }
+  public void setRespuestaXML(String respuestaXML) {
+    this.respuestaXML = respuestaXML;
+  }
 
-    public LocalTime getHoraModificacion() {
-        return horaModificacion;
-    }
+  public int getEstado() {
+    return estado;
+  }
 
-    public void setHoraModificacion(LocalTime horaModificacion) {
-        this.horaModificacion = horaModificacion;
-    }
+  public void setEstado(int estado) {
+    this.estado = estado;
+  }
 
-    public int getIdUsuarioModificacion() {
-        return idUsuarioModificacion;
-    }
+  public LocalDate getFechaModificacion() {
+    return fechaModificacion;
+  }
 
-    public void setIdUsuarioModificacion(int idUsuarioModificacion) {
-        this.idUsuarioModificacion = idUsuarioModificacion;
-    }
+  public void setFechaModificacion(LocalDate fechaModificacion) {
+    this.fechaModificacion = fechaModificacion;
+  }
+
+  public LocalTime getHoraModificacion() {
+    return horaModificacion;
+  }
+
+  public void setHoraModificacion(LocalTime horaModificacion) {
+    this.horaModificacion = horaModificacion;
+  }
+
+  public int getIdUsuarioModificacion() {
+    return idUsuarioModificacion;
+  }
+
+  public void setIdUsuarioModificacion(int idUsuarioModificacion) {
+    this.idUsuarioModificacion = idUsuarioModificacion;
+  }
 }
