@@ -102,7 +102,9 @@ public class InventarioRestController {
     inventario.setFechaModificacion(LocalDate.now());
     inventario.setHoraModificacion(LocalTime.now());
     inventario.setEstado(1);
-    repinv.save(inventario);
+    erpInventario saved  = repinv.save(inventario);
+    saved.setOrdenInventario(Math.toIntExact(saved.getIdInventario()));
+
     return "Grabado";
   }
 
