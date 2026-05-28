@@ -16,6 +16,9 @@ public class erpDetalleFacturas {
     @Column(name = "idEncabezadoFactura")
     private int idEncabezadoFactura;
 
+    @Column(name = "ordenDetalleFactura")
+    private int ordenDetalleFactura;
+
     @Column(name = "idProducto")
     private Long idProducto;
 
@@ -90,7 +93,15 @@ public class erpDetalleFacturas {
         this.idEncabezadoFactura = idEncabezadoFactura;
     }
 
-    public Long getIdProducto() {
+  public int getOrdenDetalleFactura() {
+    return ordenDetalleFactura;
+  }
+
+  public void setOrdenDetalleFactura(int ordenDetalleFactura) {
+    this.ordenDetalleFactura = ordenDetalleFactura;
+  }
+
+  public Long getIdProducto() {
         return idProducto;
     }
 
