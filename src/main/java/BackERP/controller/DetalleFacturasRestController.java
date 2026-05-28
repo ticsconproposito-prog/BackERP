@@ -31,7 +31,7 @@ public class DetalleFacturasRestController {
     @RequestParam(required = false) Integer idEncabezadoFactura,
     @RequestParam(required = false) LocalDate fechaInicio,
     @RequestParam(required = false) LocalDate fechaFin,
-    @RequestParam(defaultValue = "idDetalleFactura,asc") String sort) {
+    @RequestParam(defaultValue = "ordenDetalleFactura,asc") String sort) {
 
     Specification<erpDetalleFacturas> spec = Specification
       .where(erpDetalleFacturaSpecs.idEncabezadoFacturaContains(idEncabezadoFactura))
