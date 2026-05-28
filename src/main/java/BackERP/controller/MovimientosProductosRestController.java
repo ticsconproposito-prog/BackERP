@@ -78,7 +78,10 @@ public class MovimientosProductosRestController {
                 nuevoInventario.setFechaModificacion(LocalDate.now());
                 nuevoInventario.setHoraModificacion(LocalTime.now());
                 nuevoInventario.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
-                repinv.save(nuevoInventario);
+
+              erpInventario saved  =  repinv.save(nuevoInventario);
+              saved.setOrdenInventario(Math.toIntExact(saved.getIdInventario()));
+
             }
 
             // 🔎 Actualizar el producto en la tabla de productos
@@ -112,7 +115,9 @@ public class MovimientosProductosRestController {
                 nuevoInventario.setFechaModificacion(LocalDate.now());
                 nuevoInventario.setHoraModificacion(LocalTime.now());
                 nuevoInventario.setIdUsuarioModificacion(movimientosProductos.getIdUsuarioModificacion());
-                repinv.save(nuevoInventario);
+
+              erpInventario saved  =  repinv.save(nuevoInventario);
+              saved.setOrdenInventario(Math.toIntExact(saved.getIdInventario()));
             }
         }
 
