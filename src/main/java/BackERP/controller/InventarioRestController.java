@@ -32,7 +32,7 @@ public class InventarioRestController {
     @RequestParam(defaultValue = "0") Integer estadoExcluido,  // ← NUEVO PARÁMETRO OPCIONAL
     @RequestParam(defaultValue = "0") int page,
     @RequestParam(defaultValue = "20") int size,
-    @RequestParam(defaultValue = "idInventario,asc") String sort
+    @RequestParam(defaultValue = "ordenInventario,asc") String sort
   ) {
 
     String[] sortParts = sort.split(",", 2);
@@ -59,7 +59,7 @@ public class InventarioRestController {
     @RequestParam(defaultValue = "0") Integer estadoExcluido,
     @RequestParam(defaultValue = "0") int page,
     @RequestParam(defaultValue = "20") int size,
-    @RequestParam(defaultValue = "idInventario,asc") String sort
+    @RequestParam(defaultValue = "ordenInventario,asc") String sort
   ) {
 
     String[] sortParts = sort.split(",", 2);
@@ -106,9 +106,9 @@ public class InventarioRestController {
     return "Grabado";
   }
 
-  @PutMapping("editarInventario/{idProductoInventario}")
-  public String editarInventario(@PathVariable long idProductoInventario, @RequestBody erpInventario inventario) {
-    erpInventario updateInventario = repinv.findById(idProductoInventario).get();
+  @PutMapping("editarInventario/{idInventario}")
+  public String editarInventario(@PathVariable long idInventario, @RequestBody erpInventario inventario) {
+    erpInventario updateInventario = repinv.findById(idInventario).get();
     updateInventario.setCantidadExistencias(inventario.getCantidadExistencias());
     updateInventario.setCantidadDanados(inventario.getCantidadDanados());
     updateInventario.setFechaModificacion(LocalDate.now());
@@ -118,14 +118,40 @@ public class InventarioRestController {
     return "Editado";
   }
 
-  @DeleteMapping("eliminarInventario/{idProductoInventario}")
-  public String eliminarInventario(@PathVariable long idProductoInventario, @RequestBody erpInventario inventario) {
-    erpInventario updateInventario = repinv.findById(idProductoInventario).get();
+  @DeleteMapping("eliminarInventario/{idInventario}")
+  public String eliminarInventario(@PathVariable long idInventario, @RequestBody erpInventario inventario) {
+
+    erpInventario updateInventario = repinv.findById(idInventario).get();
     updateInventario.setFechaModificacion(LocalDate.now());
     updateInventario.setHoraModificacion(LocalTime.now());
     updateInventario.setIdUsuarioModificacion(inventario.getIdUsuarioModificacion());
     updateInventario.setEstado(0);
     repinv.save(updateInventario);
     return "Eliminado";
+  }
+
+
+
+  @DeleteMapping("eliminarInventarioXProd/{idProducto}")
+
+  public String eliminarInventarioXProd(@PathVariable long idProducto, @RequestBody erpInventario inventario) {
+
+        // Buscar TODOS los inventarios que tengan este idProducto
+        List<erpInventario> inventariosAEliminar = repinv.findByIdProducto_IdProducto(idProducto);
+
+        if (inventariosAEliminar.isEmpty()) {
+            return "No se encontraron inventarios para el producto con ID: " + idProducto;
+        }
+
+        // Actualizar cada inventario encontrado
+        for (erpInventario updateInventario : inventariosAEliminar) {
+            updateInventario.setFechaModificacion(LocalDate.now());
+            updateInventario.setHoraModificacion(LocalTime.now());
+            updateInventario.setIdUsuarioModificacion(inventario.getIdUsuarioModificacion());
+            updateInventario.setEstado(0);
+            repinv.save(updateInventario);
+        }
+
+        return "Eliminados " + inventariosAEliminar.size() + " registros de inventario para el producto ID: " + idProducto;
   }
 }
