@@ -81,7 +81,7 @@ public class MovimientosProductosRestController {
 
               erpInventario saved  =  repinv.save(nuevoInventario);
               saved.setOrdenInventario(Math.toIntExact(saved.getIdInventario()));
-
+              repinv.save(saved);
             }
 
             // 🔎 Actualizar el producto en la tabla de productos
@@ -118,6 +118,7 @@ public class MovimientosProductosRestController {
 
               erpInventario saved  =  repinv.save(nuevoInventario);
               saved.setOrdenInventario(Math.toIntExact(saved.getIdInventario()));
+              repinv.save(saved);
             }
         }
 

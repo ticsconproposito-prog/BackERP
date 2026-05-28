@@ -104,7 +104,7 @@ public class InventarioRestController {
     inventario.setEstado(1);
     erpInventario saved  = repinv.save(inventario);
     saved.setOrdenInventario(Math.toIntExact(saved.getIdInventario()));
-
+    repinv.save(saved);
     return "Grabado";
   }
 
