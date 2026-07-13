@@ -20,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 //@CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -86,7 +88,36 @@ public class EncabezadoFacturasRestController {
         return repencfac.findAll(spec, pageable);
     }
 
+  // Agregar este método al controlador
+  @GetMapping("resumenFacturas")
+  public ResponseEntity<Map<String, Object>> getResumenFacturas(
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
 
+    // Validar que las fechas no sean nulas
+    if (fechaInicio == null || fechaFin == null) {
+      return ResponseEntity.badRequest().body(Map.of("error", "Las fechas son requeridas"));
+    }
+
+    // Validar que fechaInicio no sea posterior a fechaFin
+    if (fechaInicio.isAfter(fechaFin)) {
+      return ResponseEntity.badRequest().body(Map.of("error", "La fecha de inicio no puede ser posterior a la fecha de fin"));
+    }
+
+    Object[] resultado = repencfac.getResumenFacturas(fechaInicio, fechaFin);
+
+    long totalFacturas = resultado[0] != null ? ((Number) resultado[0]).longValue() : 0L;
+    double montoTotal = resultado[1] != null ? ((Number) resultado[1]).doubleValue() : 0.0;
+
+    Map<String, Object> response = new HashMap<>();
+    response.put("fechaInicio", fechaInicio);
+    response.put("fechaFin", fechaFin);
+    response.put("totalFacturas", totalFacturas);
+    response.put("montoTotal", montoTotal);
+    response.put("moneda", "GTQ"); // o la moneda que corresponda
+
+    return ResponseEntity.ok(response);
+  }
     @PostMapping("grabarEncabezadoFacturas")
     @Transactional
     public ResponseEntity<Long> grabarEncabezadoFacturas(@RequestBody erpEncabezadoFacturas EncabezadoFacturas){

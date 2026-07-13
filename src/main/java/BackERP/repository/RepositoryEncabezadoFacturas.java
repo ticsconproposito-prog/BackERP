@@ -8,13 +8,22 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
+// Agregar esto a RepositoryEncabezadoFacturas.java
 public interface RepositoryEncabezadoFacturas extends JpaRepository<erpEncabezadoFacturas, Long>, JpaSpecificationExecutor<erpEncabezadoFacturas> {
 
   Optional<erpEncabezadoFacturas> findByNumeroAutorizacionResAPI(String numeroAutorizacionResAPI);
   Optional<erpEncabezadoFacturas> findBySerieResAPIAndPreimpresoResAPI(String serieResAPI, long preimpresoResAPI);
 
-  // Buscar encabezado activo
   Optional<erpEncabezadoFacturas> findByIdEncabezadoFacturaAndEstado(Long idEncabezadoFactura, int estado);
+
+  // Nuevo método para obtener resumen de facturas
+  @Query("SELECT COUNT(e), SUM(e.total) FROM erpEncabezadoFacturas e " +
+    "WHERE e.estado = 1 " +
+    "AND e.facturaProcesada = 'S' " +
+    "AND e.FechaFactura BETWEEN :fechaInicio AND :fechaFin")
+  Object[] getResumenFacturas(@Param("fechaInicio") LocalDate fechaInicio,
+                              @Param("fechaFin") LocalDate fechaFin);
 }
