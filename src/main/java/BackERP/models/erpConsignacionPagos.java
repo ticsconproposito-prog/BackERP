@@ -11,7 +11,7 @@ public class erpConsignacionPagos {
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   @Column(name = "idConsignacionPago")
-  private Long idConsignacionPago;
+  private int idConsignacionPago;
 
   @Column(name = "idEncabezadoFactura", nullable = false)
   private int idEncabezadoFactura;
@@ -41,11 +41,11 @@ public class erpConsignacionPagos {
   public erpConsignacionPagos() {}
 
   // Getters y Setters
-  public Long getIdConsignacionPago() {
+  public int getIdConsignacionPago() {
     return idConsignacionPago;
   }
 
-  public void setIdConsignacionPago(Long idConsignacionPago) {
+  public void setIdConsignacionPago(int idConsignacionPago) {
     this.idConsignacionPago = idConsignacionPago;
   }
 

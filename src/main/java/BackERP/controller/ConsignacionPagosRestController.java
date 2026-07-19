@@ -58,7 +58,7 @@ public class ConsignacionPagosRestController {
 
   // POST - Crear nuevo pago
   @PostMapping
-  public Long grabarConsignacionPago(@RequestBody erpConsignacionPagos consignacionPago) {
+  public int  grabarConsignacionPago(@RequestBody erpConsignacionPagos consignacionPago) {
     consignacionPago.setFechaModificacion(LocalDate.now());
     consignacionPago.setHoraModificacion(LocalTime.now());
 
@@ -68,7 +68,7 @@ public class ConsignacionPagosRestController {
     }
 
     erpConsignacionPagos saved = repositoryConsignacionPagos.save(consignacionPago);
-    return saved.getIdConsignacionPago();
+    return  saved.getIdConsignacionPago();
   }
 
   // PUT - Actualizar pago existente
