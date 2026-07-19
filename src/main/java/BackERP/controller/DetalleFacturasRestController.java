@@ -138,6 +138,40 @@ public class DetalleFacturasRestController {
     return value;
   }
 
+  @PatchMapping("actualizarConsignacionFacturada/{idDetalleFactura}")
+  @Transactional
+  public String actualizarConsignacionFacturada(
+    @PathVariable Long idDetalleFactura,
+    @RequestBody erpDetalleFacturas detalleFacturasActualizado) {
+
+    // Buscar el detalle existente
+    erpDetalleFacturas detalleExistente = repdetfac.findById(idDetalleFactura)
+      .orElseThrow(() -> new RuntimeException("Detalle de factura no encontrado con ID: " + idDetalleFactura));
+
+    // Verificar que el detalle está activo
+    if (detalleExistente.getEstado() == 0) {
+      throw new RuntimeException("No se puede actualizar un detalle de factura anulado");
+    }
+
+    // ACTUALIZAR SOLO EL CAMPO consignacionFacturada
+    detalleExistente.setConsignacionFacturada(detalleFacturasActualizado.getConsignacionFacturada());
+
+    // Actualizar fechas y usuario de modificación
+    detalleExistente.setFechaModificacion(LocalDate.now());
+    detalleExistente.setHoraModificacion(LocalTime.now());
+
+    // Si el usuario de modificación viene en el body, actualizarlo
+    if (detalleFacturasActualizado.getIdUsuarioModificacion() != 0) {
+      detalleExistente.setIdUsuarioModificacion(detalleFacturasActualizado.getIdUsuarioModificacion());
+    }
+
+    // Guardar cambios
+    repdetfac.save(detalleExistente);
+
+    return "Campo consignacionFacturada actualizado exitosamente a: " +
+      detalleExistente.getConsignacionFacturada();
+  }
+
   @DeleteMapping("eliminarDetalleFactura/{idDetalleFactura}")
   public String eliminarDetalleFactura(@PathVariable long idDetalleFactura, @RequestBody erpDetalleFacturas  DetalleFacturas){
 
