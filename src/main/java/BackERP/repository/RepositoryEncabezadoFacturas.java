@@ -19,11 +19,17 @@ public interface RepositoryEncabezadoFacturas extends JpaRepository<erpEncabezad
 
   Optional<erpEncabezadoFacturas> findByIdEncabezadoFacturaAndEstado(Long idEncabezadoFactura, int estado);
 
-  // Nuevo método para obtener resumen de facturas
+  // RepositoryEncabezadoFacturas.java
   @Query("SELECT COUNT(e), SUM(e.total) FROM erpEncabezadoFacturas e " +
     "WHERE e.estado = 1 " +
     "AND e.facturaProcesada = 'S' " +
-    "AND e.FechaFactura BETWEEN :fechaInicio AND :fechaFin")
-  Object[] getResumenFacturas(@Param("fechaInicio") LocalDate fechaInicio,
-                              @Param("fechaFin") LocalDate fechaFin);
+    "AND e.FechaFactura BETWEEN :fechaInicio AND :fechaFin " +
+    "AND (:nombreCliente IS NULL OR LOWER(e.idCliente.nombreCliente) LIKE LOWER(CONCAT('%', :nombreCliente, '%'))) " +
+    "AND (:tipoDocumento IS NULL OR e.tipoDocumento = :tipoDocumento)")
+  Object[] getResumenFacturas(
+    @Param("fechaInicio") LocalDate fechaInicio,
+    @Param("fechaFin") LocalDate fechaFin,
+    @Param("nombreCliente") String nombreCliente,
+    @Param("tipoDocumento") Integer tipoDocumento
+  );
 }

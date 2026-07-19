@@ -1,9 +1,6 @@
 package BackERP.controller;
 import BackERP.helper.erpEncabezadoFacturasSpecs;
-import BackERP.models.erpDetalleFacturas;
-import BackERP.models.erpEncabezadoFacturas;
-import BackERP.models.AnulacionFacturaRequest;
-import BackERP.models.erpInventario;
+import BackERP.models.*;
 import BackERP.repository.RepositoryDetalleFacturas;
 import BackERP.repository.RepositoryEncabezadoFacturas;
 import BackERP.repository.RepositoryInventario;
@@ -92,31 +89,71 @@ public class EncabezadoFacturasRestController {
   @GetMapping("resumenFacturas")
   public ResponseEntity<Map<String, Object>> getResumenFacturas(
     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
-    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+    @RequestParam(required = false) String nombreCliente,
+    @RequestParam(required = false) Integer tipoDocumento) {
 
     // Validar que las fechas no sean nulas
     if (fechaInicio == null || fechaFin == null) {
-      return ResponseEntity.badRequest().body(Map.of("error", "Las fechas son requeridas"));
+      Map<String, Object> errorResponse = new HashMap<>();
+      errorResponse.put("error", "Las fechas son requeridas");
+      return ResponseEntity.badRequest().body(errorResponse);
     }
 
     // Validar que fechaInicio no sea posterior a fechaFin
     if (fechaInicio.isAfter(fechaFin)) {
-      return ResponseEntity.badRequest().body(Map.of("error", "La fecha de inicio no puede ser posterior a la fecha de fin"));
+      Map<String, Object> errorResponse = new HashMap<>();
+      errorResponse.put("error", "La fecha de inicio no puede ser posterior a la fecha de fin");
+      return ResponseEntity.badRequest().body(errorResponse);
     }
 
-    Object[] resultado = repencfac.getResumenFacturas(fechaInicio, fechaFin);
+    try {
+      // Obtener el resumen con los filtros aplicados
+      Object[] resultado = repencfac.getResumenFacturas(fechaInicio, fechaFin, nombreCliente, tipoDocumento);
 
-    long totalFacturas = resultado[0] != null ? ((Number) resultado[0]).longValue() : 0L;
-    double montoTotal = resultado[1] != null ? ((Number) resultado[1]).doubleValue() : 0.0;
+      // Extraer los valores del resultado
+      long totalFacturas = resultado[0] != null ? ((Number) resultado[0]).longValue() : 0L;
+      double montoTotal = resultado[1] != null ? ((Number) resultado[1]).doubleValue() : 0.0;
 
-    Map<String, Object> response = new HashMap<>();
-    response.put("fechaInicio", fechaInicio);
-    response.put("fechaFin", fechaFin);
-    response.put("totalFacturas", totalFacturas);
-    response.put("montoTotal", montoTotal);
-    response.put("moneda", "GTQ"); // o la moneda que corresponda
+      // Construir la respuesta
+      Map<String, Object> response = new HashMap<>();
+      response.put("fechaInicio", fechaInicio);
+      response.put("fechaFin", fechaFin);
+      response.put("totalFacturas", totalFacturas);
+      response.put("montoTotal", montoTotal);
+      response.put("moneda", "GTQ");
 
-    return ResponseEntity.ok(response);
+      // Agregar información de los filtros aplicados
+      if (nombreCliente != null && !nombreCliente.isEmpty()) {
+        response.put("nombreCliente", nombreCliente);
+      }
+      if (tipoDocumento != null) {
+        response.put("tipoDocumento", tipoDocumento);
+      }
+
+      // Construir mensaje de filtros aplicados
+      StringBuilder filtrosMsg = new StringBuilder();
+      if (nombreCliente != null && !nombreCliente.isEmpty()) {
+        filtrosMsg.append("Cliente: ").append(nombreCliente);
+      }
+      if (tipoDocumento != null) {
+        if (filtrosMsg.length() > 0) {
+          filtrosMsg.append(", ");
+        }
+        filtrosMsg.append("Tipo Documento: ").append(tipoDocumento);
+      }
+      if (filtrosMsg.length() == 0) {
+        filtrosMsg.append("Ninguno");
+      }
+      response.put("filtrosAplicados", filtrosMsg.toString());
+
+      return ResponseEntity.ok(response);
+
+    } catch (Exception e) {
+      Map<String, Object> errorResponse = new HashMap<>();
+      errorResponse.put("error", "Error al obtener el resumen de facturas: " + e.getMessage());
+      return ResponseEntity.internalServerError().body(errorResponse);
+    }
   }
     @PostMapping("grabarEncabezadoFacturas")
     @Transactional
@@ -133,6 +170,52 @@ public class EncabezadoFacturasRestController {
         return ResponseEntity.ok(saved.getIdEncabezadoFactura());
     }
 
+  @PutMapping("actualizarMontosFactura/{idEncabezadoFactura}")
+  public ResponseEntity<?> actualizarMontosFactura(
+    @PathVariable Long idEncabezadoFactura,
+    @RequestBody ActualizarEncabezadoFacturaRequest request) {
+
+    try {
+      // Validar que la factura existe y está activa
+      erpEncabezadoFacturas encabezado = repencfac
+        .findByIdEncabezadoFacturaAndEstado(idEncabezadoFactura, 1)
+        .orElseThrow(() -> new RuntimeException("Factura no encontrada o no está activa"));
+
+      // Actualizar los montos
+      encabezado.setTotalBruto(request.getTotalBruto());
+      encabezado.setPorcentajeDeDescuento(request.getPorcentajeDeDescuento());
+      encabezado.setCantidadDeDescuento(request.getCantidadDeDescuento());
+      encabezado.setTotalNeto(request.getTotalNeto());
+      encabezado.setIva(request.getIva());
+      encabezado.setTotal(request.getTotal());
+
+      // Actualizar campos de auditoría
+      encabezado.setFechaModificacion(LocalDate.now());
+      encabezado.setHoraModificacion(LocalTime.now());
+      encabezado.setIdUsuarioModificacion(request.getIdUsuarioModificacion());
+
+      // Guardar los cambios
+      repencfac.save(encabezado);
+
+      // Crear respuesta de éxito
+      Map<String, Object> response = new HashMap<>();
+      response.put("mensaje", "Montos actualizados correctamente");
+      response.put("idEncabezadoFactura", idEncabezadoFactura);
+      response.put("totalBruto", encabezado.getTotalBruto());
+      response.put("totalNeto", encabezado.getTotalNeto());
+      response.put("iva", encabezado.getIva());
+      response.put("total", encabezado.getTotal());
+
+      return ResponseEntity.ok(response);
+
+    } catch (RuntimeException e) {
+      return ResponseEntity.badRequest()
+        .body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      return ResponseEntity.internalServerError()
+        .body(Map.of("error", "Error al actualizar los montos: " + e.getMessage()));
+    }
+  }
 
     @DeleteMapping("anulacionEncabezadoFactura/{idEncabezadoFactura}")
     public String anulacionEncabezadoFactura(@PathVariable long idEncabezadoFactura,@RequestBody erpEncabezadoFacturas EncabezadoFacturas){
