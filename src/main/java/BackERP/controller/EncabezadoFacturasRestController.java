@@ -170,6 +170,81 @@ public class EncabezadoFacturasRestController {
         return ResponseEntity.ok(saved.getIdEncabezadoFactura());
     }
 
+  @PatchMapping("actualizarFacturaProcesada/{idEncabezadoFactura}")
+  @Transactional
+  public ResponseEntity<?> actualizarFacturaProcesada(
+    @PathVariable Long idEncabezadoFactura,
+    @RequestBody Map<String, Object> request) {
+
+    try {
+      // Validar que el ID sea válido
+      if (idEncabezadoFactura == null || idEncabezadoFactura <= 0) {
+        return ResponseEntity.badRequest()
+          .body(Map.of("error", "ID de encabezado de factura inválido"));
+      }
+
+      // Buscar el encabezado existente
+      erpEncabezadoFacturas encabezado = repencfac.findById(idEncabezadoFactura)
+        .orElseThrow(() -> new RuntimeException("Encabezado de factura no encontrado con ID: " + idEncabezadoFactura));
+
+      // Verificar que el encabezado está activo
+      if (encabezado.getEstado() == 0) {
+        return ResponseEntity.badRequest()
+          .body(Map.of("error", "No se puede actualizar un encabezado de factura anulado"));
+      }
+
+      // Validar que el campo facturaProcesada esté presente
+      if (!request.containsKey("facturaProcesada")) {
+        return ResponseEntity.badRequest()
+          .body(Map.of("error", "El campo 'facturaProcesada' es requerido"));
+      }
+
+      // Obtener y validar el nuevo valor
+      String nuevoValor = request.get("facturaProcesada").toString();
+
+      // Validar que el valor sea válido (S, N, A)
+      if (!nuevoValor.matches("[SNA]")) {
+        return ResponseEntity.badRequest()
+          .body(Map.of("error", "El valor de facturaProcesada debe ser 'S' (procesada), 'N' (no procesada) o 'A' (anulada)"));
+      }
+
+      // ACTUALIZAR SOLO EL CAMPO facturaProcesada
+      encabezado.setFacturaProcesada(nuevoValor);
+
+      // Actualizar fechas de modificación
+      encabezado.setFechaModificacion(LocalDate.now());
+      encabezado.setHoraModificacion(LocalTime.now());
+
+      // Actualizar usuario de modificación si se proporciona
+      if (request.containsKey("idUsuarioModificacion")) {
+        Integer idUsuario = (Integer) request.get("idUsuarioModificacion");
+        if (idUsuario != null && idUsuario > 0) {
+          encabezado.setIdUsuarioModificacion(idUsuario);
+        }
+      }
+
+      // Guardar cambios
+      repencfac.save(encabezado);
+
+      // Crear respuesta de éxito
+      Map<String, Object> response = new HashMap<>();
+      response.put("mensaje", "Campo facturaProcesada actualizado exitosamente");
+      response.put("idEncabezadoFactura", idEncabezadoFactura);
+      response.put("facturaProcesada", nuevoValor);
+      response.put("fechaModificacion", encabezado.getFechaModificacion());
+      response.put("horaModificacion", encabezado.getHoraModificacion().toString());
+
+      return ResponseEntity.ok(response);
+
+    } catch (RuntimeException e) {
+      return ResponseEntity.badRequest()
+        .body(Map.of("error", e.getMessage()));
+    } catch (Exception e) {
+      return ResponseEntity.internalServerError()
+        .body(Map.of("error", "Error al actualizar facturaProcesada: " + e.getMessage()));
+    }
+  }
+
   @PutMapping("actualizarMontosFactura/{idEncabezadoFactura}")
   public ResponseEntity<?> actualizarMontosFactura(
     @PathVariable Long idEncabezadoFactura,
