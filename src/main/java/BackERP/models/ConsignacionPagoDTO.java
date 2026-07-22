@@ -1,4 +1,4 @@
-package BackERP.dto;
+package BackERP.models;
 
 import java.time.LocalDate;
 
@@ -7,7 +7,7 @@ public class ConsignacionPagoDTO {
   private int idEncabezadoFactura;
   private double montoPago;
   private LocalDate fechaPago;
-  private String estado;
+  private int estado;
   private String observaciones;
   private int idUsuarioModificacion;
 
@@ -44,11 +44,11 @@ public class ConsignacionPagoDTO {
     this.fechaPago = fechaPago;
   }
 
-  public String getEstado() {
+  public int getEstado() {
     return estado;
   }
 
-  public void setEstado(String estado) {
+  public void setEstado(int estado) {
     this.estado = estado;
   }
 

@@ -20,6 +20,6 @@ public interface RepositoryConsignacionPagos extends JpaRepository<erpConsignaci
   List<erpConsignacionPagos> findByIdEncabezadoFacturaAndEstado(int idEncabezadoFactura, String estado);
 
   // Obtener suma de pagos por factura
-  @Query("SELECT SUM(c.montoPago) FROM erpConsignacionPagos c WHERE c.idEncabezadoFactura = :idFactura AND c.estado = 'Confirmado'")
+  @Query("SELECT SUM(c.montoPago) FROM erpConsignacionPagos c WHERE c.idEncabezadoFactura = :idFactura AND c.estado = 1")
   Double sumMontoPagosByFactura(@Param("idFactura") int idFactura);
 }

@@ -22,8 +22,8 @@ public class erpConsignacionPagos {
   @Column(name = "fechaPago", nullable = false)
   private LocalDate fechaPago;
 
-  @Column(name = "estado", columnDefinition = "varchar(20) default 'Pendiente'")
-  private String estado;
+  @Column(name = "estado")
+  private int estado;
 
   @Column(name = "observaciones", length = 500)
   private String observaciones;
@@ -73,11 +73,11 @@ public class erpConsignacionPagos {
     this.fechaPago = fechaPago;
   }
 
-  public String getEstado() {
+  public int getEstado() {
     return estado;
   }
 
-  public void setEstado(String estado) {
+  public void setEstado(int estado) {
     this.estado = estado;
   }
 

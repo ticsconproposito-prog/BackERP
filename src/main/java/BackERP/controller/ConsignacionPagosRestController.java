@@ -62,11 +62,7 @@ public class ConsignacionPagosRestController {
     consignacionPago.setFechaModificacion(LocalDate.now());
     consignacionPago.setHoraModificacion(LocalTime.now());
 
-    // Si no se especifica estado, asignar 'Pendiente'
-    if (consignacionPago.getEstado() == null || consignacionPago.getEstado().isEmpty()) {
-      consignacionPago.setEstado("Pendiente");
-    }
-
+    consignacionPago.setEstado(1);
     erpConsignacionPagos saved = repositoryConsignacionPagos.save(consignacionPago);
     return  saved.getIdConsignacionPago();
   }
@@ -98,7 +94,7 @@ public class ConsignacionPagosRestController {
   // PATCH - Actualizar estado del pago (específico)
   @PatchMapping("/{idConsignacionPago}/estado")
   public String actualizarEstadoPago(@PathVariable Long idConsignacionPago,
-                                     @RequestParam String estado,
+                                     @RequestParam int estado,
                                      @RequestParam int idUsuarioModificacion) {
     Optional<erpConsignacionPagos> optionalPago = repositoryConsignacionPagos.findById(idConsignacionPago);
 
@@ -124,7 +120,7 @@ public class ConsignacionPagosRestController {
 
     if (optionalPago.isPresent()) {
       erpConsignacionPagos updatePago = optionalPago.get();
-      updatePago.setEstado("Anulado");
+      updatePago.setEstado(3);
       updatePago.setFechaModificacion(LocalDate.now());
       updatePago.setHoraModificacion(LocalTime.now());
       updatePago.setIdUsuarioModificacion(idUsuarioModificacion);
@@ -144,7 +140,7 @@ public class ConsignacionPagosRestController {
 
     if (!pagos.isEmpty()) {
       pagos.forEach(pago -> {
-        pago.setEstado("Anulado");
+        pago.setEstado(0);
         pago.setFechaModificacion(LocalDate.now());
         pago.setHoraModificacion(LocalTime.now());
         pago.setIdUsuarioModificacion(idUsuarioModificacion);
