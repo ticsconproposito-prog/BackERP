@@ -14,7 +14,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
+import BackERP.service.EncabezadoFacturaService; // Importar el servicio
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
@@ -34,6 +34,9 @@ public class EncabezadoFacturasRestController {
 
     @Autowired
     private RepositoryInventario repinv;
+
+    @Autowired
+    private EncabezadoFacturaService encabezadoFacturaService;
 
     @GetMapping("erpEncabezadoFacturas")
     public Page<erpEncabezadoFacturas> getOrdenProductos(
@@ -65,9 +68,27 @@ public class EncabezadoFacturasRestController {
                 .and(erpEncabezadoFacturasSpecs.numeroPreimpresoContains(preimpreso)); // 🔎 nuevo filtro
 
 
-        return repencfac.findAll(spec, pageable);
+      // Usar el servicio para obtener facturas con totalPagado
+      return encabezadoFacturaService.findWithPaymentInfo(spec, pageable);
     }
 
+  // Endpoint para obtener una factura específica con totalPagado
+  @GetMapping("erpEncabezadoFactura/{idEncabezadoFactura}")
+  public ResponseEntity<?> getFacturaById(@PathVariable Long idEncabezadoFactura) {
+    try {
+      erpEncabezadoFacturas factura = encabezadoFacturaService.findByIdWithPaymentInfo(idEncabezadoFactura);
+
+      if (factura == null) {
+        return ResponseEntity.notFound().build();
+      }
+
+      return ResponseEntity.ok(factura);
+
+    } catch (Exception e) {
+      return ResponseEntity.internalServerError()
+        .body(Map.of("error", "Error al obtener factura: " + e.getMessage()));
+    }
+  }
     @GetMapping("facturasPorFecha")
     public Page<erpEncabezadoFacturas> getFacturasPorFecha(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fecha,

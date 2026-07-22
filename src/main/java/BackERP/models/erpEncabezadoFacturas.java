@@ -131,6 +131,12 @@ public class erpEncabezadoFacturas {
   @Column(name = "idUsuarioModificacion")
   private int idUsuarioModificacion;
 
+  @Transient
+  private Double totalPagado;
+
+  @Transient
+  private Double saldoPendiente;
+
   public erpEncabezadoFacturas() {}
   // getters y setters...
 
@@ -444,5 +450,24 @@ public class erpEncabezadoFacturas {
 
   public void setIdUsuarioModificacion(int idUsuarioModificacion) {
     this.idUsuarioModificacion = idUsuarioModificacion;
+  }
+  // Getters y Setters
+  public Double getTotalPagado() {
+    return totalPagado;
+  }
+
+  public void setTotalPagado(Double totalPagado) {
+    this.totalPagado = totalPagado;
+  }
+
+  public Double getSaldoPendiente() {
+    if (totalPagado != null && total != 0) {
+      return total - totalPagado;
+    }
+    return null;
+  }
+
+  public void setSaldoPendiente(Double saldoPendiente) {
+    this.saldoPendiente = saldoPendiente;
   }
 }
