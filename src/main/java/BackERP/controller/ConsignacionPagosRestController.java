@@ -40,13 +40,14 @@ public class ConsignacionPagosRestController {
       return repositoryConsignacionPagos.findAll(spec);
   }
 
-// ConsignacionPagosRestController.java - Método actualizado
+// ConsignacionPagosRestController.java - Método actualizado con facturaProcesada
 
   @GetMapping("/resumenConsignaciones")
   public ResponseEntity<Map<String, Object>> getResumenConsignacionesPagos(
     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
     @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
-    @RequestParam(required = false) String nombreCliente) {
+    @RequestParam(required = false) String nombreCliente,
+    @RequestParam(required = false) String facturaProcesada) {
 
     // Validar que las fechas no sean nulas
     if (fechaInicio == null || fechaFin == null) {
@@ -62,10 +63,19 @@ public class ConsignacionPagosRestController {
       return ResponseEntity.badRequest().body(errorResponse);
     }
 
+    // Validar que facturaProcesada tenga un valor válido si se proporciona
+    if (facturaProcesada != null && !facturaProcesada.isEmpty()) {
+      if (!facturaProcesada.matches("[SNA]")) {
+        Map<String, Object> errorResponse = new HashMap<>();
+        errorResponse.put("error", "El valor de facturaProcesada debe ser 'S' (procesada), 'N' (no procesada) o 'A' (anulada)");
+        return ResponseEntity.badRequest().body(errorResponse);
+      }
+    }
+
     try {
       // Obtener el resumen de consignaciones con los filtros aplicados
       Object[] resultado = repositoryConsignacionPagos.getResumenConsignacionesPagos(
-        fechaInicio, fechaFin, nombreCliente);
+        fechaInicio, fechaFin, nombreCliente, facturaProcesada);
 
       // Extraer los valores del resultado
       long totalConsignaciones = resultado[0] != null ? ((Number) resultado[0]).longValue() : 0L;
@@ -82,7 +92,7 @@ public class ConsignacionPagosRestController {
         porcentajePendiente = (saldoPendiente / montoTotalConsignaciones) * 100;
       }
 
-      // Construir la respuesta (SOLO CAMPOS ESENCIALES)
+      // Construir la respuesta
       Map<String, Object> response = new HashMap<>();
 
       // Datos del resumen

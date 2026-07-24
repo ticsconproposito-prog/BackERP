@@ -31,8 +31,7 @@ public interface RepositoryConsignacionPagos extends JpaRepository<erpConsignaci
     List<Object[]> sumMontoPagosByFacturas(@Param("idsFactura") List<Integer> idsFactura);
 
 
-
-  // RepositoryConsignacionPagos.java - Método actualizado
+// RepositoryConsignacionPagos.java - Método actualizado con facturaProcesada
 
   @Query("SELECT " +
     "COUNT(c) as totalConsignaciones, " +
@@ -44,7 +43,8 @@ public interface RepositoryConsignacionPagos extends JpaRepository<erpConsignaci
     "WHERE e.estado = 1 " +
     "AND e.tipoDocumento = 4 " +
     "AND e.FechaFactura BETWEEN :fechaInicio AND :fechaFin " +
-    "AND (:nombreCliente IS NULL OR LOWER(e.idCliente.nombreCliente) LIKE LOWER(CONCAT('%', :nombreCliente, '%')))) as saldoPendiente " +
+    "AND (:nombreCliente IS NULL OR LOWER(e.idCliente.nombreCliente) LIKE LOWER(CONCAT('%', :nombreCliente, '%'))) " +
+    "AND (:facturaProcesada IS NULL OR e.facturaProcesada = :facturaProcesada)) as saldoPendiente " +
     "FROM erpConsignacionPagos c " +
     "WHERE c.estado = 1 " +
     "AND c.idEncabezadoFactura IN ( " +
@@ -52,11 +52,13 @@ public interface RepositoryConsignacionPagos extends JpaRepository<erpConsignaci
     "  WHERE e.estado = 1 " +
     "  AND e.tipoDocumento = 4 " +
     "  AND e.FechaFactura BETWEEN :fechaInicio AND :fechaFin " +
-    "  AND (:nombreCliente IS NULL OR LOWER(e.idCliente.nombreCliente) LIKE LOWER(CONCAT('%', :nombreCliente, '%'))))")
+    "  AND (:nombreCliente IS NULL OR LOWER(e.idCliente.nombreCliente) LIKE LOWER(CONCAT('%', :nombreCliente, '%'))) " +
+    "  AND (:facturaProcesada IS NULL OR e.facturaProcesada = :facturaProcesada))")
   Object[] getResumenConsignacionesPagos(
     @Param("fechaInicio") LocalDate fechaInicio,
     @Param("fechaFin") LocalDate fechaFin,
-    @Param("nombreCliente") String nombreCliente
+    @Param("nombreCliente") String nombreCliente,
+    @Param("facturaProcesada") String facturaProcesada
   );
 
 }
