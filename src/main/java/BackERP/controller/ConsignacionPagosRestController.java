@@ -6,11 +6,14 @@ import BackERP.repository.RepositoryConsignacionPagos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 //@CrossOrigin(origins = "http://localhost:3000")
@@ -35,6 +38,97 @@ public class ConsignacionPagosRestController {
               .and(erpConsignacionPagosSpecs.fechaPagoBetween(fechaInicio, fechaFin));
 
       return repositoryConsignacionPagos.findAll(spec);
+  }
+
+  // ConsignacionPagosRestController.java - Agregar este método
+
+  // ConsignacionPagosRestController.java - Método actualizado
+// ConsignacionPagosRestController.java - Método actualizado
+
+  @GetMapping("/resumenConsignaciones")
+  public ResponseEntity<Map<String, Object>> getResumenConsignacionesPagos(
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+    @RequestParam(required = false) String nombreCliente) {
+
+    // Validar que las fechas no sean nulas
+    if (fechaInicio == null || fechaFin == null) {
+      Map<String, Object> errorResponse = new HashMap<>();
+      errorResponse.put("error", "Las fechas son requeridas");
+      return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    // Validar que fechaInicio no sea posterior a fechaFin
+    if (fechaInicio.isAfter(fechaFin)) {
+      Map<String, Object> errorResponse = new HashMap<>();
+      errorResponse.put("error", "La fecha de inicio no puede ser posterior a la fecha de fin");
+      return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    try {
+      // Obtener el resumen de consignaciones con los filtros aplicados
+      Object[] resultado = repositoryConsignacionPagos.getResumenConsignacionesPagos(
+        fechaInicio, fechaFin, nombreCliente);
+
+      // Extraer los valores del resultado
+      long totalConsignaciones = resultado[0] != null ? ((Number) resultado[0]).longValue() : 0L;
+      double montoTotalConsignaciones = resultado[1] != null ? ((Number) resultado[1]).doubleValue() : 0.0;
+      double totalPagado = resultado[2] != null ? ((Number) resultado[2]).doubleValue() : 0.0;
+      double saldoPendiente = resultado[3] != null ? ((Number) resultado[3]).doubleValue() : 0.0;
+
+      // Construir la respuesta
+      Map<String, Object> response = new HashMap<>();
+
+      // Información de filtros
+      response.put("fechaInicio", fechaInicio);
+      response.put("fechaFin", fechaFin);
+
+      if (nombreCliente != null && !nombreCliente.isEmpty()) {
+        response.put("nombreCliente", nombreCliente);
+      }
+
+      // Datos del resumen (similar al resumen de facturas)
+      response.put("totalConsignaciones", totalConsignaciones);
+      response.put("montoTotalConsignaciones", montoTotalConsignaciones);
+      response.put("totalPagado", totalPagado);
+      response.put("saldoPendiente", saldoPendiente);
+      response.put("moneda", "GTQ");
+      response.put("tipoDocumento", 4);
+      response.put("tipoDocumentoDescripcion", "Consignaciones");
+
+      // Construir mensaje de filtros aplicados
+      StringBuilder filtrosMsg = new StringBuilder();
+      if (nombreCliente != null && !nombreCliente.isEmpty()) {
+        filtrosMsg.append("Cliente: ").append(nombreCliente);
+      }
+      if (filtrosMsg.length() == 0) {
+        filtrosMsg.append("Ninguno");
+      }
+      response.put("filtrosAplicados", filtrosMsg.toString());
+
+      // Estadísticas adicionales
+      if (montoTotalConsignaciones > 0) {
+        double porcentajePagado = (totalPagado / montoTotalConsignaciones) * 100;
+        double porcentajePendiente = (saldoPendiente / montoTotalConsignaciones) * 100;
+        response.put("porcentajePagado", Math.round(porcentajePagado * 100.0) / 100.0);
+        response.put("porcentajePendiente", Math.round(porcentajePendiente * 100.0) / 100.0);
+      } else {
+        response.put("porcentajePagado", 0.0);
+        response.put("porcentajePendiente", 0.0);
+      }
+
+      // Información adicional
+      response.put("descripcion", "Resumen de consignaciones de pagos (tipo documento 4)");
+      response.put("estado", "Consignaciones activas");
+      response.put("timestamp", java.time.LocalDateTime.now().toString());
+
+      return ResponseEntity.ok(response);
+
+    } catch (Exception e) {
+      Map<String, Object> errorResponse = new HashMap<>();
+      errorResponse.put("error", "Error al obtener el resumen de consignaciones: " + e.getMessage());
+      return ResponseEntity.internalServerError().body(errorResponse);
+    }
   }
 
   // GET - Obtener pagos por ID de factura
