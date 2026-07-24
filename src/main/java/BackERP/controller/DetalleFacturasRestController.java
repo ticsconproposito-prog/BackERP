@@ -61,11 +61,11 @@ public class DetalleFacturasRestController {
 
   @PostMapping("grabarDetalleFactura")
   @Transactional
-  public String grabarDetalleFacturas(@RequestBody erpDetalleFacturas detalleFacturas){
+  public String grabarDetalleFacturas(
+    @RequestBody erpDetalleFacturas detalleFacturas,
+    @RequestParam(required = false, defaultValue = "S") String rebajarInventario) {
 
     // 🔥 VALIDACIÓN: Evita división por cero y valores nulos
-
-
     double cantidadDeDescuento = detalleFacturas.getCantidadDeDescuento() != 0
       ? detalleFacturas.getCantidadDeDescuento()
       : 0.0;
@@ -98,7 +98,6 @@ public class DetalleFacturasRestController {
     detalleFacturas.setIva(safeDouble(detalleFacturas.getIva()));
     detalleFacturas.setImpTotal(safeDouble(detalleFacturas.getImpTotal()));
 
-
     // Asegura que porcentaje de descuento sea válido
     detalleFacturas.setPorcentajeDeDescuento(safeDouble(detalleFacturas.getPorcentajeDeDescuento()));
 
@@ -108,19 +107,23 @@ public class DetalleFacturasRestController {
 
     repdetfac.save(detalleFacturas);
 
-    // 🔹 Descontar inventario
-    List<erpInventario> inventarios = repinv.findByIdProducto_IdProducto((long) detalleFacturas.getIdProducto());
-    erpInventario inventario = inventarios.isEmpty() ? null : inventarios.get(0);
+    // 🔹 Descontar inventario SOLO si la bandera lo permite
+    // Si rebajarInventario es "N" (mayúscula o minúscula), NO se rebaja
+    // En cualquier otro caso (S, vacío, null, etc.) se rebaja
+    if (!"N".equalsIgnoreCase(rebajarInventario)) {
+      List<erpInventario> inventarios = repinv.findByIdProducto_IdProducto((long) detalleFacturas.getIdProducto());
+      erpInventario inventario = inventarios.isEmpty() ? null : inventarios.get(0);
 
-    if (inventario != null) {
-      int nuevaCantidad = inventario.getCantidadExistencias() - (int) detalleFacturas.getCantidad();
-      inventario.setCantidadExistencias(nuevaCantidad);
-      inventario.setFechaModificacion(LocalDate.now());
-      inventario.setHoraModificacion(LocalTime.now());
-      repinv.save(inventario);
+      if (inventario != null) {
+        int nuevaCantidad = inventario.getCantidadExistencias() - (int) detalleFacturas.getCantidad();
+        inventario.setCantidadExistencias(nuevaCantidad);
+        inventario.setFechaModificacion(LocalDate.now());
+        inventario.setHoraModificacion(LocalTime.now());
+        repinv.save(inventario);
+      }
     }
 
-    return "Grabado y actualizado inventario";
+    return "Grabado" + ("N".equalsIgnoreCase(rebajarInventario) ? " sin rebajar inventario" : " y actualizado inventario");
   }
 
   // 🔥 MÉTODO AUXILIAR: Convierte valores inválidos a 0.0
