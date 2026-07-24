@@ -10,23 +10,23 @@ import java.util.List;
 
 public interface RepositoryConsignacionPagos extends JpaRepository<erpConsignacionPagos, Long>, JpaSpecificationExecutor<erpConsignacionPagos> {
 
-  // Buscar pagos por factura
-  List<erpConsignacionPagos> findByIdEncabezadoFactura(int idEncabezadoFactura);
+    // Buscar pagos por factura
+    List<erpConsignacionPagos> findByIdEncabezadoFactura(int idEncabezadoFactura);
 
-  // Buscar pagos por estado
-  List<erpConsignacionPagos> findByEstado(String estado);
+    // Buscar pagos por estado - CORREGIDO: ahora usa int en lugar de String
+    List<erpConsignacionPagos> findByEstado(int estado);
 
-  // Buscar pagos por factura y estado
-  List<erpConsignacionPagos> findByIdEncabezadoFacturaAndEstado(int idEncabezadoFactura, String estado);
+    // Buscar pagos por factura y estado
+    List<erpConsignacionPagos> findByIdEncabezadoFacturaAndEstado(int idEncabezadoFactura, int estado);
 
-  // Obtener suma de pagos por factura
-  @Query("SELECT SUM(c.montoPago) FROM erpConsignacionPagos c WHERE c.idEncabezadoFactura = :idFactura AND c.estado = 1")
-  Double sumMontoPagosByFactura(@Param("idFactura") int idFactura);
+    // Obtener suma de pagos por factura
+    @Query("SELECT SUM(c.montoPago) FROM erpConsignacionPagos c WHERE c.idEncabezadoFactura = :idFactura AND c.estado = 1 ")
+    Double sumMontoPagosByFactura(@Param("idFactura") int idFactura);
 
-  // Nuevo método para múltiples facturas (más eficiente)
-  @Query("SELECT c.idEncabezadoFactura, SUM(c.montoPago) FROM erpConsignacionPagos c " +
-    "WHERE c.idEncabezadoFactura IN :idsFactura AND c.estado = 1 " +
-    "GROUP BY c.idEncabezadoFactura")
-  List<Object[]> sumMontoPagosByFacturas(@Param("idsFactura") List<Integer> idsFactura);
+    // Nuevo método para múltiples facturas (más eficiente)
+    @Query("SELECT c.idEncabezadoFactura, SUM(c.montoPago) FROM erpConsignacionPagos c " +
+            "WHERE c.idEncabezadoFactura IN :idsFactura AND c.estado = 1 " +
+            "GROUP BY c.idEncabezadoFactura")
+    List<Object[]> sumMontoPagosByFacturas(@Param("idsFactura") List<Integer> idsFactura);
 
 }

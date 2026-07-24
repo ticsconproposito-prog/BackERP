@@ -24,17 +24,17 @@ public class ConsignacionPagosRestController {
   // GET - Obtener todos los pagos con filtros
   @GetMapping
   public List<erpConsignacionPagos> getConsignacionPagos(
-    @RequestParam(required = false) Integer idEncabezadoFactura,
-    @RequestParam(required = false) String estado,
-    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
-    @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
+          @RequestParam(required = false) Integer idEncabezadoFactura,
+          @RequestParam(required = false) Integer estado,  // Cambiado de String a Integer
+          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+          @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin) {
 
-    Specification<erpConsignacionPagos> spec = Specification
-      .where(erpConsignacionPagosSpecs.idEncabezadoFacturaEquals(idEncabezadoFactura))
-      .and(erpConsignacionPagosSpecs.estadoEquals(estado))
-      .and(erpConsignacionPagosSpecs.fechaPagoBetween(fechaInicio, fechaFin));
+      Specification<erpConsignacionPagos> spec = Specification
+              .where(erpConsignacionPagosSpecs.idEncabezadoFacturaEquals(idEncabezadoFactura))
+              .and(erpConsignacionPagosSpecs.estadoEquals(estado))
+              .and(erpConsignacionPagosSpecs.fechaPagoBetween(fechaInicio, fechaFin));
 
-    return repositoryConsignacionPagos.findAll(spec);
+      return repositoryConsignacionPagos.findAll(spec);
   }
 
   // GET - Obtener pagos por ID de factura
