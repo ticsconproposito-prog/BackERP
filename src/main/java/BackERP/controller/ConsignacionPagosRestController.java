@@ -40,9 +40,6 @@ public class ConsignacionPagosRestController {
       return repositoryConsignacionPagos.findAll(spec);
   }
 
-  // ConsignacionPagosRestController.java - Agregar este método
-
-  // ConsignacionPagosRestController.java - Método actualizado
 // ConsignacionPagosRestController.java - Método actualizado
 
   @GetMapping("/resumenConsignaciones")
@@ -76,51 +73,26 @@ public class ConsignacionPagosRestController {
       double totalPagado = resultado[2] != null ? ((Number) resultado[2]).doubleValue() : 0.0;
       double saldoPendiente = resultado[3] != null ? ((Number) resultado[3]).doubleValue() : 0.0;
 
-      // Construir la respuesta
-      Map<String, Object> response = new HashMap<>();
+      // Calcular porcentajes
+      double porcentajePagado = 0.0;
+      double porcentajePendiente = 0.0;
 
-      // Información de filtros
-      response.put("fechaInicio", fechaInicio);
-      response.put("fechaFin", fechaFin);
-
-      if (nombreCliente != null && !nombreCliente.isEmpty()) {
-        response.put("nombreCliente", nombreCliente);
+      if (montoTotalConsignaciones > 0) {
+        porcentajePagado = (totalPagado / montoTotalConsignaciones) * 100;
+        porcentajePendiente = (saldoPendiente / montoTotalConsignaciones) * 100;
       }
 
-      // Datos del resumen (similar al resumen de facturas)
+      // Construir la respuesta (SOLO CAMPOS ESENCIALES)
+      Map<String, Object> response = new HashMap<>();
+
+      // Datos del resumen
       response.put("totalConsignaciones", totalConsignaciones);
-      response.put("montoTotalConsignaciones", montoTotalConsignaciones);
+      response.put("montoTotal", montoTotalConsignaciones);
       response.put("totalPagado", totalPagado);
       response.put("saldoPendiente", saldoPendiente);
       response.put("moneda", "GTQ");
-      response.put("tipoDocumento", 4);
-      response.put("tipoDocumentoDescripcion", "Consignaciones");
-
-      // Construir mensaje de filtros aplicados
-      StringBuilder filtrosMsg = new StringBuilder();
-      if (nombreCliente != null && !nombreCliente.isEmpty()) {
-        filtrosMsg.append("Cliente: ").append(nombreCliente);
-      }
-      if (filtrosMsg.length() == 0) {
-        filtrosMsg.append("Ninguno");
-      }
-      response.put("filtrosAplicados", filtrosMsg.toString());
-
-      // Estadísticas adicionales
-      if (montoTotalConsignaciones > 0) {
-        double porcentajePagado = (totalPagado / montoTotalConsignaciones) * 100;
-        double porcentajePendiente = (saldoPendiente / montoTotalConsignaciones) * 100;
-        response.put("porcentajePagado", Math.round(porcentajePagado * 100.0) / 100.0);
-        response.put("porcentajePendiente", Math.round(porcentajePendiente * 100.0) / 100.0);
-      } else {
-        response.put("porcentajePagado", 0.0);
-        response.put("porcentajePendiente", 0.0);
-      }
-
-      // Información adicional
-      response.put("descripcion", "Resumen de consignaciones de pagos (tipo documento 4)");
-      response.put("estado", "Consignaciones activas");
-      response.put("timestamp", java.time.LocalDateTime.now().toString());
+      response.put("porcentajePagado", Math.round(porcentajePagado * 100.0) / 100.0);
+      response.put("porcentajePendiente", Math.round(porcentajePendiente * 100.0) / 100.0);
 
       return ResponseEntity.ok(response);
 
