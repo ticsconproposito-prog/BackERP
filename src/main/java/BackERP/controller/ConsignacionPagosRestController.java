@@ -74,14 +74,16 @@ public class ConsignacionPagosRestController {
 
     try {
       // Obtener el resumen de consignaciones con los filtros aplicados
-      Object[] resultado = repositoryConsignacionPagos.getResumenConsignacionesPagos(
+      Object[] resultado = repositoryConsignacionPagos.getResumenConsignaciones(
         fechaInicio, fechaFin, nombreCliente, facturaProcesada);
 
       // Extraer los valores del resultado
       long totalConsignaciones = resultado[0] != null ? ((Number) resultado[0]).longValue() : 0L;
       double montoTotalConsignaciones = resultado[1] != null ? ((Number) resultado[1]).doubleValue() : 0.0;
       double totalPagado = resultado[2] != null ? ((Number) resultado[2]).doubleValue() : 0.0;
-      double saldoPendiente = resultado[3] != null ? ((Number) resultado[3]).doubleValue() : 0.0;
+
+      // 🔥 CALCULAR SALDO PENDIENTE RESTANDO EL TOTAL PAGADO DEL MONTO TOTAL
+      double saldoPendiente = montoTotalConsignaciones - totalPagado;
 
       // Calcular porcentajes
       double porcentajePagado = 0.0;
@@ -112,7 +114,6 @@ public class ConsignacionPagosRestController {
       return ResponseEntity.internalServerError().body(errorResponse);
     }
   }
-
   // GET - Obtener pagos por ID de factura
   @GetMapping("/factura/{idEncabezadoFactura}")
   public List<erpConsignacionPagos> getPagosByFactura(@PathVariable int idEncabezadoFactura) {
