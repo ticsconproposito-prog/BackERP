@@ -34,7 +34,7 @@ public interface RepositoryConsignacionPagos extends JpaRepository<erpConsignaci
     // RepositoryConsignacionPagos.java
     @Query(value = "SELECT " +
             "COUNT(*) as totalConsignaciones, " +
-            "SUM(ef.totalBruto) as montoTotalConsignaciones, " +
+            "SUM(ef.total) as montoTotalConsignaciones, " +
             "COALESCE( " +
             "    ( " +
             "        SELECT SUM(montoPago) " +
