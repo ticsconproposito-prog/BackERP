@@ -40,80 +40,89 @@ public class ConsignacionPagosRestController {
       return repositoryConsignacionPagos.findAll(spec);
   }
 
-// ConsignacionPagosRestController.java - Método actualizado con facturaProcesada
+    // ConsignacionPagosRestController.java
+    @GetMapping("/resumenConsignaciones")
+    public ResponseEntity<Map<String, Object>> getResumenConsignacionesPagos(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
+            @RequestParam(required = false) String nombreCliente,
+            @RequestParam(required = false) String facturaProcesada) {
 
-  @GetMapping("/resumenConsignaciones")
-  public ResponseEntity<Map<String, Object>> getResumenConsignacionesPagos(
-    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaInicio,
-    @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate fechaFin,
-    @RequestParam(required = false) String nombreCliente,
-    @RequestParam(required = false) String facturaProcesada) {
+        // Validar fechas
+        if (fechaInicio == null || fechaFin == null) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Las fechas son requeridas");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
 
-    // Validar que las fechas no sean nulas
-    if (fechaInicio == null || fechaFin == null) {
-      Map<String, Object> errorResponse = new HashMap<>();
-      errorResponse.put("error", "Las fechas son requeridas");
-      return ResponseEntity.badRequest().body(errorResponse);
+        if (fechaInicio.isAfter(fechaFin)) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "La fecha de inicio no puede ser posterior a la fecha de fin");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        // Limpiar nombreCliente si viene vacío
+        if (nombreCliente != null && nombreCliente.trim().isEmpty()) {
+            nombreCliente = null;
+        }
+
+        // Limpiar facturaProcesada si viene vacío
+        if (facturaProcesada != null && facturaProcesada.trim().isEmpty()) {
+            facturaProcesada = null;
+        }
+
+        // Validar que facturaProcesada tenga un valor válido si se proporciona
+        if (facturaProcesada != null && !facturaProcesada.matches("[SN]")) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "El valor de facturaProcesada debe ser 'S' (procesada) o 'N' (no procesada)");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        try {
+            List<Object[]> resultado = repositoryConsignacionPagos.getResumenConsignaciones(
+                    fechaInicio, fechaFin, nombreCliente, facturaProcesada);
+
+            long totalConsignaciones = 0L;
+            double montoTotalConsignaciones = 0.0;
+            double totalPagado = 0.0;
+
+            if (resultado != null && !resultado.isEmpty()) {
+                Object[] fila = resultado.get(0);
+                if (fila != null && fila.length >= 3) {
+                    totalConsignaciones = fila[0] != null ? ((Number) fila[0]).longValue() : 0L;
+                    montoTotalConsignaciones = fila[1] != null ? ((Number) fila[1]).doubleValue() : 0.0;
+                    totalPagado = fila[2] != null ? ((Number) fila[2]).doubleValue() : 0.0;
+                }
+            }
+
+            double saldoPendiente = montoTotalConsignaciones - totalPagado;
+
+            double porcentajePagado = 0.0;
+            double porcentajePendiente = 0.0;
+
+            if (montoTotalConsignaciones > 0) {
+                porcentajePagado = (totalPagado / montoTotalConsignaciones) * 100;
+                porcentajePendiente = (saldoPendiente / montoTotalConsignaciones) * 100;
+            }
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("totalConsignaciones", totalConsignaciones);
+            response.put("montoTotal", Math.round(montoTotalConsignaciones * 100.0) / 100.0);
+            response.put("totalPagado", Math.round(totalPagado * 100.0) / 100.0);
+            response.put("saldoPendiente", Math.round(saldoPendiente * 100.0) / 100.0);
+            response.put("moneda", "GTQ");
+            response.put("porcentajePagado", Math.round(porcentajePagado * 100.0) / 100.0);
+            response.put("porcentajePendiente", Math.round(porcentajePendiente * 100.0) / 100.0);
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("error", "Error al obtener el resumen de consignaciones: " + e.getMessage());
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
     }
 
-    // Validar que fechaInicio no sea posterior a fechaFin
-    if (fechaInicio.isAfter(fechaFin)) {
-      Map<String, Object> errorResponse = new HashMap<>();
-      errorResponse.put("error", "La fecha de inicio no puede ser posterior a la fecha de fin");
-      return ResponseEntity.badRequest().body(errorResponse);
-    }
-
-    // Validar que facturaProcesada tenga un valor válido si se proporciona
-    if (facturaProcesada != null && !facturaProcesada.isEmpty()) {
-      if (!facturaProcesada.matches("[SNA]")) {
-        Map<String, Object> errorResponse = new HashMap<>();
-        errorResponse.put("error", "El valor de facturaProcesada debe ser 'S' (procesada), 'N' (no procesada) o 'A' (anulada)");
-        return ResponseEntity.badRequest().body(errorResponse);
-      }
-    }
-
-    try {
-      // Obtener el resumen de consignaciones con los filtros aplicados
-      Object[] resultado = repositoryConsignacionPagos.getResumenConsignaciones(
-        fechaInicio, fechaFin, nombreCliente, facturaProcesada);
-
-      // Extraer los valores del resultado
-      long totalConsignaciones = resultado[0] != null ? ((Number) resultado[0]).longValue() : 0L;
-      double montoTotalConsignaciones = resultado[1] != null ? ((Number) resultado[1]).doubleValue() : 0.0;
-      double totalPagado = resultado[2] != null ? ((Number) resultado[2]).doubleValue() : 0.0;
-
-      // 🔥 CALCULAR SALDO PENDIENTE RESTANDO EL TOTAL PAGADO DEL MONTO TOTAL
-      double saldoPendiente = montoTotalConsignaciones - totalPagado;
-
-      // Calcular porcentajes
-      double porcentajePagado = 0.0;
-      double porcentajePendiente = 0.0;
-
-      if (montoTotalConsignaciones > 0) {
-        porcentajePagado = (totalPagado / montoTotalConsignaciones) * 100;
-        porcentajePendiente = (saldoPendiente / montoTotalConsignaciones) * 100;
-      }
-
-      // Construir la respuesta
-      Map<String, Object> response = new HashMap<>();
-
-      // Datos del resumen
-      response.put("totalConsignaciones", totalConsignaciones);
-      response.put("montoTotal", montoTotalConsignaciones);
-      response.put("totalPagado", totalPagado);
-      response.put("saldoPendiente", saldoPendiente);
-      response.put("moneda", "GTQ");
-      response.put("porcentajePagado", Math.round(porcentajePagado * 100.0) / 100.0);
-      response.put("porcentajePendiente", Math.round(porcentajePendiente * 100.0) / 100.0);
-
-      return ResponseEntity.ok(response);
-
-    } catch (Exception e) {
-      Map<String, Object> errorResponse = new HashMap<>();
-      errorResponse.put("error", "Error al obtener el resumen de consignaciones: " + e.getMessage());
-      return ResponseEntity.internalServerError().body(errorResponse);
-    }
-  }
   // GET - Obtener pagos por ID de factura
   @GetMapping("/factura/{idEncabezadoFactura}")
   public List<erpConsignacionPagos> getPagosByFactura(@PathVariable int idEncabezadoFactura) {

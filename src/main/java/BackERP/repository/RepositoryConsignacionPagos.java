@@ -31,46 +31,52 @@ public interface RepositoryConsignacionPagos extends JpaRepository<erpConsignaci
     List<Object[]> sumMontoPagosByFacturas(@Param("idsFactura") List<Integer> idsFactura);
 
 
-// RepositoryConsignacionPagos.java - Método actualizado con facturaProcesada
-
-  @Query(value = "SELECT " +
-    "COALESCE(COUNT(*), 0) as totalConsignaciones, " +
-    "COALESCE(SUM(ef.totalBruto), 0) as montoTotalConsignaciones, " +
-    "COALESCE( " +
-    "    ( " +
-    "        SELECT SUM(cp.montoPago) " +
-    "        FROM erpConsignacionPagos cp " +
-    "        WHERE cp.idEncabezadoFactura IN ( " +
-    "            SELECT ef2.idEncabezadoFactura " +
-    "            FROM erpEncabezadoFacturas ef2 " +
-    "            INNER JOIN erpClientes c2 ON ef2.idCliente = c2.idCliente " +
-    "            WHERE ef2.estado = 1 " +
-    "              AND ef2.tipoDocumento = 4 " +
-    "              AND (:facturaProcesada IS NULL OR ef2.facturaProcesada = :facturaProcesada) " +
-    "              AND ef2.fechaFactura BETWEEN :fechaInicio AND :fechaFin " +
-    "              AND ( " +
-    "                  (:nombreCliente IS NULL OR LOWER(c2.nombreCliente) LIKE LOWER(CONCAT('%', :nombreCliente, '%'))) " +
-    "                  OR (:nombreCliente IS NULL OR LOWER(ef2.nombreFactura) LIKE LOWER(CONCAT('%', :nombreCliente, '%'))) " +
-    "              ) " +
-    "        ) " +
-    "        AND cp.estado = 1 " +
-    "    ), 0 " +
-    ") as totalPagado " +
-    "FROM erpEncabezadoFacturas ef " +
-    "INNER JOIN erpClientes c ON ef.idCliente = c.idCliente " +
-    "WHERE ef.estado = 1 " +
-    "  AND ef.tipoDocumento = 4 " +
-    "  AND (:facturaProcesada IS NULL OR ef.facturaProcesada = :facturaProcesada) " +
-    "  AND ef.fechaFactura BETWEEN :fechaInicio AND :fechaFin " +
-    "  AND ( " +
-    "      (:nombreCliente IS NULL OR LOWER(c.nombreCliente) LIKE LOWER(CONCAT('%', :nombreCliente, '%'))) " +
-    "      OR (:nombreCliente IS NULL OR LOWER(ef.nombreFactura) LIKE LOWER(CONCAT('%', :nombreCliente, '%'))) " +
-    "  )", nativeQuery = true)
-  Object[] getResumenConsignaciones(
-    @Param("fechaInicio") LocalDate fechaInicio,
-    @Param("fechaFin") LocalDate fechaFin,
-    @Param("nombreCliente") String nombreCliente,
-    @Param("facturaProcesada") String facturaProcesada
-  );
-
+    // RepositoryConsignacionPagos.java
+    @Query(value = "SELECT " +
+            "COUNT(*) as totalConsignaciones, " +
+            "SUM(ef.totalBruto) as montoTotalConsignaciones, " +
+            "COALESCE( " +
+            "    ( " +
+            "        SELECT SUM(montoPago) " +
+            "        FROM erpConsignacionPagos " +
+            "        WHERE IdEncabezadofactura IN ( " +
+            "            SELECT ef2.IdEncabezadofactura " +
+            "            FROM erpEncabezadoFacturas ef2 " +
+            "            INNER JOIN erpClientes c2 ON ef2.idCliente = c2.idCliente " +
+            "            WHERE ef2.tipoDocumento = 4 " +
+            "            AND ef2.FechaFactura BETWEEN :fechaInicio AND :fechaFin " +
+            "            AND ( " +
+            "                (:nombreCliente IS NULL OR :nombreCliente = '') OR " +
+            "                LOWER(c2.nombreCliente) LIKE LOWER(CONCAT('%', :nombreCliente, '%')) OR " +
+            "                LOWER(ef2.nombreFactura) LIKE LOWER(CONCAT('%', :nombreCliente, '%')) " +
+            "            ) " +
+            "            AND ( " +
+            "                (:facturaProcesada IS NULL OR :facturaProcesada = '') OR " +
+            "                (:facturaProcesada = 'S' AND ef2.facturaProcesada = 'S') OR " +
+            "                (:facturaProcesada != 'S' AND ef2.facturaProcesada != 'S') " +
+            "            ) " +
+            "        ) " +
+            "    ), 0 " +
+            ") as totalPagado " +
+            "FROM erpEncabezadoFacturas ef " +
+            "INNER JOIN erpClientes c ON ef.idCliente = c.idCliente " +
+            "WHERE ef.tipoDocumento = 4 " +
+            "AND ef.FechaFactura BETWEEN :fechaInicio AND :fechaFin " +
+            "AND ( " +
+            "    (:nombreCliente IS NULL OR :nombreCliente = '') OR " +
+            "    LOWER(c.nombreCliente) LIKE LOWER(CONCAT('%', :nombreCliente, '%')) OR " +
+            "    LOWER(ef.nombreFactura) LIKE LOWER(CONCAT('%', :nombreCliente, '%')) " +
+            ") " +
+            "AND ( " +
+            "    (:facturaProcesada IS NULL OR :facturaProcesada = '') OR " +
+            "    (:facturaProcesada = 'S' AND ef.facturaProcesada = 'S') OR " +
+            "    (:facturaProcesada != 'S' AND ef.facturaProcesada != 'S') " +
+            ")",
+            nativeQuery = true)
+    List<Object[]> getResumenConsignaciones(
+            @Param("fechaInicio") LocalDate fechaInicio,
+            @Param("fechaFin") LocalDate fechaFin,
+            @Param("nombreCliente") String nombreCliente,
+            @Param("facturaProcesada") String facturaProcesada
+    );
 }
