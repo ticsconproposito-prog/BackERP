@@ -32,28 +32,34 @@ public class InventarioBusquedaService {
     String codigoProducto,
     String codigoProductoProveedor,
     Integer idUbicacion,
-    Integer estadoExcluir,  // ← ESTADO A EXCLUIR
+    Integer estadoExcluir,
     Pageable pageable) {
 
     Specification<erpInventario> spec = (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
 
-      // 🔥 FILTRO DE ESTADO MODIFICADO
+      // 🔥 FILTRO DE ESTADO - Opción B
+      // Si viene estadoExcluir → excluir ese estado
+      // Si NO viene (null) → mostrar TODOS
       if (estadoExcluir != null) {
-        // Si viene estado, excluir ese estado (trae todos los diferentes)
-        predicates.add(cb.notEqual(root.get("estado"), estadoExcluir));
+        predicates.add(cb.notEqual(
+          root.get("estado").as(Integer.class),   // ← FORZAR TIPO
+          estadoExcluir
+        ));
       }
-      // Si NO viene estado, NO se agrega filtro de estado (trae todos)
 
-      // Filtro de ubicación (AND obligatorio si viene)
+      // Filtro de ubicación
       if (idUbicacion != null) {
-        predicates.add(cb.equal(root.get("idUbicacion"), idUbicacion));
+        predicates.add(cb.equal(
+          root.get("idUbicacion").as(Integer.class),
+          idUbicacion
+        ));
       }
 
       // Grupo de filtros OR - cada filtro es INDEPENDIENTE
       List<Predicate> orPredicates = new ArrayList<>();
 
-      // 🔥 1. Búsqueda por código de producto (texto completo)
+      // 1. Búsqueda por código de producto
       if (codigoProducto != null && !codigoProducto.trim().isEmpty()) {
         String pattern = "%" + escapeLike(codigoProducto.toLowerCase().trim()) + "%";
         orPredicates.add(cb.like(
@@ -62,7 +68,7 @@ public class InventarioBusquedaService {
         ));
       }
 
-      // 🔥 2. Búsqueda por código de proveedor (texto completo)
+      // 2. Búsqueda por código de proveedor
       if (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty()) {
         String pattern = "%" + escapeLike(codigoProductoProveedor.toLowerCase().trim()) + "%";
         orPredicates.add(cb.like(
@@ -71,11 +77,10 @@ public class InventarioBusquedaService {
         ));
       }
 
-      // 🔥 3. Búsqueda por descripción (TODAS las palabras en el MISMO campo)
+      // 3. Búsqueda por descripción (TODAS las palabras deben coincidir)
       if (descripcion != null && !descripcion.trim().isEmpty()) {
         String[] palabras = descripcion.toLowerCase().trim().split("\\s+");
 
-        // Construir condición: cada palabra debe estar en la descripción
         List<Predicate> descripcionPredicates = new ArrayList<>();
         for (String palabra : palabras) {
           if (!palabra.isEmpty()) {
@@ -88,23 +93,13 @@ public class InventarioBusquedaService {
         }
 
         if (!descripcionPredicates.isEmpty()) {
-          // AND entre todas las palabras en la descripción
           orPredicates.add(cb.and(descripcionPredicates.toArray(new Predicate[0])));
         }
       }
 
-      // Si hay filtros, aplicamos OR entre ellos
+      // Si hay filtros de texto, aplicar OR entre ellos
       if (!orPredicates.isEmpty()) {
         predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
-      } else {
-        // Sin filtros de texto
-        boolean hayFiltrosTexto = (descripcion != null && !descripcion.trim().isEmpty()) ||
-          (codigoProducto != null && !codigoProducto.trim().isEmpty()) ||
-          (codigoProductoProveedor != null && !codigoProductoProveedor.trim().isEmpty());
-
-        if (hayFiltrosTexto) {
-          predicates.add(cb.disjunction());
-        }
       }
 
       return cb.and(predicates.toArray(new Predicate[0]));
@@ -125,7 +120,7 @@ public class InventarioBusquedaService {
   public Page<erpInventario> buscarPorFraseExacta(
     String textoBusqueda,
     Integer idUbicacion,
-    Integer estadoExcluir,  // ← ESTADO A EXCLUIR
+    Integer estadoExcluir,
     Pageable pageable) {
 
     if (textoBusqueda == null || textoBusqueda.trim().isEmpty()) {
@@ -138,18 +133,21 @@ public class InventarioBusquedaService {
     Specification<erpInventario> spec = (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
 
-      // 🔥 FILTRO DE ESTADO MODIFICADO
+      // 🔥 FILTRO DE ESTADO - Opción B
       if (estadoExcluir != null) {
-        // Si viene estado, excluir ese estado (trae todos los diferentes)
-        predicates.add(cb.notEqual(root.get("estado"), estadoExcluir));
+        predicates.add(cb.notEqual(
+          root.get("estado").as(Integer.class),
+          estadoExcluir
+        ));
       }
-      // Si NO viene estado, NO se agrega filtro de estado (trae todos)
 
       if (idUbicacion != null) {
-        predicates.add(cb.equal(root.get("idUbicacion"), idUbicacion));
+        predicates.add(cb.equal(
+          root.get("idUbicacion").as(Integer.class),
+          idUbicacion
+        ));
       }
 
-      // Buscar la frase exacta en CUALQUIER campo
       predicates.add(cb.or(
         cb.like(cb.lower(root.get("idProducto").get("codigoProducto")), pattern, '\\'),
         cb.like(cb.lower(root.get("idProducto").get("codigoProductoProveedor")), pattern, '\\'),

@@ -1,7 +1,9 @@
 package BackERP.controller;
 
 import BackERP.helper.erpProductosSpecs;
+import BackERP.models.erpInventario;
 import BackERP.models.erpProductos;
+import BackERP.repository.RepositoryInventario;
 import BackERP.repository.RepositoryProductos;
 import org.springframework.beans.factory.annotation.Autowired;
 import BackERP.service.ProductoBusquedaService;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -21,8 +24,12 @@ import java.util.List;
 @RestController
 public class ProductoRestController {
 
-    @Autowired
-    private RepositoryProductos repro;
+  @Autowired
+  private RepositoryProductos repro;
+
+  @Autowired
+  private RepositoryInventario repinv;   // ← NUEVO
+
   @Autowired
   private ProductoBusquedaService busquedaService;
 
@@ -86,16 +93,30 @@ public class ProductoRestController {
     return "Editado";
 }
 
-@DeleteMapping("eliminarProducto/{idProducto}")
-    public String eliminarProducto(@PathVariable long idProducto, @RequestBody erpProductos producto){
+  @DeleteMapping("eliminarProducto/{idProducto}")
+  @Transactional   // ← IMPORTANTE: una sola transacción para ambas operaciones
+  public String eliminarProducto(@PathVariable long idProducto, @RequestBody erpProductos producto) {
 
+    // 1. Borrado lógico del producto
     erpProductos updateProducto = repro.findById(idProducto).get();
     updateProducto.setFechaModificacion(LocalDate.now());
     updateProducto.setHoraModificacion(LocalTime.now());
     updateProducto.setIdUsuarioModificacion(producto.getIdUsuarioModificacion());
     updateProducto.setEstado(0);
     repro.save(updateProducto);
-    return "Eliminado";
-}
+
+    // 2. Borrado lógico de TODOS los inventarios asociados
+    List<erpInventario> inventarios = repinv.findByIdProducto_IdProducto(idProducto);
+
+    for (erpInventario inv : inventarios) {
+      inv.setEstado(0);
+      inv.setFechaModificacion(LocalDate.now());
+      inv.setHoraModificacion(LocalTime.now());
+      inv.setIdUsuarioModificacion(producto.getIdUsuarioModificacion());
+      repinv.save(inv);
+    }
+
+    return "Producto eliminado y " + inventarios.size() + " registros de inventario desactivados";
+  }
 
 }

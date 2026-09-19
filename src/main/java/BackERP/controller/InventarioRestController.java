@@ -29,7 +29,7 @@ public class InventarioRestController {
     @RequestParam(required = false) String codigoProductoProveedor,
     @RequestParam(required = false) String codigoProducto,
     @RequestParam(required = false) Integer idUbicacion,
-    @RequestParam(defaultValue = "0") Integer estadoExcluido,  // ← NUEVO PARÁMETRO OPCIONAL
+    @RequestParam(required = false) Integer estadoExcluido,  // ← NUEVO PARÁMETRO OPCIONAL
     @RequestParam(defaultValue = "0") int page,
     @RequestParam(defaultValue = "20") int size,
     @RequestParam(defaultValue = "ordenInventario,asc") String sort
@@ -56,7 +56,7 @@ public class InventarioRestController {
     @RequestParam(required = false) String descripcion,
     @RequestParam(required = false) String codigoProducto,
     @RequestParam(required = false) String codigoProductoProveedor,
-    @RequestParam(defaultValue = "0") Integer estadoExcluido,
+    @RequestParam(required = false) Integer estadoExcluido,
     @RequestParam(defaultValue = "0") int page,
     @RequestParam(defaultValue = "20") int size,
     @RequestParam(defaultValue = "ordenInventario,asc") String sort
