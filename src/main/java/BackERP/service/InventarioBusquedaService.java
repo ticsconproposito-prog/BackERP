@@ -33,17 +33,16 @@ public class InventarioBusquedaService {
     String codigoProductoProveedor,
     Integer idUbicacion,
     Integer estadoExcluir,
+    Long idProducto,           // ← NUEVO PARÁMETRO
     Pageable pageable) {
 
     Specification<erpInventario> spec = (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
 
-      // 🔥 FILTRO DE ESTADO - Opción B
-      // Si viene estadoExcluir → excluir ese estado
-      // Si NO viene (null) → mostrar TODOS
+      // 🔥 FILTRO DE ESTADO
       if (estadoExcluir != null) {
         predicates.add(cb.notEqual(
-          root.get("estado").as(Integer.class),   // ← FORZAR TIPO
+          root.get("estado").as(Integer.class),
           estadoExcluir
         ));
       }
@@ -53,6 +52,14 @@ public class InventarioBusquedaService {
         predicates.add(cb.equal(
           root.get("idUbicacion").as(Integer.class),
           idUbicacion
+        ));
+      }
+
+      // 🔥 NUEVO: Filtro por ID de producto
+      if (idProducto != null) {
+        predicates.add(cb.equal(
+          root.get("idProducto").get("idProducto"),
+          idProducto
         ));
       }
 
@@ -97,7 +104,6 @@ public class InventarioBusquedaService {
         }
       }
 
-      // Si hay filtros de texto, aplicar OR entre ellos
       if (!orPredicates.isEmpty()) {
         predicates.add(cb.or(orPredicates.toArray(new Predicate[0])));
       }
@@ -107,7 +113,6 @@ public class InventarioBusquedaService {
 
     return repinv.findAll(spec, pageable);
   }
-
   /**
    * Búsqueda EXACTA por frase completa (sin dividir palabras)
    * Útil cuando quieres buscar la frase exacta en cualquier campo
@@ -121,10 +126,11 @@ public class InventarioBusquedaService {
     String textoBusqueda,
     Integer idUbicacion,
     Integer estadoExcluir,
+    Long idProducto,           // ← NUEVO
     Pageable pageable) {
 
     if (textoBusqueda == null || textoBusqueda.trim().isEmpty()) {
-      return buscarPorPalabrasEnDescripcion(null, null, null, idUbicacion, estadoExcluir, pageable);
+      return buscarPorPalabrasEnDescripcion(null, null, null, idUbicacion, estadoExcluir, idProducto, pageable);
     }
 
     String textoBusquedaLower = escapeLike(textoBusqueda.toLowerCase().trim());
@@ -133,7 +139,6 @@ public class InventarioBusquedaService {
     Specification<erpInventario> spec = (root, query, cb) -> {
       List<Predicate> predicates = new ArrayList<>();
 
-      // 🔥 FILTRO DE ESTADO - Opción B
       if (estadoExcluir != null) {
         predicates.add(cb.notEqual(
           root.get("estado").as(Integer.class),
@@ -145,6 +150,14 @@ public class InventarioBusquedaService {
         predicates.add(cb.equal(
           root.get("idUbicacion").as(Integer.class),
           idUbicacion
+        ));
+      }
+
+      // 🔥 NUEVO: Filtro por ID de producto
+      if (idProducto != null) {
+        predicates.add(cb.equal(
+          root.get("idProducto").get("idProducto"),
+          idProducto
         ));
       }
 

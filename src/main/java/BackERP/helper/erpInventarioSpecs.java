@@ -110,6 +110,15 @@ public class erpInventarioSpecs {
     };
   }
 
+  public static Specification<erpInventario> idProductoEquals(Long idProducto) {
+    return (root, query, cb) -> {
+      if (idProducto == null) {
+        return cb.conjunction();
+      }
+      return cb.equal(root.get("idProducto").get("idProducto"), idProducto);
+    };
+  }
+
   public static Specification<erpInventario> estadoEquals(int estado) {
     return (root, query, cb) -> cb.equal(root.get("estado").as(Integer.class), estado);
   }

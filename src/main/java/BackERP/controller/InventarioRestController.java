@@ -29,7 +29,8 @@ public class InventarioRestController {
     @RequestParam(required = false) String codigoProductoProveedor,
     @RequestParam(required = false) String codigoProducto,
     @RequestParam(required = false) Integer idUbicacion,
-    @RequestParam(required = false) Integer estadoExcluido,  // ← NUEVO PARÁMETRO OPCIONAL
+    @RequestParam(required = false) Integer estadoExcluido,
+    @RequestParam(required = false) Long idProducto,   // ← NUEVO PARÁMETRO
     @RequestParam(defaultValue = "0") int page,
     @RequestParam(defaultValue = "20") int size,
     @RequestParam(defaultValue = "ordenInventario,asc") String sort
@@ -40,13 +41,13 @@ public class InventarioRestController {
     Sort s = Sort.by(dir, sortParts[0]);
     Pageable pageable = PageRequest.of(page, size, s);
 
-    // 🔥 LLAMAR AL SERVICIO CON EL PARÁMETRO ESTADO
     return busquedaService.buscarPorPalabrasEnDescripcion(
       descripcion,
       codigoProducto,
       codigoProductoProveedor,
       idUbicacion,
-      estadoExcluido,  // ← AGREGAR ESTE PARÁMETRO
+      estadoExcluido,
+      idProducto,   // ← NUEVO PARÁMETRO
       pageable
     );
   }
@@ -67,13 +68,13 @@ public class InventarioRestController {
     Sort s = Sort.by(dir, sortParts[0]);
     Pageable pageable = PageRequest.of(page, size, s);
 
-    // Usar el mismo servicio para agrupado
     Page<erpInventario> inventariosPage = busquedaService.buscarPorPalabrasEnDescripcion(
       descripcion,
       codigoProducto,
       codigoProductoProveedor,
-      null,  // Sin filtro de ubicación para el agrupado
-      estadoExcluido,  // ← AGREGAR ESTE PARÁMETRO
+      null,
+      estadoExcluido,
+      null,   // ← Sin filtro de idProducto en agrupado
       pageable
     );
 
