@@ -4,8 +4,10 @@ import BackERP.helper.erpDetalleFacturaSpecs;
 import BackERP.models.felResumenDiarioDTO;
 import BackERP.models.erpDetalleFacturas;
 import BackERP.models.erpInventario;
+import BackERP.models.erpProductos;
 import BackERP.repository.RepositoryDetalleFacturas;
 import BackERP.repository.RepositoryInventario;
+import BackERP.repository.RepositoryProductos;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
@@ -25,6 +27,8 @@ public class DetalleFacturasRestController {
   private RepositoryDetalleFacturas repdetfac;
   @Autowired
   private RepositoryInventario repinv;
+  @Autowired
+  private RepositoryProductos repro;   // ← NUEVO
 
   @GetMapping("detalleFactura")
   public List<erpDetalleFacturas> getDetalleFacturas(
@@ -100,6 +104,18 @@ public class DetalleFacturasRestController {
 
     // Asegura que porcentaje de descuento sea válido
     detalleFacturas.setPorcentajeDeDescuento(safeDouble(detalleFacturas.getPorcentajeDeDescuento()));
+
+    // 🔥 NUEVO: Llenar precioCompra desde el producto
+    if (detalleFacturas.getIdProducto() != null) {
+      erpProductos producto = repro.findById(detalleFacturas.getIdProducto()).orElse(null);
+      if (producto != null) {
+        detalleFacturas.setPrecioCompra(producto.getPrecioCompra());
+      } else {
+        detalleFacturas.setPrecioCompra(0.0);
+      }
+    } else {
+      detalleFacturas.setPrecioCompra(0.0);
+    }
 
     detalleFacturas.setFechaModificacion(LocalDate.now());
     detalleFacturas.setHoraModificacion(LocalTime.now());

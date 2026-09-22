@@ -73,6 +73,9 @@ public class erpDetalleFacturas {
     @Column(name = "idUsuarioModificacion")
     private int idUsuarioModificacion;
 
+    @Column(name = "precioCompra")
+    private double precioCompra;
+
     public erpDetalleFacturas() {}
     // getters y setters...
 
@@ -244,5 +247,13 @@ public class erpDetalleFacturas {
 
     public void setIdUsuarioModificacion(int idUsuarioModificacion) {
         this.idUsuarioModificacion = idUsuarioModificacion;
+    }
+
+    public double getPrecioCompra() {
+      return precioCompra;
+    }
+
+    public void setPrecioCompra(double precioCompra) {
+      this.precioCompra = precioCompra;
     }
 }
