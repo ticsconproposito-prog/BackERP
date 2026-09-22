@@ -99,7 +99,7 @@ public interface RepositoryDetalleFacturas extends JpaRepository<erpDetalleFactu
                                      @Param("fechaFin") LocalDate fechaFin);
 
   // Reporte de ganancias por PRODUCTO
-  @Query(value = "SELECT d.idProducto, p.nombreProducto, " +
+  @Query(value = "SELECT d.idProducto, p.descripcionProducto AS nombreProducto, " +
     "SUM(d.cantidad) AS totalProductos, " +
     "SUM(d.ImpTotal) AS totalVenta, " +
     "SUM(d.precioCompra * d.cantidad) AS totalCompra, " +
@@ -107,7 +107,7 @@ public interface RepositoryDetalleFacturas extends JpaRepository<erpDetalleFactu
     "FROM erpDetalleFacturas d " +
     "LEFT JOIN erpProductos p ON d.idProducto = p.idProducto " +
     "WHERE d.estado = 1 AND d.fechaModificacion BETWEEN :fechaInicio AND :fechaFin " +
-    "GROUP BY d.idProducto, p.nombreProducto " +
+    "GROUP BY d.idProducto, p.descripcionProducto " +
     "ORDER BY totalGanancia DESC", nativeQuery = true)
   List<Object[]> getGananciasPorProducto(@Param("fechaInicio") LocalDate fechaInicio,
                                          @Param("fechaFin") LocalDate fechaFin);
